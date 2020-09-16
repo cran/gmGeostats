@@ -1,0 +1,103 @@
+---
+title: "Multivariate geostatistics with gmGeostats"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Multivariate geostatistics with gmGeostats}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+## The basics
+
+"gmGeostats" is a package for multivariate geostatistics, focusing in the usage of data from restricted sampling spaces. Such data include positive data, compositional data, distributional data and the like. Most of the times, the geostatistical analysis of such data includes three steps:
+
+1. express your data as some vectors of real values, through a mapping. Such mappings can be isomorphisms (for Euclidean spaces) or embeddings (for regular manifolds)
+2. analyse the resulting multivariate data with vectorial methods (i.e. using cross-variograms, cokriging, cosimulation or distance based methods modified in such a way that they are rotation-invariant resp. affine equivariant)
+3. back-transform the interpolations/simulations to the original units
+
+The package is loaded, as usual with
+```{r setup}
+library(gmGeostats)
+```
+and it fundamentally depends on packages "compositions", "gstat" and "sp". Other dependencies are more instrumental and less fundamental.
+
+This vignette very briefly presents the steps to follow in several analysis and modelling routes, illustrated with the case of compositional data. No explanations, theory or discussion is included.
+
+
+## Exploratory analysis
+
+### Descriptive analysis
+
+The data can be visually inspected with scatterplots, in raw representation (`plot()`, `pairs()`), in ternary diagrams (`compositions::plot.acomp()`), and in scatterplots of logratio transformed data (use the transformations `pwlr()`, `alr()`, `clr()` or `ilr()` from package "compositions", then `pairs()`). Function `pairs()` can be given panel functions such as e.g. `vp.lrdensityplot()`,  `vp.kde2dplot()` or `vp.lrboxplot()` resp. for creating histograms of pairwise logratios, 2D kernel density maps on the scatterplots or boxplots of the pairwise logratios. Package "compositions" provides the class "acomp" to directly deal with the right representation in the several methods. 
+
+Principal component analysis is also a strong help. For this, you need an isometry (not just an isomorphism). Transformation `clr()` is the best for this, and is actually automatically used when you do `princomp(acomp(YOURDATA))`. "gmGeostats" provides generalised diagonalisation methods, see `?genDiag` for details.
+
+### Spatial analysis
+
+Create your spatial objects by connecting the spatial coordinates to the multivariate observations via the functions `sp:SpatialPointsDataFrame()` or better the "gmGeostats" functions `make.gmMultivariateGaussianSpatialModel()` for multivariate data and `make.gmCompositionalGaussianSpatialModel()` for compositional data. This produces objects of spatial data container class "gmSpatialModel", that are necessary for the rest of the analysis and modelling.
+
+Swath plots are available with command `swath()`. If you give it an "acomp" object you will obtain a matrix of logratio swath plots. Otherwise you will get an set of swath plots, one for each variable. Function `pairsmap()` works similarly, but produces bubble maps (you can control size and color of the symbols).
+
+Empirical variograms can be obtained with function `variogram()` out of the spatial data container. You can also use the function `logratioVariogram()` for compositional data. Both accept anisotropy. Their output can be plotted with `plot()`, which has specific methods for compositional and non-compositional data. In the case of anisotropic data, you can also use `image()` to visualise the variogram maps.
+
+Finally you can also check for the strength of the spatial dependence with the test `noSpatCorr.test()`. This is a permutations test, which null hypothesis is that the data do not exhibit spatial autocorrelation.
+
+## Interpolation
+
+### Linear model of coregionalisation (LMC)
+
+Modelling the empirical variograms obtained in the last step can be done with the function `fit_lmc()`. This requires specifying a variogram model, which parameters will be fitted by that function. Variogram specifications are available with any of the following functions: `gstat::vgm()` and `gmGeostats::gmCgram()` for multivariate data, `compositions::CompLinModCoReg()` and `gmGeostats::LMCAnisCompo()` for compositional data. `CompLinModCoReg()` is the only one not accepting anisotropy. You can mix and merge empirical and theoretical models from different packages, as `fit_lmc()` will take care to convert between them for appropriate consistency.
+
+Plotting of LMCs against their empirical variograms can be done with function `variogramModelPlot()`.
+
+### Variogram and neighbourhood validation
+
+Neighbourhood descriptions are created with function `KrigingNeighbourhood()`. Kriging neighbourhoods and LMC variogram models and can be attached to the "gmSpatialModel" objects at the moment of creation via `make.*()` functions, using arguments `ng` and `model`. 
+
+Validation of the model or of the neighbourhood can then be obtained with the function `validate()`. This requires an `object` (the complete "gmSpatialModel") and a `strategy`. Validation strategies are small S3-objects describing what will exactly be done in the validation. They can be quickly defined by means of configuration functions as `LeaveOneOut()` or `NfoldCrossValidation()`. The call to `validate()` will provide some output that can be evaluated with functions such as `xvErrorMeasures()`
+
+
+
+### Cokriging and mapping
+
+This way of working is common to the package. You always build a model (with a `make.*()` function), define a method parameter object (created with a specific, verbose, helper function), and feed both to a common umbrella function describing what do you want to do: `validate()` or `predict()`, which also requires an argument `newdata` as is standard in R. The output can then be postprocessed by specific functions. 
+
+The method parameter for cokriging is actually the neighbourhood. So, you can give `predict()` an object resulting from  `KrigingNeighbourhood()`, otherwise it will take the standard one stored in the "gmSpatialModel", or produce a global neighbourhood cokriging if no neighbourhood description is found.
+
+Output of `predict` for "gstat" objects (the current default) can be re-formed to compositional shape by means of the function `gsi.gstatCokriging2compo()`; there is an `gsi.gstatCokriging2rmult()` as well for multivariate data. Maps can be obtained with function `image_cokriged()`, that produces a choropleth map with legend, and returns the color scale (i.e. some breaks and a palette of colors) to be used, e.g. for plotting the initial data on top of the maps using the same color scale. NOTE: this funtion does NOT freeze the plot! Most probably you will need to call `par(mfrow=c(1,1))` to create a clean slate device for the next plot.
+
+
+## Gaussian cosimulation
+
+### Transformation to Gaussianity
+
+Gaussian cosimulation requires joint multivariate normality. The package provides the flow anamorphosis algorithm for this goal. This is obtained in two steps. First, you create the transformation by calling function `ana()` with your data and storing it. 
+Then, you apply the stored transformation to the data, and obtain the normalised scores. These scores can then be treated with all methods and techniques of the preceding sections "Exploratory analysis" and "Linear model of coregionalisation (LMC)", in particular a call to `make.gmMultivariateGaussianSpatialModel()` will create the passing "gmSpatialModel".
+
+
+### Cosimulation
+
+Cosimulation method parameters are created by calls to one of the functions `SequentialSimulation()`, `TurningBands()` or  `CholeskyDecomposition()`. All these functions include an argument `nsim` controlling the number of realisations desired. These are then obtained by a call to `predict()`, giving it the "gmSpatialModel", the `newdata` and the method parameters, in this order.
+
+### Postprocessing
+
+Multivariate cosimulation output can be seen analogue to a 3-dimensional array, with one dimension running along the simulated locations, one dimension along the realisations and one dimension along the variables. This structure is captured in "gmGeostats" with an object of class "DataFrameStack" (extending "data.frame" and mimicking arrays). Point-wise, simulation-wise and variable-wise ransformations on this array can be computed with function `gmApply()`, a wrapper on `base::apply()` allowing for an easier management of the dimensions of the simulation stack. Maps can also be produced by function `image_cokriged()`.
+
+
+
+## Multipoint simulation
+
+Multipoint cosimulation is available with the same strategy than Gaussian based simulation. One needs first to define a "gmSpatialModel" containing the conditioning data (the original data) and the stochastic model (the training image). Second, a simulation grid must be created, and provided to `predict()` as the `newdata` argument. And third, we must provide some method parameters defining the simulation algorithm to use: currently, only direct sampling is available, and its parameters can be obtained calling `DSpars()`.
+
+Training images are currently objects of class "SpatialPixelsDataFrame" or "SpatialGridDataFrame", from package "sp". The conditioning data will be migrated to the simulation grid internally; the grid topologies for simulation and training image will be checked for consistency.
+
+
+

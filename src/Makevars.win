@@ -1,0 +1,14 @@
+#PKG_CFLAGS = $(SHLIB_OPENMP_CFLAGS)
+PKG_LIBS =  $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) -lstdc++  # $(SHLIB_OPENMP_CFLAGS)
+
+C_OBJS = gmGeostats.o
+
+OBJECTS = $(C_OBJS)
+
+all: $(SHLIB)
+$(SHLIB): $(OBJECTS)
+
+
+clean:
+	@rm -rf *.mod *.d *.rc *.dylib *.a *.lib $(SHLIB) $(OBJECTS)
+
