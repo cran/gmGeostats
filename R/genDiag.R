@@ -20,6 +20,7 @@ gsi.computeExplainedVariance <- function(X, Winv){
 #' @describeIn Maf.data.frame  Generalised diagonalisations
 #' @param ... generic functionality arguments
 #' @export
+#' @importFrom stats loadings princomp
 Maf = function(x,...) UseMethod("Maf",x)
 
 #' Generalised diagonalisations
@@ -36,7 +37,7 @@ Maf = function(x,...) UseMethod("Maf",x)
 #' 
 #' Function \code{Maf} results carry the extra class "\code{maf}", and they correspond
 #' to minimum/maximum autocorrelation factors (MAF) as proposed by Switzer and Green 
-#' (XXXX) or XXXXX (XXXX). In this case, the
+#' (1984). In this case, the
 #' slicer is typically just the index of one lag distance (defaults to i=2). MAF 
 #' provides the analytical solution to the joint diagonalisation of two matrices,
 #' the covariance of increments provided by the slicing and the conventional covariance
@@ -45,8 +46,10 @@ Maf = function(x,...) UseMethod("Maf",x)
 #' scree-plots for those who are used to see a screeplot of a principal component analysis.
 #' 
 #' Function \code{UWEDGE} (Uniformly Weighted Exhaustive Diagonalization with Gauss 
-#' iterations) results carry the extra class "\code{uwedge}". The function 
-#' is a wrapper on \code{jointDiag::uwedge} from package \code{jointDiag}. In this case the 
+#' iterations; Tichavsky and Yeredor, 2009) results carry the extra class "\code{uwedge}". 
+#' The function 
+#' is a wrapper on \code{jointDiag::uwedge} from package \code{jointDiag} (Gouy-Pailler, 2017). 
+#' In this case the 
 #' slicer is typically just a subset of indices of lag distances to consider 
 #' (defaults to the nearest indexes to mininum, maximum and mean lag distances of the 
 #' variogram). UWEDGE iteratively seeks for a pair of matrices (a mixing and a
@@ -60,7 +63,9 @@ Maf = function(x,...) UseMethod("Maf",x)
 #' scree-plots for those who are used to see a screeplot of a principal component analysis.
 #' 
 #' Function \code{RJD} results carry the extra class "\code{rjd}". The function 
-#' is a wrapper on \code{JADE::rjd}, implementing the Rotational joint diagonalisation method . In this case the 
+#' is a wrapper on \code{JADE::rjd} (Miettinen, Nordhausen and Taskinen, 2017), 
+#' implementing the Rotational joint diagonalisation method (Cardoso and Souloumiac, 1996). 
+#' In this case the 
 #' slicer is typically just a subset of indices of lag distances to consider 
 #' (defaults to the nearest indexes to mininum, maximum and mean lag distances).
 #' This algorithm also served for quasi-diagonalising a set of matrices as in UWEDGE,
@@ -112,6 +117,21 @@ Maf = function(x,...) UseMethod("Maf",x)
 #' @export
 #' @method Maf data.frame
 #' @aliases genDiag
+#' @references Cardoso, J. K. and Souloumiac A. 1996. Jacobi angles for simultaneous
+#' diagonalization. SIAM Journal of Matrix Analysis and Applications 17(1), 161-164.
+#' 
+#' Gouy-Pailler C., 2017. jointDiag: Joint approximate diagonalization of a set of 
+#' square matrices. R package version 0.3. https://CRAN.R-project.org/package=jointDiag
+#' 
+#' Miettinen J., Nordhausen K., and Taskinen, S., 2017. Blind source separation based 
+#' on Joint diagonalization in R: The packages JADE and BSSasymp. Journal of Statistical 
+#' Software 76(2), 1-31.
+#' 
+#' Switzer P. and Green A.A., 1984. Min/Max autocorrelation factors for multivariate 
+#' spatial imaging, Stanford University, Palo Alto, USA, 14pp.
+#' 
+#' Tichavsky, P. and Yeredor, A., 2009. Fast approximate joint diagonalization 
+#' incorporating weight matrices. IEEE Transactions on Signal Processing 57, 878 – 891.
 #' 
 #' @family generalised Diagonalisations
 #'
@@ -273,13 +293,14 @@ UWEDGE.default <- function(x, ...) jointDiag::uwedge(M=x, ...)
 UWEDGE.acomp <-  function(x, vg, i=NULL, ...){
   requireNamespace("compositions", quietly=TRUE)
   cl <- match.call()
-  vg = as.logratioVariogram(vg)
+  vg = as.logratioVariogram(vg) 
   if(is.null(i)){
     i = c(1, floor(c(0.5,1)*dim(vg$vg)[1]))
   }
-  C1 = -clrvar2ilr(cov(x))
+  V = loadings(princomp(x))
+  C1 = clrvar2ilr(cov(x), V = V)
   d = ncol(x)-1
-  M = -0.5*apply(vg$vg[c(1,i),,], 1, clrvar2ilr )
+  M = -0.5*apply(vg$vg[c(1,i),,], 1, clrvar2ilr, V=V )
   dim(M)=c(d,d,length(i)+1)
   M[,,1]=C1
   res = jointDiag::uwedge(M)
@@ -290,11 +311,11 @@ UWEDGE.acomp <-  function(x, vg, i=NULL, ...){
   # do not normalize
   # W = unclass(t(normalize(rmult(t(W))))) 
   W = unclass(W)
-  ilrx = ilr(x)
+  ilrx = ilr(x, V=V)
   mns = mean(ilrx)
   ilrxc = ilrx-mns
   facscores = unclass(ilrxc) %*% W
-  Wclr = ilrBase(D=d+1) %*% W
+  Wclr = V %*% W
   rownames(Wclr) = colnames(x)
   colnames(Wclr) <- paste("uwedge", 1:d, sep="")
   Wclr.inv = gsiInv(Wclr)
@@ -350,7 +371,8 @@ RJD.acomp <- function(x, vg, i=NULL,  ...){
     i = c(1, floor(c(0.5,1)*dim(vg$vg)[1]))
   d = ncol(x)-1
   i = sort(i,decreasing=TRUE)
-  M = -0.5*apply(vg$vg[i ,,], 1, clrvar2ilr )
+  V = loadings(princomp(x))
+  M = -0.5*apply(vg$vg[i ,,], 1, clrvar2ilr, V=V )
   dim(M)=c(d,d,length(i))
   res = JADE::rjd(M)
   res$B = t(res$V) 
@@ -361,11 +383,11 @@ RJD.acomp <- function(x, vg, i=NULL,  ...){
   # do not normalize
   # W = unclass(t(normalize(rmult(t(W))))) 
   W = unclass(W)
-  ilrx = ilr(x)
+  ilrx = ilr(x, V=V)
   mns = mean(ilrx)
   ilrxc = ilrx-mns
   facscores = unclass(ilrxc) %*% W
-  Wclr = ilrBase(D=d+1) %*% W
+  Wclr = V %*% W
   rownames(Wclr) = colnames(x)
   Wclr.inv = t(Wclr)
   colnames(Wclr.inv) = colnames(x)
@@ -454,6 +476,10 @@ predict.genDiag = function (object, newdata=NULL, ...) {
 #' @family generalised Diagonalisations
 #' @importFrom compositions coloredBiplot
 #' @method coloredBiplot genDiag
+#' 
+#' @references Mueller, Tolosana-Delgado, Grunsky and McKinley (2021) Biplots for 
+#' Compositional Data Derived from Generalised Joint Diagonalization Methods. 
+#' Applied Computational Geosciences (under review)
 #'
 #' @examples
 #' data("jura", package="gstat")

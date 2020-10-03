@@ -11,7 +11,7 @@
 
 \item{newdata}{a collection of locations where a prediction/simulation is desired; this is typically
 a \code{\link[sp:SpatialPoints]{sp::SpatialPoints()}}, a data.frame or similar of X-Y(-Z) coordinates; or perhaps for gridded data
-an object of class  \code{\link[sp:GridTopology]{sp::GridTopology()}}, \code{\link[sp:SpatialGrid]{sp::SpatialGrid()}} or \code{\link[sp:SpatialPixels]{sp::SpatialPixels()}}}
+an object of class  \code{\link[sp:SpatialGrid]{sp::GridTopology()}}, \code{\link[sp:SpatialGrid]{sp::SpatialGrid()}} or \code{\link[sp:SpatialGrid]{sp::SpatialPixels()}}}
 
 \item{pars}{parameters describing the method to use, \emph{encloded in an object of appropriate class} (see below)}
 
@@ -20,10 +20,10 @@ an object of class  \code{\link[sp:GridTopology]{sp::GridTopology()}}, \code{\li
 \value{
 Depending on the nature of \code{newdata}, the result will be a data container of the same kind,
 extended with the predictions or simulations. For instance, if we want to obtain predictions on the
-locations of a "SpatialPoints", the result will be a \code{\link[sp:SpatialPointsDataFrame]{sp::SpatialPointsDataFrame()}}; if we want to obtain
+locations of a "SpatialPoints", the result will be a \code{\link[sp:SpatialPoints]{sp::SpatialPointsDataFrame()}}; if we want to obtain
 simulations on the coordinates provided by a "data.frame", the result will be a \code{\link[=DataFrameStack]{DataFrameStack()}} with
 the spatial coordinates stored as an extra attribute; or if the input for a simulation is a masked grid of class
-\code{\link[sp:SpatialPixels]{sp::SpatialPixels()}}, the result will be of class \code{\link[sp:SpatialPixelsDataFrame]{sp::SpatialPixelsDataFrame()}} which \code{data} slot will be
+\code{\link[sp:SpatialGrid]{sp::SpatialPixels()}}, the result will be of class \code{\link[sp:SpatialGridDataFrame]{sp::SpatialPixelsDataFrame()}} which \code{data} slot will be
 a \link{DataFrameStack}.
 }
 \description{

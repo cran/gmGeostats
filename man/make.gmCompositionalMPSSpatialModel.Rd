@@ -13,7 +13,7 @@ make.gmCompositionalMPSSpatialModel(
 )
 }
 \arguments{
-\item{data}{either a \code{\link[compositions:acomp]{compositions::acomp()}} compositional data set, or else a \code{\link[sp:SpatialPointsDataFrame]{sp::SpatialPointsDataFrame()}} containing it}
+\item{data}{either a \code{\link[compositions:acomp]{compositions::acomp()}} compositional data set, or else a \code{\link[sp:SpatialPoints]{sp::SpatialPointsDataFrame()}} containing it}
 
 \item{coords}{the coordinates of the sampling locations, if no SpatialPointsDataFrame was provided}
 
@@ -22,7 +22,7 @@ to produce a plot of the empirical variogram in the corresponding representation
 
 \item{prefix}{the desired prefix name for the logratio variables, if this is wished to be forced; otherwise derived from \code{V}}
 
-\item{model}{a training image, of any appropriate class (typically a \code{\link[sp:SpatialGridDataFrame]{sp::SpatialGridDataFrame()}} or \code{\link[sp:SpatialPixelsDataFrame]{sp::SpatialPixelsDataFrame()}})}
+\item{model}{a training image, of any appropriate class (typically a \code{\link[sp:SpatialGridDataFrame]{sp::SpatialGridDataFrame()}} or \code{\link[sp:SpatialGridDataFrame]{sp::SpatialPixelsDataFrame()}})}
 }
 \value{
 A "gmSpatialModel" object with all information provided appropriately structured. See \linkS4class{gmSpatialModel}.

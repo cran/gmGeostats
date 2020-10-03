@@ -71,7 +71,7 @@ diagonalisation method chosen.
 
 Function \code{Maf} results carry the extra class "\code{maf}", and they correspond
 to minimum/maximum autocorrelation factors (MAF) as proposed by Switzer and Green
-(XXXX) or XXXXX (XXXX). In this case, the
+(1984). In this case, the
 slicer is typically just the index of one lag distance (defaults to i=2). MAF
 provides the analytical solution to the joint diagonalisation of two matrices,
 the covariance of increments provided by the slicing and the conventional covariance
@@ -80,8 +80,10 @@ in decreasing order of spatial continuity, which might produce surprising
 scree-plots for those who are used to see a screeplot of a principal component analysis.
 
 Function \code{UWEDGE} (Uniformly Weighted Exhaustive Diagonalization with Gauss
-iterations) results carry the extra class "\code{uwedge}". The function
-is a wrapper on \code{jointDiag::uwedge} from package \code{jointDiag}. In this case the
+iterations; Tichavsky and Yeredor, 2009) results carry the extra class "\code{uwedge}".
+The function
+is a wrapper on \code{jointDiag::uwedge} from package \code{jointDiag} (Gouy-Pailler, 2017).
+In this case the
 slicer is typically just a subset of indices of lag distances to consider
 (defaults to the nearest indexes to mininum, maximum and mean lag distances of the
 variogram). UWEDGE iteratively seeks for a pair of matrices (a mixing and a
@@ -95,7 +97,9 @@ in decreasing order of spatial continuity, which might produce surprising
 scree-plots for those who are used to see a screeplot of a principal component analysis.
 
 Function \code{RJD} results carry the extra class "\code{rjd}". The function
-is a wrapper on \code{JADE::rjd}, implementing the Rotational joint diagonalisation method . In this case the
+is a wrapper on \code{JADE::rjd} (Miettinen, Nordhausen and Taskinen, 2017),
+implementing the Rotational joint diagonalisation method (Cardoso and Souloumiac, 1996).
+In this case the
 slicer is typically just a subset of indices of lag distances to consider
 (defaults to the nearest indexes to mininum, maximum and mean lag distances).
 This algorithm also served for quasi-diagonalising a set of matrices as in UWEDGE,
@@ -197,6 +201,23 @@ mf = Maf(aplus(jura.pred[, -(1:6)]), vg=vg)
 mf
 mf$loadings
 biplot(mf)
+}
+\references{
+Cardoso, J. K. and Souloumiac A. 1996. Jacobi angles for simultaneous
+diagonalization. SIAM Journal of Matrix Analysis and Applications 17(1), 161-164.
+
+Gouy-Pailler C., 2017. jointDiag: Joint approximate diagonalization of a set of
+square matrices. R package version 0.3. https://CRAN.R-project.org/package=jointDiag
+
+Miettinen J., Nordhausen K., and Taskinen, S., 2017. Blind source separation based
+on Joint diagonalization in R: The packages JADE and BSSasymp. Journal of Statistical
+Software 76(2), 1-31.
+
+Switzer P. and Green A.A., 1984. Min/Max autocorrelation factors for multivariate
+spatial imaging, Stanford University, Palo Alto, USA, 14pp.
+
+Tichavsky, P. and Yeredor, A., 2009. Fast approximate joint diagonalization
+incorporating weight matrices. IEEE Transactions on Signal Processing 57, 878 – 891.
 }
 \seealso{
 Other generalised Diagonalisations: 

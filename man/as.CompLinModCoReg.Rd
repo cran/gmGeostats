@@ -18,5 +18,5 @@ The variogram model recast to "CompLinModCoReg"
 }
 \description{
 Recast a variogram model specified in any of the models of "gstat" or "gmGeostats" in
-the format of \code{\link[compositions:CompLinModCoReg]{compositions::CompLinModCoReg()}}
+the format of \code{\link[compositions:CompLinModCo]{compositions::CompLinModCoReg()}}
 }

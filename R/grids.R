@@ -152,6 +152,7 @@ gsi.gstatCokriging2compo.default <- function(COKresult, ...){
 #' @param tol for generalized inversion of the matrix (**rarely touched!**)
 #' @param nscore boolean, were the data normal score-transformed? (**deprecated**)
 #' @param gg in the case that normal score transformation was applied, provide the gstat object! (**deprecated**)
+#' @export
 gsi.gstatCokriging2compo.data.frame = function(COKresult, # output of predict.gstat
                                                V=NULL,    # string or matrix describing which logratio was applied
                                                orignames=NULL, # names of the original components (OPTIONAL)
@@ -171,7 +172,7 @@ gsi.gstatCokriging2compo.data.frame = function(COKresult, # output of predict.gs
   if(is.null(orignames)) orignames = paste("v", 1:D, sep="")
   if(length(orignames)!=D) stop("names provided not consistent with number of logratio variables. Did you forget the rest?")
   prefix = "ilr"
-  prediccions = COKresult[,prednames]
+  prediccions = COKresult[,prednames, drop=FALSE]
   if(is.character(V)){
     if(V=="ilr"){
       V = ilrBase(prediccions)
@@ -205,12 +206,12 @@ gsi.gstatCokriging2compo.data.frame = function(COKresult, # output of predict.gs
     # add cokriging variance matrices as an attribute as well
     noms = sub(".pred", "", prednames)
     cvmat = array(0, dim=c(nrow(rg), D-1, D-1), dimnames=list(NULL, noms, noms))
-    vrs = COKresult[,varnames]
+    vrs = COKresult[,varnames, drop=FALSE]
     colnames(vrs) = sub(".var", "", varnames)
     for(ivr in noms){
       cvmat[ ,ivr, ivr] = vrs[,ivr]
     }
-    cvs = COKresult[,covnames]
+    cvs = COKresult[,covnames, drop=FALSE]
     colnames(cvs) = sub("cov.", "", covnames)
     for(ivr in noms){
       for(jvr in noms){
@@ -234,6 +235,7 @@ gsi.gstatCokriging2rmult <- function(COKresult, ...) UseMethod("gsi.gstatCokrigi
 
 #' @describeIn gsi.gstatCokriging2compo Reorganisation of cokriged multivariate data
 #' @method gsi.gstatCokriging2rmult default
+#' @export
 gsi.gstatCokriging2rmult.default <- function(COKresult, ...){
   stopifnot(is(COKresult, "Spatial"), "data" %in% slotNames(COKresult))
   coord = sp::coordinates(COKresult)
@@ -251,6 +253,7 @@ gsi.gstatCokriging2rmult.default <- function(COKresult, ...){
 
 #' @describeIn gsi.gstatCokriging2compo Reorganisation of cokriged multivariate data
 #' @method gsi.gstatCokriging2rmult data.frame
+#' @export
 gsi.gstatCokriging2rmult.data.frame = function(COKresult, # output of predict.gstat
                                     nscore=FALSE, # were the data NS-transformed?
                                     gg=NULL, # in the case that NS was applied, provide the gstat object!
@@ -264,7 +267,7 @@ gsi.gstatCokriging2rmult.data.frame = function(COKresult, # output of predict.gs
   D = length(prednames)
   noms = sub(".pred", "", prednames)
   
-  prediccions = COKresult[,prednames]
+  prediccions = COKresult[,prednames, drop=FALSE]
   if(nscore){
     ## space to back-transform the predictions
     #if(is.null(gg))stop("To apply a nscore backtransformation, the gstat object must be provided!")
@@ -283,12 +286,12 @@ gsi.gstatCokriging2rmult.data.frame = function(COKresult, # output of predict.gs
   if(!nscore){
     # add cokriging variance matrices as an attribute as well
     cvmat = array(0, dim=c(nrow(rg), D, D), dimnames=list(NULL, noms, noms))
-    vrs = COKresult[,varnames]
+    vrs = COKresult[,varnames, drop=FALSE]
     colnames(vrs) = sub(".var", "", varnames)
     for(ivr in noms){
       cvmat[ ,ivr, ivr] = vrs[,ivr]
     }
-    cvs = COKresult[,covnames]
+    cvs = COKresult[,covnames, drop=FALSE]
     colnames(cvs) = sub("cov.", "", covnames)
     for(ivr in noms){
       for(jvr in noms){

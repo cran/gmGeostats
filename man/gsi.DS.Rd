@@ -47,7 +47,7 @@ giving a logical column}
 \item{invertMask}{logical, does \code{SimGrid_mask} identify with TRUE the data OUTSIDE the simulation area?}
 }
 \value{
-A \code{\link[sp:SpatialPixelsDataFrame]{sp::SpatialPixelsDataFrame()}} or  \code{\link[sp:SpatialGridDataFrame]{sp::SpatialGridDataFrame()}}, depending on whether the whole
+A \code{\link[sp:SpatialGridDataFrame]{sp::SpatialPixelsDataFrame()}} or  \code{\link[sp:SpatialGridDataFrame]{sp::SpatialGridDataFrame()}}, depending on whether the whole
 grid is simulated. The '@data' slot of these objects contains a \code{\link[=DataFrameStack]{DataFrameStack()}} with the stacking dimension
 running through the realisations. It is safer to use this functionality through the interface
 \code{\link[=make.gmCompositionalMPSSpatialModel]{make.gmCompositionalMPSSpatialModel()}}, then request a direct simulation with \code{\link[=DSpars]{DSpars()}} and

@@ -89,6 +89,7 @@ gsi.calcCgram <- function(X,Y,vgram,ijEqual=FALSE) {
 #' and nvar = nr of variables in vgram
 #' @useDynLib gmGeostats CMVTurningBands
 gsi.TurningBands <- function(X,vgram,nBands,nsim=NULL) {
+  # checks and preps
   stopifnot(length(as.integer(nBands))==1)
   d <- dim(vgram$nugget)[1]
   m <- ncol(X)
@@ -96,6 +97,23 @@ gsi.TurningBands <- function(X,vgram,nBands,nsim=NULL) {
   stopifnot( all(dim(vgram$nugget)==c(d,d)))
   stopifnot( all(dim(vgram$sill)==c(k,d,d)))
   stopifnot( all(dim(vgram$M)==c(k,m,m)))
+  # extend to 3D if 2D
+  m0 = 3
+  if(m<3){
+    m0 = m
+    X = cbind(X, 0, 0)
+    paveId = function(i){
+      M = diag(3)
+      M[1:m, 1:m] = vgram$M[i,,]
+      return(M)
+    }
+    M = sapply(1:k, paveId)
+    dim(M) = c(3,3,k)
+    M = aperm(M, c(1,2,3))
+    vgram$M = M
+    m = 3
+  }
+  # run!
   if( is.null(nsim) ) {
     erg<-.C("CMVTurningBands",
             dimX=checkInt(dim(X),2),
@@ -111,7 +129,8 @@ gsi.TurningBands <- function(X,vgram,nBands,nsim=NULL) {
             moreCgramData=checkDouble(vgram$data,k),
             PACKAGE = "gmGeostats"
     )
-    cbind(X,Z=t(structure(erg$Z,dim=c(d,nrow(X)))))
+      erg = cbind(X[, 1:m0],Z=t(structure(erg$Z,dim=c(d,nrow(X)))))
+      return(erg) 
   } else {
     nsim <- checkInt(nsim,1)
     stopifnot(nsim>0)
@@ -129,7 +148,8 @@ gsi.TurningBands <- function(X,vgram,nBands,nsim=NULL) {
             moreCgramData=checkDouble(vgram$data,k),
             PACKAGE = "gmGeostats"
     )
-    aperm(structure(erg$Z,dim=c(d,nrow(X),nsim)),c(2,1,3))
+    erg = aperm(structure(erg$Z,dim=c(d,nrow(X),nsim)),c(2,1,3))
+    return(erg) 
   }
 }
 
@@ -171,6 +191,22 @@ gsi.CondTurningBands <- function(Xout, Xin, Zin, vgram,
     normal<-FALSE
   }
   nsim <- checkInt(nsim,1)
+  # extend to 3D if 2D
+  m0 = 3
+  if(m<3){
+    m0 = m
+    X = cbind(X, 0, 0)
+    paveId = function(i){
+      M = diag(3)
+      M[1:m, 1:m] = vgram$M[i,,]
+      return(M)
+    }
+    M = sapply(1:k, paveId)
+    dim(M) = c(3,3,k)
+    M = aperm(M, c(1,2,3))
+    vgram$M = M
+    m = 3
+  }
   erg <- .C("CCondSim",
             dimZin=checkInt(dimZin,2),
             Zin   =checkDouble(Zin),
@@ -207,22 +243,24 @@ gsi.CondTurningBands <- function(Xout, Xin, Zin, vgram,
 ### tests --
 # if(!exists("do.test")) do.test=FALSE
 # if(do.test){
-#   library("gstat")
-#   library("magrittr")
-#   data("jura", package = "gstat")
-#   dt = jura.pred %>% dplyr::select(Cd:Zn)
-#   X = jura.pred[,1:2]
-#   spc = SpatialPointsDataFrame(SpatialPoints(X),acomp(dt))
-#   a2 = make.gmCompositionalGaussianSpatialModel(spc)
-#   #attach(gsi)
-#   a3gs = as.gstat(a2)
-#   a3vg = variogram(a3gs) 
-#   a3gs = fit_lmc(a3vg, a3gs, vgm("Sph", psill=1, nugget=0, range=1))
-#   a4 = make.gmCompositionalGaussianSpatialModel(spc, V="alr", model=a3gs$model)
-#   a4gs = as.gstat(a4)
-#   p1 = predict(a4gs, newdata = jura.grid)
-#   p2 = predict(a4gs, newdata = SpatialPoints(jura.grid[,1:2]))
-#   p3 = predict(a4gs, newdata = SpatialPixels(SpatialPoints(jura.grid[,1:2])))
+  # library("compositions")
+  # library("sp")
+  # library("magrittr")
+  # library("gstat")
+  # data("jura", package = "gstat")
+  # dt = jura.pred %>% dplyr::select(Cd:Cr)
+  # X = jura.pred[,1:2]
+  # spc = SpatialPointsDataFrame(SpatialPoints(X),acomp(dt))
+  # a2 = make.gmCompositionalGaussianSpatialModel(spc)
+  # #attach(gsi)
+  # a3gs = as.gstat(a2)
+  # a3vg = variogram(a3gs)
+  # a3gs = fit_lmc(a3vg, a3gs, vgm("Sph", psill=1, nugget=0, range=1))
+  # a4 = make.gmCompositionalGaussianSpatialModel(spc, V="alr", model=a3gs$model)
+  # a4gs = as.gstat(a4)
+  # p1 = predict(a4gs, newdata = jura.grid)
+  # p2 = predict(a4gs, newdata = jura.grid[,1:2])
+  # p3 = predict(a4gs, newdata = SpatialPixels(SpatialPoints(jura.grid[,1:2])))
 #   
 # }
 

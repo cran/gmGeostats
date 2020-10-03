@@ -102,7 +102,7 @@ logratioVariogramAnisotropy1 = function(comp, loc, #
     return(logratioVariogram(comp, loc, dists=dists, azimuth=a, azimuth.tol=azimuth.tol))
   }
   rs = sapply(azimuths, onevario)
-  class(rs) = "logratioVariogramAnisotropy"
+  class(rs) = c("logratioVariogramAnisotropy", "logratioVariogram")
   colnames(rs) = azimuths
   attr(rs, "lags") = dists
   return(rs)
@@ -396,6 +396,8 @@ image.logratioVariogramAnisotropy = function(x, jointColor=FALSE, breaks=NULL,
 #' @param pch symbols for the points, potentially different for each directions
 #' @param model eventually, variogram model to plot on top of the empirical variogram
 #' @param figsp spacing between the several panels, if desired
+#' @param closeplot boolean, should the plotting par() be returned to the starting values? (defaults to TRUE; 
+#' see `plot.gmCgram()` for details) 
 #' @param ... additional graphical arguments, to be passed to the underlying [graphics::matplot()] 
 #' function
 #'
@@ -413,7 +415,7 @@ image.logratioVariogramAnisotropy = function(x, jointColor=FALSE, breaks=NULL,
 plot.logratioVariogramAnisotropy = function(x, azimuths=colnames(x), 
                                             col=rev(rainbow(length(azimuths))), type="o", 
                                             V = NULL, lty=1, pch=1:length(azimuths),
-                                            model = NULL, figsp=0, ...){
+                                            model = NULL, figsp=0, closeplot=TRUE, ...){
   lrvg = x
   # construct the polar grid
   r = attr(lrvg, "lags")
@@ -478,6 +480,12 @@ plot.logratioVariogramAnisotropy = function(x, azimuths=colnames(x),
   } 
   
   # set the matrix of figures
+  opar = par()
+  opar = par_remove_readonly(opar)
+  
+  if(closeplot) on.exit(par(opar))
+  
+  
   par(mfrow=c(Dv,Dv), mar=figsp*c(1,1,1,1)/5, oma=c(3,3,3,3)+c(0,1,1,0)*ifelse(prefix=="variation",0,1), xaxs="i", yaxs="i")
   for(j in 1:Dv){
     vglim = range(sapply(1:ncol(lrvg), function(i){
@@ -534,9 +542,11 @@ plot.logratioVariogramAnisotropy = function(x, azimuths=colnames(x),
 #' @describeIn fit_lmc method for logratioVariogram with anisotropry
 #' @method fit_lmc logratioVariogramAnisotropy
 #' @export
-fit_lmc.logratioVariogramAnisotropy <- function(v, model, ...){
-  stop("not yet available: convert your objects to formats of 'gstat' and try again")
+fit_lmc.logratioVariogramAnisotropy <- function(v, g, model, ...){
+  warning("fit_lmc.logratioVariogramAnisotropy: attempting a workaround via gstat; expect changes in the future!")
+  fit_lmc.gstatVariogram(v, g, model, ...)
 }
+
 
 #################################################
 
@@ -1057,9 +1067,7 @@ gsi.produceV = function(V=NULL, D=nrow(V),
 #' @param vg empirical variogram or covariance function
 #' @param model optional, theoretical variogram or covariance function
 #' @param col colors to use for the several directional variograms
-#' @param commonAxis boolean, should all plots in a row share the same vertical axis?
-#' @param newfig boolean, should a new figure be created? otherwise user should ensure the device space is appropriately managed  
-#' @param ... further parameters to underlying plot or matplot functions
+#' @param ... further parameters to `plot.logratioVariogramAnisotropy()`
 #'
 #' @return The function is primarily called for producing a plot. However, it 
 #' invisibly returns the graphical parameters active before the call 
@@ -1071,12 +1079,12 @@ gsi.produceV = function(V=NULL, D=nrow(V),
 #' @method variogramModelPlot logratioVariogram
 variogramModelPlot.logratioVariogram <- function(vg, model = NULL,   # gstat  or variogramModelList object containing a variogram model fitted to vg
                                         col = rev(rainbow(ndirections(vg))),
-                                        commonAxis = FALSE,
-                                        newfig = FALSE, ...){
-  stop("not yet available")
+                                        ...){
   if(!is.null(model)){
     model = as.LMCAnisCompo(model)
-  }  
+  }
+  vg = as.logratioVariogramAnisotropy(vg)
+  plot(vg, col=col, model = model, ...)
 } 
 
 
@@ -1112,6 +1120,49 @@ as.logratioVariogram.gmEVario  = function(vgemp, ...){
   stop("not yet available")
 }
 
+
+
+
+#' Convert empirical variogram to "logratioVariogramAnisotropy"
+#' 
+#' Convert an empirical variogram from any format to class "logratioVariogramAnisotropy" 
+#'
+#' @param vgemp an empirical variogram
+#' @param ... further parameters
+#'
+#' @return The empirical variogram as a  "logratioVariogramAnisotropy" object 
+#' @export 
+as.logratioVariogramAnisotropy <- function(vgemp, ...) UseMethod("as.logratioVariogramAnisotropy", vgemp)
+
+#' @describeIn as.logratioVariogramAnisotropy default method, making use of `as.logratioVariogram()`
+#' @method as.logratioVariogramAnisotropy default
+#' @export
+as.logratioVariogramAnisotropy.default <- function(vgemp,...){
+  rs = NextMethod(object=vgemp, ...)
+  return(rs)
+}
+
+#' @describeIn as.logratioVariogramAnisotropy method for "logratioVariogram" class 
+#' @method as.logratioVariogramAnisotropy logratioVariogram
+#' @export
+as.logratioVariogramAnisotropy.logratioVariogram <- function(vgemp,...){
+  dim(vgemp) = c(3,1)
+  attr(vgemp, "lags") = gsi.lagdists(apply(vgemp$h, 1, mean))
+  attr(vgemp, "directions") = gsi.azimuth(0)
+  colnames(vgemp) = "0N"
+  class(vgemp) =  c("logratioVariogramAnisotropy", "logratioVariogram")
+  attr(vgemp, "type") = "semivariogram"
+  attr(vgemp, "env") = environment()
+  return(vgemp)
+}  
+  
+
+#' @describeIn as.logratioVariogramAnisotropy identity transformation
+#' @method as.logratioVariogramAnisotropy logratioVariogramAnisotropy
+#' @export
+as.logratioVariogramAnisotropy.logratioVariogramAnisotropy <- function(vgemp,...){
+  return(vgemp)
+}
 
 
 
@@ -1249,7 +1300,28 @@ as.gmCgram.LMCAnisCompo = function(m, V=attr(m,"contrasts"),
 
 
 # @describeIn as.variogramModel
-as.variogramModel.CompLinModCoReg <- function(m, ...) stop("not yet available")
+as.variogramModel.CompLinModCoReg <- function(m, V=NULL, ...){
+  stop("not yet available")
+  # extract the substructures from m-variogram
+  rs = gsi.extractCompLMCstructures(m) # elements: "models", "ranges", "sills"
+  # construct the vgm template
+    # 1.- set the nugget (if needed) 
+  if(any(rs$models=="nugget")){
+    vg0 = vgm(psill=1, model="Nug")
+  }else{
+    vg0 = NULL
+  }
+   # 2.- add each structure
+  if(sum(rs$models!="nugget")>0){
+    for(i in which(rs$models!="nugget")){
+      vg0 = vgm(add.to = vg0, model=rs$models[i], range = rs$ranges[i], psill=1)
+    }
+  }
+  # cast the sills to the requested logratio coordinates
+  
+  # expand the vgm template to the new coordinates
+  
+} 
 
 
 #' extract information about the original data, if available

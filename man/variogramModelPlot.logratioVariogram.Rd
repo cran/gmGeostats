@@ -5,14 +5,7 @@
 \title{Quick plotting of empirical and theoretical logratio variograms
 Quick and dirty plotting of empirical logratio variograms with or without their models}
 \usage{
-\method{variogramModelPlot}{logratioVariogram}(
-  vg,
-  model = NULL,
-  col = rev(rainbow(ndirections(vg))),
-  commonAxis = FALSE,
-  newfig = FALSE,
-  ...
-)
+\method{variogramModelPlot}{logratioVariogram}(vg, model = NULL, col = rev(rainbow(ndirections(vg))), ...)
 }
 \arguments{
 \item{vg}{empirical variogram or covariance function}
@@ -21,11 +14,7 @@ Quick and dirty plotting of empirical logratio variograms with or without their 
 
 \item{col}{colors to use for the several directional variograms}
 
-\item{commonAxis}{boolean, should all plots in a row share the same vertical axis?}
-
-\item{newfig}{boolean, should a new figure be created? otherwise user should ensure the device space is appropriately managed}
-
-\item{...}{further parameters to underlying plot or matplot functions}
+\item{...}{further parameters to \code{plot.logratioVariogramAnisotropy()}}
 }
 \value{
 The function is primarily called for producing a plot. However, it

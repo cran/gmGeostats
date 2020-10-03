@@ -6,12 +6,10 @@
  */
 // attention: comment this if not compiling
 #include <stdio.h>
-#include <omp.h>
 #include <Rinternals.h>
-#include <R.h>
-#include <Rmath.h>
-#include <R_ext/BLAS.h>
-#include <R_ext/Lapack.h> 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 #define inR   // attention: this must be uncommented if not compiling
 
@@ -423,6 +421,7 @@ void CMVTurningBands(
   (*bandSim[typeCgram[ss]])(n,projs,band,1.0,moreCgramData+ss);  
     /* this function takes the projs and returns on band the  the curve */
     /* ... multiply the eigenvector by the curve, and accumulate */
+#ifdef _OPENMP
 #pragma omp parallel for		             \
     if(!omp_in_parallel()&&0)		        \
       num_threads(omp_get_num_procs())	\
@@ -433,6 +432,14 @@ void CMVTurningBands(
       Z[d*i+j]+=d2;  
     }	  
     }
+#else
+    for(i=0;i<n;i++){ /* location */
+    for(j=0;j<d;j++){ /* variable */
+    d2 = sqrtSill[ss + *nCgrams *(j+d*ev)]*band[i]; 
+      Z[d*i+j]+=d2;  
+    }	  
+    }
+#endif
   }
   }
     } 
@@ -523,21 +530,32 @@ void CCondSim(
   Rprintf("starting conditioning by dual kriging\n");
   /* Kriging from simulated using Cinv */
   // Create differenes of obs and sim
+#ifdef _OPENMP
 #pragma omp parallel			               \
   if(!omp_in_parallel())			           \
     num_threads(omp_get_num_procs())		\
     default(shared) private(i,j,sim,shift,k)
     {
 #pragma omp parallel for	      
-      for(sim=0;sim<nsim;sim++) {
-        shift=nd*sim;
-        for(i=0;i<nin;i++)
-          for(j=0;j<d;j++){
-            k=d*i+j;
+      for(int sim=0;sim<nsim;sim++) {
+        int shift=nd*sim;
+        for(int i=0;i<nin;i++)
+          for(int j=0;j<d;j++){
+            int k=d*i+j;
             Z[k+shift]-=Zin[k];
           }
       }
     }
+#else
+  for(int sim=0;sim<nsim;sim++) {
+    int shift=nd*sim;
+    for(int i=0;i<nin;i++)
+      for(int j=0;j<d;j++){
+        int k=d*i+j;
+        Z[k+shift]-=Zin[k];
+      }
+  }
+#endif
   /* Z[hinten] -= \hat{Z[hinten]}(Z[vorn]) = cov(hinten,vorn)%*% Cinv %*% Z[vorn] */
   /* dbuf = Cinv %*% Z[vorn] 
    Cinv in R ^ d*nin x d*nin
@@ -545,6 +563,7 @@ void CCondSim(
    
    */
   // Dual Kriging preparation
+#ifdef _OPENMP
 #pragma omp parallel for			           \
   if(!omp_in_parallel()&&0)			        \
     num_threads(omp_get_num_procs())		\
@@ -562,6 +581,21 @@ void CCondSim(
                dbuf+dmnin*sim,
                &oneI);
     }
+#else
+    for(sim=0;sim<nsim;sim++) {
+      F77_NAME(dgemv)(&No,
+               &dmnin,
+               &dmnin,
+               &one,
+               Cinv,
+               &dmnin,
+               Z+nd*sim,
+               &oneI,
+               &zero,
+               dbuf+dmnin*sim,
+               &oneI);
+    }
+#endif
     // /* points in*/
     //for(i=0;i<nin;i++)
     //for(j=0;j<m;j++)
@@ -608,6 +642,7 @@ void CCondSim(
       //}
       
       /* Z[,i] +=  t(cbuf(d*nin,d)) %*% dbuf(d*nin) */
+#ifdef _OPENMP
 #pragma omp parallel for			               \
       if(!omp_in_parallel()&&0)			        \
         num_threads(omp_get_num_procs())		\
@@ -625,7 +660,21 @@ void CCondSim(
                    Z+i*d+nd*sim,
                    &oneI);
         }
-        
+#else
+        for(sim=0;sim<nsim;sim++) {
+          F77_NAME(dgemv)(&Transposed,
+                   &dmnin,
+                   &d,
+                   &minus1,
+                   cbuf,
+                   &dmnin,
+                   dbuf+dmnin*sim,
+                   &oneI,
+                   &one,
+                   Z+i*d+nd*sim,
+                   &oneI);
+        }
+#endif
     }
 }
 
@@ -695,7 +744,8 @@ extern void anaForwardC(const int *dimX,
   const double h=((double)1.0)/steps;
   if( dimY[0]!=m )
     error("anaForwardC: x and y have different number of variables / rows");
-#pragma omp parallel for 
+#ifdef _OPENMP
+  #pragma omp parallel for 
   for(size_t i=0;i<nx;i++) {
     double v1[m];
     double v2[m];
@@ -714,8 +764,28 @@ extern void anaForwardC(const int *dimX,
         mx[j]+=0.5*h*(v1[j]+v2[j]);
     }
   }
-  
+#else
+  for(size_t i=0;i<nx;i++) {
+    double v1[m];
+    double v2[m];
+    double xx[m];
+    double *mx=x+m*i;
+    for(size_t s=0;s<steps;s++) {
+      // v1
+      anaV(v1,m,mx,s*h,dimY,y,wY,sigma0,sigma1);
+      // xx=x+h*v1
+      for(int j=0;j<m;j++)
+        xx[j]=mx[j]+h*v1[j];
+      // v2
+      anaV(v2,m,xx,(s+1)*h,dimY,y,wY,sigma0,sigma1);
+      // x+=0.5*h*(v1+v2)
+      for(int j=0;j<m;j++)
+        mx[j]+=0.5*h*(v1[j]+v2[j]);
+    }
+  }
+#endif
 }
+
 
 static R_NativePrimitiveArgType anaBackwardC_t[] = {  /* INTSXP,REALSXP */
     /* dimX,    x,     dimY    y     wY    stepsp   sigma0p    sigma1p */
@@ -741,6 +811,7 @@ extern void anaBackwardC(const int *dimX,
   const double h=((double)1.0)/steps;
   if( dimY[0]!=m )
     error("anaBackwardC: x and y have different number of variables / rows");
+#ifdef _OPENMP
 #pragma omp parallel for 
   for(size_t i=0;i<nx;i++) {
     double v1[m];
@@ -759,9 +830,27 @@ extern void anaBackwardC(const int *dimX,
       for(int j=0;j<m;j++)
         mx[j]-=0.5*h*(v1[j]+v2[j]);
     }
-    
   }
-  
+#else
+  for(size_t i=0;i<nx;i++) {
+    double v1[m];
+    double v2[m];
+    double xx[m];
+    double *mx=x+m*i;
+    for(size_t s=0;s<steps;s++) {
+      // v1
+      anaV(v1,m,mx,1-s*h,dimY,y,wY,sigma0,sigma1);
+      // xx=x-h*v1
+      for(int j=0;j<m;j++)
+        xx[j]=mx[j]-h*v1[j];
+      // v2
+      anaV(v2,m,xx,1-(s+1)*h,dimY,y,wY,sigma0,sigma1);
+      // x+=0.5*h*(v1+v2)
+      for(int j=0;j<m;j++)
+        mx[j]-=0.5*h*(v1[j]+v2[j]);
+    }
+  }
+#endif
 }
 
 

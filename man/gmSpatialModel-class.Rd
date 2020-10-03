@@ -32,9 +32,9 @@ You will seldom create the spatial model directly. Use instead the creators \ver
 }
 \description{
 This class is devised to contain a conditional spatial model, with: some conditioning data
-(a \code{\link[sp:SpatialPointsDataFrame]{sp::SpatialPointsDataFrame()}}), an unconditional geospatial model (a structure with e.g.
+(a \code{\link[sp:SpatialPoints]{sp::SpatialPointsDataFrame()}}), an unconditional geospatial model (a structure with e.g.
 a training image; or the information defining a Gaussian random field); and eventually some
-extra method parameters. The class extends \code{\link[sp:SpatialPointsDataFrame]{sp::SpatialPointsDataFrame()}} and has therefore its slots,
+extra method parameters. The class extends \code{\link[sp:SpatialPoints]{sp::SpatialPointsDataFrame()}} and has therefore its slots,
 plus \code{model} (for the unconditional model) and \code{parameters} (for the extra method information)
 }
 \section{Methods (by generic)}{
@@ -55,11 +55,11 @@ for details
 
 \item{\code{coords}}{a matrix or dataframe of 2-3 columns containing the sampling locations of the conditional data}
 
-\item{\code{coords.nrs}}{see \code{\link[sp:SpatialPointsDataFrame]{sp::SpatialPointsDataFrame()}}}
+\item{\code{coords.nrs}}{see \code{\link[sp:SpatialPoints]{sp::SpatialPointsDataFrame()}}}
 
-\item{\code{bbox}}{see \code{\link[sp:SpatialPointsDataFrame]{sp::SpatialPointsDataFrame()}}}
+\item{\code{bbox}}{see \code{\link[sp:SpatialPoints]{sp::SpatialPointsDataFrame()}}}
 
-\item{\code{proj4string}}{see \code{\link[sp:SpatialPointsDataFrame]{sp::SpatialPointsDataFrame()}}}
+\item{\code{proj4string}}{see \code{\link[sp:SpatialPoints]{sp::SpatialPointsDataFrame()}}}
 
 \item{\code{model}}{gmUnconditionalSpatialModel. Some unconditional geospatial model. It can be NULL.}
 

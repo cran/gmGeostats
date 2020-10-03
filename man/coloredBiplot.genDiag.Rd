@@ -36,6 +36,11 @@ mf = Maf(juracomp, vg=lrvg)
 mf
 compositions::coloredBiplot(mf, xlabs.col=as.integer(jura.pred$Rock)+2)
 }
+\references{
+Mueller, Tolosana-Delgado, Grunsky and McKinley (2021) Biplots for
+Compositional Data Derived from Generalised Joint Diagonalization Methods.
+Applied Computational Geosciences (under review)
+}
 \seealso{
 Other generalised Diagonalisations: 
 \code{\link{Maf}()},

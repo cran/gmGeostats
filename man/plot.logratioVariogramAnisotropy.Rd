@@ -14,6 +14,7 @@
   pch = 1:length(azimuths),
   model = NULL,
   figsp = 0,
+  closeplot = TRUE,
   ...
 )
 }
@@ -36,6 +37,9 @@ to produce a plot of the empirical variogram in the corresponding representation
 \item{model}{eventually, variogram model to plot on top of the empirical variogram}
 
 \item{figsp}{spacing between the several panels, if desired}
+
+\item{closeplot}{boolean, should the plotting par() be returned to the starting values? (defaults to TRUE;
+see \code{plot.gmCgram()} for details)}
 
 \item{...}{additional graphical arguments, to be passed to the underlying \code{\link[graphics:matplot]{graphics::matplot()}}
 function}

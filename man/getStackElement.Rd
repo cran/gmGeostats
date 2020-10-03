@@ -29,7 +29,7 @@ getStackElement(x, i, ...)
 \method{setStackElement}{DataFrameStack}(x, i, value, MARGIN = stackDim(x), ...)
 }
 \arguments{
-\item{x}{container data, typically a \code{\link[=DataFrameStack]{DataFrameStack()}}, but it can also be certain \code{\link[sp:Spatial]{sp::Spatial()}}
+\item{x}{container data, typically a \code{\link[=DataFrameStack]{DataFrameStack()}}, but it can also be certain \code{\link[sp:Spatial-class]{sp::Spatial()}}
 object derivates of it}
 
 \item{i}{index (or name) of the element of the stack to extract or replace}

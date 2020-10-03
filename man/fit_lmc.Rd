@@ -9,7 +9,7 @@
 \alias{fit_lmc.logratioVariogram}
 \title{Fit an LMC to an empirical variogram}
 \usage{
-\method{fit_lmc}{logratioVariogramAnisotropy}(v, model, ...)
+\method{fit_lmc}{logratioVariogramAnisotropy}(v, g, model, ...)
 
 fit_lmc(v, ...)
 
@@ -22,11 +22,11 @@ fit_lmc(v, ...)
 \arguments{
 \item{v}{empirical variogram}
 
+\item{g}{spatial data object, containing the original data}
+
 \item{model}{LMC or variogram model to fit}
 
 \item{...}{further parameters}
-
-\item{g}{spatial data object, containing the original data}
 }
 \value{
 Method fit_lmc.gstatVariogram is a wrapper around \code{\link[gstat:fit.lmc]{gstat::fit.lmc()}}, that calls this function
@@ -48,7 +48,7 @@ for \code{\link[=as.gstatVariogram]{as.gstatVariogram()}}, \code{\link[=as.gstat
 In the future there may be direct specialised implementations not depending on
 package gstat.
 
-\item \code{logratioVariogram}: method for compositions::fit.lmc.
+\item \code{logratioVariogram}: method for logratioVariogram wrapping compositions::fit.lmc.
 In the future there may be direct specialised implementations,
 including anisotropy (not yet possible).
 }}

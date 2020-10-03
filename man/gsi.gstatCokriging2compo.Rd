@@ -29,8 +29,8 @@ gsi.gstatCokriging2compo(COKresult, ...)
 }
 \arguments{
 \item{COKresult}{output of a \code{\link[gstat:predict.gstat]{gstat::predict.gstat()}} cokriging,
-typically of class "data.frame", \code{\link[sp:SpatialPointsDataFrame]{sp::SpatialPointsDataFrame()}},
-\code{\link[sp:SpatialGridDataFrame]{sp::SpatialGridDataFrame()}} or \code{\link[sp:SpatialPixelsDataFrame]{sp::SpatialPixelsDataFrame()}}}
+typically of class "data.frame", \code{\link[sp:SpatialPoints]{sp::SpatialPointsDataFrame()}},
+\code{\link[sp:SpatialGridDataFrame]{sp::SpatialGridDataFrame()}} or \code{\link[sp:SpatialGridDataFrame]{sp::SpatialPixelsDataFrame()}}}
 
 \item{...}{further arguments needed for nscore (\strong{deprecated})}
 

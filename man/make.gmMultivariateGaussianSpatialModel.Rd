@@ -19,7 +19,7 @@ make.gmMultivariateGaussianSpatialModel(
 )
 }
 \arguments{
-\item{data}{either a data set of any data.frame similar class, or else a \code{\link[sp:SpatialPointsDataFrame]{sp::SpatialPointsDataFrame()}} containing it}
+\item{data}{either a data set of any data.frame similar class, or else a \code{\link[sp:SpatialPoints]{sp::SpatialPointsDataFrame()}} containing it}
 
 \item{coords}{the coordinates of the sampling locations, if no SpatialPointsDataFrame was provided}
 

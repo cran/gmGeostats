@@ -53,7 +53,7 @@ fit_lmc.default <- function(v, g, model,...){
 }
   
 
-#' @describeIn fit_lmc method for compositions::fit.lmc.
+#' @describeIn fit_lmc method for logratioVariogram wrapping compositions::fit.lmc.
 #' In the future there may be direct specialised implementations, 
 #' including anisotropy (not yet possible).
 #' @export
@@ -369,7 +369,7 @@ as.logratioVariogram.gstatVariogram = function(vgemp,  # gstatVariogram object, 
   mndfh = mean(diff(hh))
   dists = (hh[-1]+hh[-length(hh)])/2
   attr(res, "dists") = c(0, dists, max(dists)+mndfh)
-  class(res)="logratioVariogramAnisotropy"
+  class(res)=c("logratioVariogramAnisotropy", "logratioVariogram")
   return(res)
 }
 
