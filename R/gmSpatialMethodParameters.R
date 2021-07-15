@@ -16,7 +16,7 @@
 #' @param ... further arguments, currently ignored
 #'
 #' @return an S3-list of class "gmKrigingNeighbourhood" containing the six elements given as arguments 
-#' to the function. This is just a compact way to provide further functions such as [predict.gmSpatialModel()]
+#' to the function. This is just a compact way to provide further functions such as [predict_gmSpatialModel]
 #' with appropriate triggers for choosing a prediction method or another, in this case for triggering
 #' cokriging (if alone) or eventually sequential simulation (see [SequentialSimulation()]).
 #' @export
@@ -64,7 +64,7 @@ KrigingNeighbourhood <- function(nmax=Inf, nmin=0, omax=0, maxdist=Inf, force=FA
 #' @param ... further parameters, not used
 #'
 #' @return an S3-list of class "gmDirectSamplingParameters" containing the six elements given as arguments 
-#' to the function. This is just a compact way to provide further functions such as [predict.gmSpatialModel()]
+#' to the function. This is just a compact way to provide further functions such as [predict_gmSpatialModel]
 #' with appropriate triggers for choosing a prediction method or another, in this case for triggering 
 #' direct sampling.
 #' @export
@@ -96,7 +96,7 @@ DSpars <- DirectSamplingParameters <- function(nsim=1, scanFraction=0.25, patter
 #' @param ... further parameters, currently ignored
 #'
 #' @return an S3-list of class "gmSequentialSimulation" containing the four elements given as arguments 
-#' to the function. This is just a compact way to provide further functions such as [predict.gmSpatialModel()]
+#' to the function. This is just a compact way to provide further functions such as [predict_gmSpatialModel]
 #' with appropriate triggers for choosing a prediction method or another, in this case for triggering 
 #' sequential Gaussian simulation.
 #' @export
@@ -128,7 +128,7 @@ SequentialSimulation = function(nsim=1, ng=NULL, rank=Inf, debug.level=1, ...){
 #' @param ... further parameters, currently ignored
 #'
 #' @return an S3-list of class "gmTurningBands" containing the few elements given as arguments 
-#' to the function. This is just a compact way to provide further functions such as [predict.gmSpatialModel()]
+#' to the function. This is just a compact way to provide further functions such as [predict_gmSpatialModel]
 #' with appropriate triggers for choosing a prediction method or another, in this case for triggering 
 #' turning bands simulation.
 #' @export
@@ -152,7 +152,7 @@ TurningBands = function(nsim=1, nBands=1000,  ...){
 #' @param ... further parameters, currently ignored
 #'
 #' @return an S3-list of class "gmCholeskyDecomposition" containing the few elements given as arguments 
-#' to the function. This is just a compact way to provide further functions such as [predict.gmSpatialModel()]
+#' to the function. This is just a compact way to provide further functions such as [predict_gmSpatialModel]
 #' with appropriate triggers for choosing a prediction method or another, in this case for triggering 
 #' LU or Cholesky decomposition simulation.
 #' @export

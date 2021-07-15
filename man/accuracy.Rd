@@ -14,15 +14,16 @@ accuracy(x, ...)
   prob = seq(from = 0, to = 1, by = 0.05),
   method = "kriging",
   outMahalanobis = FALSE,
+  ivar,
   ...
 )
 
 \method{accuracy}{DataFrameStack}(
   x,
   observed,
-  vars = intersect(colnames(observed), dimnames(x)[[noStackDim(x)]]),
+  ivars = intersect(colnames(observed), dimnames(x)[[noStackDim(x)]]),
   prob = seq(from = 0, to = 1, by = 0.05),
-  method = ifelse(length(vars) == 1, "simulation", "Mahalanobis"),
+  method = ifelse(length(ivars) == 1, "simulation", "Mahalanobis"),
   outMahalanobis = FALSE,
   ...
 )
@@ -43,7 +44,12 @@ c("simulation", "mahalanobis", "flow") for \code{x} of class \code{\link[=DataFr
 \item{outMahalanobis}{if TRUE, do not do the final accuracy calculations and return the Mahalanobis
 norms of the residuals; if FALSE do the accuracy calculations}
 
-\item{vars}{in multivariate cases, a vector of names of the variables to analyse}
+\item{ivar}{if \code{method}="kriging" or "cokriging" you can also specify here one single variable name
+to consider for univariate accuracy; this variable name must exist both in \code{x}
+(including "pred" and "var" prefixes or suffixes in the column names) and in \code{observed};
+this might require renaming the columns of these files!}
+
+\item{ivars}{in multivariate cases, a vector of names of the variables to analyse (or one single variable name)}
 }
 \value{
 If \code{outMahalanobis=TRUE} (the primary use), this function returns a two-column dataset of class
@@ -113,6 +119,7 @@ Other accuracy functions:
 \code{\link{plot.accuracy}()},
 \code{\link{precision}()},
 \code{\link{validate}()},
+\code{\link{xvErrorMeasures.default}()},
 \code{\link{xvErrorMeasures}()}
 }
 \concept{accuracy functions}

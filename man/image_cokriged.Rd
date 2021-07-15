@@ -51,7 +51,7 @@ image_cokriged(x, ...)
 for "spatialGridAcomp" and "spatialGridRmult", but the default method is able to
 deal with "SpatialPointsDataFrame", "SpatialPixelsDataFrame" and "SpatialGridDataFrame"
 objects, and with the "data.frame" output of \code{\link[gstat:predict.gstat]{gstat::predict.gstat()}} and
-\code{\link[=predict.gmSpatialModel]{predict.gmSpatialModel()}}}
+\link{predict_gmSpatialModel}}
 
 \item{...}{generic functionality, currently ignored}
 

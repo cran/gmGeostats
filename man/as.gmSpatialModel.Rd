@@ -36,10 +36,10 @@ Recast a spatial data object model to format gmSpatialModel
 
 \seealso{
 Other gmSpatialModel: 
+\code{\link{Predict}()},
 \code{\link{gmSpatialModel-class}},
 \code{\link{make.gmCompositionalGaussianSpatialModel}()},
 \code{\link{make.gmCompositionalMPSSpatialModel}()},
-\code{\link{make.gmMultivariateGaussianSpatialModel}()},
-\code{\link{predict.gmSpatialModel}()}
+\code{\link{make.gmMultivariateGaussianSpatialModel}()}
 }
 \concept{gmSpatialModel}

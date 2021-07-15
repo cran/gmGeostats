@@ -33,7 +33,7 @@ logratioVariogram <- function(data, ...) UseMethod("logratioVariogram", data)
 #' @method logratioVariogram default
 #' @export
 #' @param loc if `data` is a composition (or if `comp` is provided), spatial coordinates of the sampling locations 
-#' @param comp an alias for `data`, provided for back-compatibility with [compositions::logratioVariogram()] 
+#' @param comp an alias for `data`, provided for back-compatibility with compositions::logratioVariogram 
 logratioVariogram.default <- function(data, loc, ..., comp=data){
   res = try(compositions::logratioVariogram(comp=acomp(comp), loc=loc, ...), silent=TRUE)
   if(class(res)!="try-error") return(res)
@@ -66,7 +66,7 @@ logratioVariogram_gmSpatialModel <- function(data, ..., azimuth=0, azimuth.tol=1
   logratioVariogram.default(comp, loc=coords, ...)    
 }
 
-
+#' @describeIn logratioVariogram S4 generic for gmSpatialModel objects 
 setGeneric("logratioVariogram", logratioVariogram)
 
 
@@ -706,13 +706,14 @@ LMCAnisCompo = function(Z, models=c("nugget", "sph", "sph"),
 #'
 #' @return an array of dimension (nr of lags, D, D) with D the number of variables in the model.
 #' @export
-#'
+#' @include gmAnisotropy.R
+#' @method predict LMCAnisCompo
 #' @examples
 #' data("jura", package="gstat")
 #' Zc = compositions::acomp(jura.pred[,7:9])
 #' lrmd = LMCAnisCompo(Zc, models=c("nugget", "sph"), azimuths=c(0,45))
 #' predict(lrmd, outer(0:5, c(0,1)))
-predict.LMCAnisCompo <- function(object, newdata, ...){
+predict.LMCAnisCompo = function(object, newdata, ...){
   K = ncol(object)
   if(is.data.frame(newdata)) newdata = as.matrix(newdata)
   if(is.null(dim(newdata))) newdata = cbind(newdata, 0)
@@ -732,6 +733,8 @@ predict.LMCAnisCompo <- function(object, newdata, ...){
   vvgg = aperm(vvgg, c(3,1,2))
   return(vvgg)
 }
+
+
 
 
 
@@ -1298,30 +1301,31 @@ as.gmCgram.LMCAnisCompo = function(m, V=attr(m,"contrasts"),
   return(output)
 }
 
-
-# @describeIn as.variogramModel
-as.variogramModel.CompLinModCoReg <- function(m, V=NULL, ...){
-  stop("not yet available")
-  # extract the substructures from m-variogram
-  rs = gsi.extractCompLMCstructures(m) # elements: "models", "ranges", "sills"
-  # construct the vgm template
-    # 1.- set the nugget (if needed) 
-  if(any(rs$models=="nugget")){
-    vg0 = vgm(psill=1, model="Nug")
-  }else{
-    vg0 = NULL
-  }
-   # 2.- add each structure
-  if(sum(rs$models!="nugget")>0){
-    for(i in which(rs$models!="nugget")){
-      vg0 = vgm(add.to = vg0, model=rs$models[i], range = rs$ranges[i], psill=1)
-    }
-  }
-  # cast the sills to the requested logratio coordinates
-  
-  # expand the vgm template to the new coordinates
-  
-} 
+# 
+# # @describeIn as.variogramModel
+#  EXISTS in gstatCompatibility.R
+# as.variogramModel.CompLinModCoReg <- function(m, V=NULL, ...){
+#   stop("not yet available")
+#   # extract the substructures from m-variogram
+#   rs = gsi.extractCompLMCstructures(m) # elements: "models", "ranges", "sills"
+#   # construct the vgm template
+#     # 1.- set the nugget (if needed) 
+#   if(any(rs$models=="nugget")){
+#     vg0 = vgm(psill=1, model="Nug")
+#   }else{
+#     vg0 = NULL
+#   }
+#    # 2.- add each structure
+#   if(sum(rs$models!="nugget")>0){
+#     for(i in which(rs$models!="nugget")){
+#       vg0 = vgm(add.to = vg0, model=rs$models[i], range = rs$ranges[i], psill=1)
+#     }
+#   }
+#   # cast the sills to the requested logratio coordinates
+#   
+#   # expand the vgm template to the new coordinates
+#   
+# } 
 
 
 #' extract information about the original data, if available

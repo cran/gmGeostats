@@ -24,6 +24,7 @@ Other accuracy functions:
 \code{\link{plot.accuracy}()},
 \code{\link{precision}()},
 \code{\link{validate}()},
+\code{\link{xvErrorMeasures.default}()},
 \code{\link{xvErrorMeasures}()}
 }
 \concept{accuracy functions}

@@ -272,6 +272,7 @@ as.function.gmCgram = function(x,...){
 #' @describeIn as.function.gmCgram predict a gmCgram object on some lag vector coordinates
 #' @param object gmCgram object
 #' @param newdata matrix, data.frame or Spatial object containing coordinates
+#' @include gmAnisotropy.R
 #' @method predict gmCgram
 #' @export
 predict.gmCgram = function(object, newdata, ...){
@@ -553,9 +554,6 @@ variogram_gmSpatialModel <-  function(object, methodPars=NULL, ...){
 #  return(variogram_gmSpatialModel(object, ...))
 #}
 
-  
-#' @export
-setGeneric("variogram", function(object,...) standardGeneric("variogram"))  
 
 
 
@@ -1066,17 +1064,15 @@ gsi.midValues.azimuthInterval <- function(x){ (x[[1]]+x[[2]])/2 }
 ## theoretical structural functions
 # S3 -> S4 classes  
 # cat("creating variogram model classes\n")
-#' @include gstatCompatibility.R
-#' @include compositionsCompatibility.R
-setOldClass("gmCgram")
-setOldClass("LMCAnisCompo")
-setOldClass("variogramModelList")
-setOldClass("variogramModel")
+
 
 # abstract classes
 #' @title Structural function model specification
 #' @description Abstract class, containing any specification of a variogram (or covariance) model
 #' @export
+#' @include compositionsCompatibility.R
+#' @include gstatCompatibility.R
+#' @include preparations.R
 setClassUnion(name="ModelStructuralFunctionSpecification", 
               members=c("NULL","gmCgram", "LMCAnisCompo", "variogramModelList", "variogramModel"))
 
@@ -1143,15 +1139,14 @@ setClass("gmGaussianModel",
 ## empirical structural functions
 # S3 -> S4 classes
 # cat("creating empirical variogram classes\n")
-setOldClass("gmEVario")
-setOldClass("logratioVariogram")
-setOldClass("logratioVariogramAnisotropy")
-setOldClass("gstatVariogram")
 
 
 # abstract classes
 #' @title Empirical structural function specification
 #' @description Abstract class, containing any specification of an empirical variogram (or covariance function, or variations)
 #' @export
+#' @include compositionsCompatibility.R
+#' @include gstatCompatibility.R
+#' @include preparations.R
 setClassUnion(name="EmpiricalStructuralFunctionSpecification", members=c("NULL","gmEVario", "logratioVariogram", "logratioVariogramAnisotropy", "gstatVariogram"))
 

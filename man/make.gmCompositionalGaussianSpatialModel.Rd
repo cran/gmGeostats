@@ -65,13 +65,13 @@ make.gmCompositionalGaussianSpatialModel(data=Zc, coords=X, V="alr")
 }
 \seealso{
 \code{\link[=SequentialSimulation]{SequentialSimulation()}}, \code{\link[=TurningBands]{TurningBands()}} or \code{\link[=CholeskyDecomposition]{CholeskyDecomposition()}} for specifying the exact
-simulation method and its parameters, \code{\link[=predict.gmSpatialModel]{predict.gmSpatialModel()}} for running predictions or simulations
+simulation method and its parameters, \link{predict_gmSpatialModel} for running predictions or simulations
 
 Other gmSpatialModel: 
+\code{\link{Predict}()},
 \code{\link{as.gmSpatialModel}()},
 \code{\link{gmSpatialModel-class}},
 \code{\link{make.gmCompositionalMPSSpatialModel}()},
-\code{\link{make.gmMultivariateGaussianSpatialModel}()},
-\code{\link{predict.gmSpatialModel}()}
+\code{\link{make.gmMultivariateGaussianSpatialModel}()}
 }
 \concept{gmSpatialModel}

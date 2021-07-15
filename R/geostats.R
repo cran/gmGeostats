@@ -65,8 +65,7 @@ gsi.calcCgram <- function(X,Y,vgram,ijEqual=FALSE) {
            A = checkDouble(t(apply(vgram$M,1,gsi.powM,alpha=-1/2)),k*m*m),
            Sill=checkDouble(vgram$sill,k*d*d),
            moreCgramData=checkDouble(vgram$data,k),
-           ijEqual=checkLogical(ijEqual,1),
-           PACKAGE = "gmGeostats"
+           ijEqual=checkLogical(ijEqual,1)#,     PACKAGE = "gmGeostats"
   )
   structure(erg$C,dim=c(d*nX,d*nY))
 }
@@ -87,6 +86,7 @@ gsi.calcCgram <- function(X,Y,vgram,ijEqual=FALSE) {
 #' 
 #' @return an array with (npoint, nvar, nsim)-elements, being npoint=nrow(X)
 #' and nvar = nr of variables in vgram
+#' @export
 #' @useDynLib gmGeostats CMVTurningBands
 gsi.TurningBands <- function(X,vgram,nBands,nsim=NULL) {
   # checks and preps
@@ -126,8 +126,7 @@ gsi.TurningBands <- function(X,vgram,nBands,nsim=NULL) {
             typeCgram = checkInt(vgram$type,k),
             A = checkDouble(t(apply(vgram$M,1,gsi.powM,alpha=-1/2)),k*m*m),
             sqrtSill=checkDouble(t(apply(vgram$sill,1,gsi.powM,alpha=1/2)),k*d*d),
-            moreCgramData=checkDouble(vgram$data,k),
-            PACKAGE = "gmGeostats"
+            moreCgramData=checkDouble(vgram$data,k)#,     PACKAGE = "gmGeostats"
     )
       erg = cbind(X[, 1:m0],Z=t(structure(erg$Z,dim=c(d,nrow(X)))))
       return(erg) 
@@ -145,8 +144,7 @@ gsi.TurningBands <- function(X,vgram,nBands,nsim=NULL) {
             typeCgram = checkInt(vgram$type,k),
             A = checkDouble(t(apply(vgram$M,1,gsi.powM,alpha=-1/2)),k*m*m),
             sqrtSill=checkDouble(t(apply(vgram$sill,1,gsi.powM,alpha=1/2)),k*d*d),
-            moreCgramData=checkDouble(vgram$data,k),
-            PACKAGE = "gmGeostats"
+            moreCgramData=checkDouble(vgram$data,k)#,     PACKAGE = "gmGeostats"
     )
     erg = aperm(structure(erg$Z,dim=c(d,nrow(X),nsim)),c(2,1,3))
     return(erg) 
@@ -225,8 +223,7 @@ gsi.CondTurningBands <- function(Xout, Xin, Zin, vgram,
             Sill=checkDouble(vgram$sill,k*d*d),
             moreCgramData=checkDouble(vgram$data,k),
             cbuf=numeric(d*d*nin),
-            dbuf=numeric(d*nin*nsim),
-            PACKAGE = "gmGeostats"
+            dbuf=numeric(d*nin*nsim)#,     PACKAGE = "gmGeostats"
   )
   if( normal ) {
     cbind(Xout,t(structure(erg$Z,dim=dimZ))[-(1:nrow(Xin)),])

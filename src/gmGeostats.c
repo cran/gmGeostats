@@ -103,7 +103,7 @@ vgramFunctionPtr cgramFunctions[]={
 
 static R_NativePrimitiveArgType CcalcCgram_t[] = {
   /* dimX  LDX   X       dimY    LDY    Y       dimC   C     Nugget  nCgr  typeCgr  A       Sill    moreC   ijEq*/
-  INTSXP,INTSXP,REALSXP,INTSXP,INTSXP,REALSXP,INTSXP,REALSXP,REALSXP,INTSXP,REALSXP,REALSXP,REALSXP,REALSXP,INTSXP
+  INTSXP,INTSXP,REALSXP,INTSXP,INTSXP,REALSXP,INTSXP,REALSXP,REALSXP,INTSXP,INTSXP,REALSXP,REALSXP,REALSXP,LGLSXP
 };
 
 void CcalcCgram(
@@ -341,6 +341,7 @@ void getUnitvec(
     unitvec[0] = cos(d1)*d3; 
     unitvec[1] = sin(d1)*d3;
   } else if( dimX==2 ) {
+    Rprintf("Warning: gmGeostatsC.getUnitvec in 2D is incompatible with spherical variograms");
     d1=invBitExp2(ip);
     unitvec[0] = cos(d1*M_PI); 
     unitvec[1] = sin(d1*M_PI);   
@@ -857,6 +858,14 @@ extern void anaBackwardC(const int *dimX,
 
 
 
+/* ======================================
+ * EXPORT FUNCTIONS TO R
+ * ======================================
+ */
+
+
+
+
 static R_CMethodDef cMethods[] = {
   {"CcalcCgram", (DL_FUNC) &CcalcCgram, 15, CcalcCgram_t},
   {"CMVTurningBands", (DL_FUNC) &CMVTurningBands, 11, CMVTurningBands_t},
@@ -866,11 +875,19 @@ static R_CMethodDef cMethods[] = {
   {NULL, NULL, 0}
 };
 
+//{"CMVTurningBands2", (DL_FUNC) &CMVTurningBands2, 11, CMVTurningBands2_t},
 
-void R_init_compositions(DllInfo *info)
+
+
+void R_init_gmGeostats(DllInfo *info)
 {
   R_registerRoutines(info, cMethods, NULL, NULL, NULL);
   R_useDynamicSymbols(info, FALSE);
   R_forceSymbols(info, TRUE);
 }
+
+
+
+
+
 

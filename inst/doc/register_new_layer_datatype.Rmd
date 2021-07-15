@@ -1,0 +1,190 @@
+---
+title: "How to register new layer datatypes"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{How to register new layer datatypes}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Purpose of this vignette
+
+This vignette explains how to tweak "gmGeostasts" to declare new datatypes for data layers (e.g. for data with special characteristics besides compositional data), and associate creation and prediction function to it. If you are looking for a general introduction to the package, see [this other vignette](../doc/gmGeostats.html)
+
+```{r setup}
+library(compositions)
+library(gstat)
+library(gmGeostats)
+library(RandomFields)
+library(magrittr)
+```
+
+
+
+## Statistical scale and representation functions
+
+The statistical scale of a data layer is a subjective assessment of the way in which pairs of values of that layer need to be compared. Classical statistical scales after Stevens (XXXX) are the nominal (two values are either equal or they are different), ordinal (two values are either equal, or one is larger than the other), interval (values can be meaningfully compared by the mathematical operation of subtraction) and ratio (values are strictly positive and can be meaningfully compared by the operation of quotient). Other scales have been introduced, such as several compositional scales for data about the amounts and proportions of components forming a system (Aitchison, 1986; van den Boogaart and Tolosana-Delgado, 2013; van den Boogaart, Tolosana-Delgado and Bren, XXXX); for circular and spherical data; for distributional data; for positive definite matrices; etc.
+
+A scale $s$ is then typically described by a way of computing the difference between two values $d_s(\cdot, \cdot)$, coupled with a description of the set $\mathcal{E}_s$ of values of that layer that are at all possible. In the case of circular data, the set of possible values is $[-\pi, \pi)$, and given the periodicity condition, the way to compare two values $a$ and $b$ is $(a-b)$ modulo $\pi$. 
+
+To ease the computation with observations $x$ on such layers we want to define a transformation $R(x)$ that delivers a *representation* $z=R(x)$ of the data, such that: (i) $R^{-1}(z)$ exists for all values of the linear span of $R(x)$, (ii) it can be ensured that $R^{-1}(z)\in \mathcal{E}_s$, *and* (iii) that $d_s(x_1, x_2)\approx R(x_1)-R(x_2)$. A classical representation strategy of circular data is through an embedding into $R^2$ the bivariate real space, by means of the transformation
+$$
+R(\theta)=[\sin(\theta), \cos(\theta)]=\mathbf{z}
+$$
+with inverse operation
+$$
+\theta = \tan^{-1} \frac{z_2}{z_1}
+$$
+
+For our purposes, the absolute minimum you need to program is: 
+
+1. choose a class name for your data tyoe (e.g. "periodic"), and create a function with that name taking the values as they might be in your case study, converting them into a datamatrix and giving them the class of your choice
+```{r}
+circular = function(x, varname ="theta", conversion=pi/180){
+  # output to be a (N, 1)-datamatrix 
+  if(length(dim(x))!=2){ # case `x` is a vector
+    y = t(t(x))
+    colnames(y) = varname
+  }else if(nrow(x)!=1){ # case `x` is a too large matrix
+    y = x[, varname]
+  }
+  y = y * conversion
+  class(y) = "circular"
+  return(y)
+}
+```
+(The function can do other things, like in this case, allowing a potential conversion from degrees to radians, or managing several input cases).
+
+2. create method of the function `compositions::cdt()` implementing the representation for data of your type and returning an rmult object
+```{r}
+cdt.circular = function(x, ...){ 
+  z = cbind(sin(x), cos(x))
+  colnames(z) = c("z1", "z2")
+  return(rmult(z, orig=x))
+}
+```
+
+3. create method of the function `compositions::cdtInv()` implementing the backrepresentation for data of your type (argument `z` expects the representation, and `orig` must be exactly what is set in this example; NOTICE the three dots at `compositions:::gsi.orig`)
+```{r}
+cdtInv.circular = function(z, orig=compositions:::gsi.orig(x),...){ 
+  #z = unclass(z)
+  x = atan2(z[,2], z[,1])
+  return(circular(x, varname=colnames(orig), conversion = 1))
+}
+```
+
+## Geostatistical analysis of scaled data, quick and dirty
+
+With these few lines of programming you could already be able to use "gmGeostats" for your data. To show how, we will generate first a univariate, real-valued random field, take it as if it were circular data (in radians), extract some components out of it, and do a geostatistical analysis with the output.
+```{r data_creation, fig.height=7, fig.width=7}
+# simulate a random function
+set.seed(333275)
+model <- RMexp()
+x <- seq(0, 10, 0.1)
+z <- RFsimulate(model, x, x, n=1)
+# extract components 
+X = coordinates(z)
+Z = z@data
+# select some of them
+tk = sample(1:nrow(X), 1000)
+Xdt = X[tk,]
+Zdt = Z[tk,1]
+Zdtc = circular(Zdt,varname = "theta", conversion = 1)
+pairsmap(Zdtc, loc=Xdt)
+```
+
+Now we can proceed with the analysis. First we create the "gmSpatialModel" containing the transformed data
+```{r}
+theta.gg = 
+  make.gmMultivariateGaussianSpatialModel(
+    data=cdt(Zdtc), coords = Xdt, # always set V="clr" in such cases!
+    formula = ~1 # for ordinary (co)kriging
+    )
+```
+compute and plot the variogram
+```{r, fig.width=7, fig.height=5}
+theta.vg = gmGeostats::variogram(theta.gg)
+plot(theta.vg)
+```
+and model it, in this case with an exponental of effective range approximately 3, a sill of 0.5, and a nugget close to zero. All ways of modelling variograms are allowed, for instance with "gstat" variograms
+```{r, fig.width=7, fig.height=5}
+theta.md = gstat::vgm(model="Exp", range=1, psill=0.5)
+theta.gs = fit_lmc(v=theta.vg, g = theta.gg, model = theta.md)
+plot(theta.vg, model=theta.gs$model)
+```
+Finally we extend the original data container with this model
+```{r}
+theta.gg = 
+  make.gmMultivariateGaussianSpatialModel(
+    data=cdt(Zdtc), coords = Xdt, # always set V="clr" in such cases!
+    formula = ~1, # for ordinary (co)kriging
+    model = theta.gs$model
+    )
+```
+The outcome can then be used for validation, prediction or simulation. Here we do cokriging on the same grid we simulated above
+```{r}
+xx = expand.grid(x,x)
+colnames(xx) = colnames(Xdt)
+ng = KrigingNeighbourhood(nmax = 20, omax=7, maxdist=1)
+theta.prds = predict(theta.gg, newdata = xx, pars=ng)
+```
+and the result be reordered and backtransformed
+```{r}
+theta.prds.grid = gsi.gstatCokriging2rmult(theta.prds)
+theta.prds.back = backtransform(theta.prds.grid, as = cdt(Zdtc))
+summary(theta.prds.back)
+```
+Note that the function `backtransform()` is available in package "compositions" from version 1.0.1-9002. To plot the result we might have to program a method for `image_cokriged` that should take care to fictionally reclass the backtransformed data to "spatialGridRmult" and choose a color sequence appropriate for the periodic nature of the data
+```{r, fig.width=6, fig.height=8.5}
+image_cokriged.circular = function(x, ...){
+  class(x) = c("spatialGridRmult", "rmult")
+  image_cokriged(x, breaks=40, col=rainbow(10), ...)
+}
+image_cokriged(theta.prds.back, ivar="theta")
+```
+
+## An excursion on superclasses classes 
+
+"gmGeostats" uses a mixture of S3 and S4 classes to manage the several kinds of objects, S3 classes mostly preferred for simple configuration objects, models and data elements, and S4 classes mostly in use for large compound spatial models and data containers. S4 classes, though being somewhat more complex to handle and slightly slower, have the advantage to allow for multiple dispatch, which this package extensively uses. S4 classes require its fields (called "slots") to strictly belong to a specific class. To handle this condition, and at the same time allow for multiple methods of specification, estimation, fitting and prediction of spatial models and random functions, "gmGeostats" provides a series of abstract classes controlling allowing certain fields to contain certain kinds of objects:
+
+**gmNeighbourhoodSpecification** contains a description of the neighbourhood of a point during interpolation/simulation.
+
+**EmpiricalStructuralFunctionSpecification** contains a desciption of empirical structural functions, typically empirical variograms in different formats (e.g. "gstatVariogram" from package "gstat", or "logratioVariogram" from package "compositions").
+
+**ModelStructuralFunctionSpecification**, equivalent to the preceding one, this class contains specifications of models for structural functions (e.g. "variogramModel" or "CompLinModCoReg" for packages "gstat" resp. "compositions").
+
+**gmValidationStrategy** describes the way a model should be validated.
+
+**gmGaussianSimulationAlgorithm** specifies the exact gaussian simulation algorithm to be used, and provides its parameters (e.g. number of bands for Turning Bands).
+
+**gmTrainingImage** for multipoint statistics (MPS) methods, this abstract class gathers all ways to specify a gridded image.
+
+**gmUnconditionalSpatialModel** convenience class of the union of "gmTrainingImage" and "gmGaussianModel" (a concrete class containing "ModelStructuralFunctionSpecification" with some extra information), it is thought to contain all specifications of an unconditional random function.
+
+**gmMPSParameters**, analogous to "gmGaussianSimulationAlgorithm" or "gmValidationStrategy", this abstract class contains all specifications of MPS algorithms available.
+
+**gmSpatialMethodParameters** is a large container of both two-point and multipoint methods, i.e. descriptors of specific algorithms and their parameters. This union class should only contain other abstract claases!
+
+The package "methods" provides a way of checking the subclasses and superclasses of any specific class, thanks to the function `classesToAM()`:
+```{r}
+classesToAM("gmSpatialMethodParameters", includeSubclasses = TRUE)
+```
+The matrix contain a 1 if the row class is a subclass of the column class, and 0 otherwise.
+
+
+
+
+
+## Future work
+
+In future extensions of this vignette we will discuss the way to create own structural functions (variograms) and estimation models/methods adapted to the nature of the data, and register them to the package (usage of `setIs()` and coercion in conjunction with the abstract classes mention, `validate()`- and `predict()`-methods, creation of own `make.gm****Model()` data containers, etc).
+
+
+

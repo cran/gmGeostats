@@ -1,4 +1,26 @@
-# gmGeostats 0.10.7
+# gmGeostats 0.10.7.9006
+
+* new vignette "How to register new layer datatypes", with a howto adapt gmGeostats to deal with your very special data type (with an example for regionalized circular data)
+* (2021-07-06) new option to extract univariate accuracy() from multivariate kriging results
+* NEWS.md and vignettes/gmGeostats.Rmd polished
+* "predict"-methods for objects of class gmSpatialModel now programmed with multiple dispatching, to enable further extensions
+
+# gmGeostats 0.10.7.9005
+
+* (2021-06-30) bugs in xvErrorMeasures() for simulated data corrected
+* (2021-06-30) bugs in accuracy() and precision() corrected
+
+# gmGeostats 0.10.7.9004
+
+* (2021-06-29) bugs in accuracy() and precision() corrected
+* (2021-06-23) bug in validate.NfoldCrossValidation() corrected
+
+# gmGeostats 0.10.7.9003
+
+* (2021-04-08) exported turning bands for direct usage
+* (2020-10-01) bug in turning bands spherical variogram corrected
+
+#  gmGeostats 0.10.7
 
 * (2020-09-27) updated references in generalised diagonalisations; improved/reimplemented `as.logratioVariogram()` and `as.logratioVariogramAnisotropy()` methods; minor edits at `plot.logratioVariogramAnisotropy()` and `variogramModelPlot.logratioVariogram()`
 * (2020-09-24) openMP pragmas enclosed, to improve portability 

@@ -24,7 +24,7 @@
 
 \item{azimuth.tol}{which tolerance sould be used for directional variograms?}
 
-\item{comp}{an alias for \code{data}, provided for back-compatibility with \code{\link[compositions:logratioVariogram]{compositions::logratioVariogram()}}}
+\item{comp}{an alias for \code{data}, provided for back-compatibility with compositions::logratioVariogram}
 }
 \value{
 a "logratioVariogram" object, or a "logratioVariogramAnisotropy" object

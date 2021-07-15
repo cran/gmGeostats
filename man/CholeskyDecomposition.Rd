@@ -13,7 +13,7 @@ CholeskyDecomposition(nsim = 1, ...)
 }
 \value{
 an S3-list of class "gmCholeskyDecomposition" containing the few elements given as arguments
-to the function. This is just a compact way to provide further functions such as \code{\link[=predict.gmSpatialModel]{predict.gmSpatialModel()}}
+to the function. This is just a compact way to provide further functions such as \link{predict_gmSpatialModel}
 with appropriate triggers for choosing a prediction method or another, in this case for triggering
 LU or Cholesky decomposition simulation.
 }

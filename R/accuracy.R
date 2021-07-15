@@ -72,12 +72,27 @@ accuracy <- function(x,...) UseMethod("accuracy", x)
 #' c("simulation", "mahalanobis", "flow") for `x` of class [DataFrameStack()].
 #' @param outMahalanobis if TRUE, do not do the final accuracy calculations and return the Mahalanobis
 #' norms of the residuals; if FALSE do the accuracy calculations
+#' @param ivar if `method`="kriging" or "cokriging" you can also specify here one single variable name 
+#' to consider for univariate accuracy; this variable name must exist both in `x` 
+#' (including "pred" and "var" prefixes or suffixes in the column names) and in `observed`;
+#' this might require renaming the columns of these files!
 #' @export
 accuracy.data.frame <- function(x, observed=x$observed, 
                                 prob = seq(from=0, to=1, by=0.05),
-                                method="kriging", outMahalanobis=FALSE, ...){
+                                method="kriging", outMahalanobis=FALSE, 
+                                ivar, ...){
   methods = c("kriging", "cokriging", "simulation")
   mm = methods[pmatch(method, methods)]
+  if(!missing(ivar)){
+    iTrue = grep(ivar, colnames(observed))
+    iPred = intersect(grep(ivar, colnames(x)), grep("pred", colnames(x)))
+    iVar = intersect(grep(ivar, colnames(x)), grep("var", colnames(x)))
+    if(any(sapply(list(iTrue, iPred, iVar), length)!=1))
+      stop("accuracy: univariate case by specifying an `ivar` requires the named variable to occur ONCE in `observed` and once in `x`, here prefixed or suffixed with `pred` and `var` to identify kriging predictions and variances")
+    mm = "kriging"
+    observed = observed[,iTrue]
+    x = x[, c(iPred, iVar)]
+  } 
   if(mm=="kriging"){
     mynorms = xvErrorMeasures(x, observed=observed, output = "Mahalanobis", univariate=TRUE)
     D = 1
@@ -121,13 +136,13 @@ accuracy.data.frame <- function(x, observed=x$observed,
 
 
 #' @describeIn accuracy Compute accuracy and precision
-#' @param vars in multivariate cases, a vector of names of the variables to analyse
+#' @param ivars in multivariate cases, a vector of names of the variables to analyse (or one single variable name)
 #' @method accuracy DataFrameStack
 #' @export
 accuracy.DataFrameStack <- function(x, observed, 
-                                    vars = intersect(colnames(observed), dimnames(x)[[noStackDim(x)]]),
+                                    ivars = intersect(colnames(observed), dimnames(x)[[noStackDim(x)]]),
                                     prob = seq(from=0, to=1, by=0.05),
-                                    method = ifelse(length(vars)==1, "simulation", "Mahalanobis"),
+                                    method = ifelse(length(ivars)==1, "simulation", "Mahalanobis"),
                                     outMahalanobis=FALSE, ...){
   methods = c("simulation", "Mahalanobis","mahalanobis", "flow")
   mm = methods[pmatch(method, methods)]
@@ -146,8 +161,8 @@ accuracy.DataFrameStack <- function(x, observed,
     if(nrow(x)!=length(observed))
       if(nrow(x)!=nrow(observed))
         stop("accuracy: dimensions of x and observed do not match")
-    sims = as.matrix(gmApply(x, FUN=function(xx)xx[,vars]))
-    res = sapply(1:nrow(sims), function(i) oneAcc.sim(sims[i,], observed[i, vars]))
+    sims = as.matrix(gmApply(x, FUN=function(xx)xx[,ivars, drop=FALSE]))
+    res = sapply(1:nrow(sims), function(i) oneAcc.sim(sims[i,], observed[i, ivars, drop=FALSE]))
     aa = outer(res, prob, "<=")
     a = colMeans(aa)
     erg = data.frame(p=prob, accuracy=a)
@@ -157,8 +172,8 @@ accuracy.DataFrameStack <- function(x, observed,
   sim_array = as.array(x)
   permidx = c(ifelse(is.numeric(stackDim(x)),1,names(dimnames(x))[1]),stackDim(x),noStackDim(x)) 
   sim_array = aperm(sim_array, perm = permidx)
-  sim_array = sim_array[,,vars]
-  observed = as.matrix(unclass(observed)[,vars])
+  sim_array = sim_array[,,ivars, drop=FALSE]
+  observed = as.matrix(unclass(observed)[,ivars, drop=FALSE])
   N = dim(sim_array)[1]
   S = dim(sim_array)[stackDim(x)]
   D = dim(sim_array)[noStackDim(x)]
@@ -210,7 +225,8 @@ accuracy.DataFrameStack <- function(x, observed,
 #' @family accuracy functions
 mean.accuracy = function(x, ...){
   aux = x$accuracy - x$p
-  mean(ifelse(aux>0,1,0),...)
+  n = nrow(x)
+  n/(n-1)*mean(ifelse(aux>0,1,0),...)
 }
 
 
@@ -250,8 +266,9 @@ precision <- function(x,...) UseMethod("precision",x)
 #' @export
 precision.accuracy <- function(x, ...){
   aux = x$accuracy - x$p
-  erg = c(precision=1-2* x$accuracy %*% ifelse(aux>0,aux,0),
-      goodness = 1-(3*x$accuracy-2) %*% aux)/nrow(x)
+  a = ifelse(aux>0,1,0)
+  erg = c(precision=1-2*(a %*% aux)/(nrow(x)-1),
+      goodness = 1-((3*a-2) %*% aux)/(nrow(x)-1))
   return(erg)
 }
 
@@ -303,6 +320,36 @@ plot.accuracy <- function(x, xlim=c(0,1), ylim=c(0,1), xaxs="i", yaxs="i", type=
 xvErrorMeasures <- function(x,...) UseMethod("xvErrorMeasures", x)
 
 
+
+#' Cross-validation errror measures
+#' 
+#' Compute one or more error measures from cross-validation output
+#'
+#' @param x a vector containing the predicted values
+#' @param krigVar a vector containing the kriging variances
+#' @param observed a vector containing the true values
+#' @param output  which output do you want? a vector of one or several of  c("ME","MSE","MSDR","Mahalanobis")
+#' @param ... extra arguments for generic functionality
+#'
+#' 
+#' @export
+#' @method xvErrorMeasures default
+#' @family accuracy functions
+xvErrorMeasures.default <- function(x, krigVar, observed, output="MSDR1", ...){
+  if(length(output)>1)
+    return(sapply(output, function(o) xvErrorMeasures(x, krigVar, observed, output=o)))
+  
+  outputs = c("ME","MSE","MSDR","MSDR1","MSDR2","Mahalanobis")
+  output = outputs[pmatch(output, outputs, duplicates.ok = TRUE)]
+  
+  resids = x - observed
+  mynorms = resids^2/krigVar
+  if(output=="ME") return(mean(resids, na.rm=TRUE))
+  if(output=="MSE") return(mean(resids^2, na.rm=TRUE))
+  if(output=="MSDR") return(mean(mynorms, na.rm=TRUE))
+  if(output=="Mahalanobis") return(mynorms)
+}
+
 #' Cross-validation errror measures
 #' 
 #' Compute one or more error measures from cross-validation output
@@ -312,6 +359,7 @@ xvErrorMeasures <- function(x,...) UseMethod("xvErrorMeasures", x)
 #' @param observed a vector (if univariate) or a matrix/dataset of true values
 #' @param output which output do you want? a vector of one or several of  c("ME","MSE","MSDR","MSDR1","MSDR2","Mahalanobis")
 #' @param univariate logical control, typically you should not touch it
+#' @param ... extra arguments for generic functionality
 #'
 #' @return If just some of c("ME","MSE","MSDR","MSDR1","MSDR2") are requested, the output is a named
 #' vector with the desired quantities. If only "Mahalanobis" is requested, the output is a vector 
@@ -385,7 +433,17 @@ xvErrorMeasures.DataFrameStack = function(x, observed, output="ME",
   
   outputs = c("ME","MSE")
   output = outputs[pmatch(output, outputs, duplicates.ok = TRUE)]
-  mn = gmApply(x, FUN=colMeans)
-  class(mn) = "data.frame"
-  xvErrorMeasures(mn, observed, output, univariate)
+  dims = noStackDim(x)
+  dims = c(ifelse(is.numeric(dims), 1, "loc"), dims)
+  mn = gmApply(x, MARGIN=dims, FUN=mean)
+  # class(mn) = "data.frame"
+  # xvErrorMeasures(mn, observed, output, univariate=TRUE)
+  
+  resids = mn-observed
+  myfun = function(output){
+    if(output=="ME") return(colMeans(resids, na.rm=TRUE))
+    if(output=="MSE") return(mean(rowSums(resids^2, na.rm=T), na.rm=TRUE))
+  }
+  
+  return(sapply(outputs, myfun))
 }

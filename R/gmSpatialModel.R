@@ -64,7 +64,7 @@ setClass("gmSpatialModel", contains="SpatialPointsDataFrame",
 #' @export
 #' @family gmSpatialModel 
 #' @seealso [SequentialSimulation()], [TurningBands()] or [CholeskyDecomposition()] for specifying the exact 
-#' simulation method and its parameters, [predict.gmSpatialModel()] for running predictions or simulations
+#' simulation method and its parameters, [predict_gmSpatialModel] for running predictions or simulations
 #'
 #' @examples
 #' data("jura", package="gstat")
@@ -120,7 +120,7 @@ make.gmMultivariateGaussianSpatialModel <- function(
 #' @export
 #' @family gmSpatialModel
 #' @seealso [SequentialSimulation()], [TurningBands()] or [CholeskyDecomposition()] for specifying the exact 
-#' simulation method and its parameters, [predict.gmSpatialModel()] for running predictions or simulations
+#' simulation method and its parameters, [predict_gmSpatialModel] for running predictions or simulations
 #'
 #' @examples
 #' data("jura", package="gstat")
@@ -181,7 +181,7 @@ make.gmCompositionalGaussianSpatialModel <- function(
 #' @export
 #' @family gmSpatialModel 
 #' @seealso [DirectSamplingParameters()] for specifying a direct simulation method parameters,
-#' [predict.gmSpatialModel()] for running the simulation
+#' [predict_gmSpatialModel] for running the simulation
 make.gmCompositionalMPSSpatialModel = function(
   data, coords = attr(data, "coords"), V="ilr", prefix=NULL,  ## data trench
   model=NULL)   ## model trench
@@ -286,10 +286,10 @@ as.gstat.gmSpatialModel <- function(object, ...){
   # data elements
   coords = sp::coordinates(object)
   X = compositions::rmult(object@data, V= gsi.getV(object@data), orig=gsi.orig(object@data))
-  compo = backtransform(X)
   V = gsi.getV(X)
   if(!is.null(V)){
     # compositional case
+    compo = backtransform(X)
     Vinv = t(gsiInv(V))
     prefix = sub("1","",colnames(V)[1])
     if(is.null(prefix) | length(prefix)==0)   prefix = sub("1","",colnames(object@data)[1])
@@ -306,14 +306,23 @@ as.gstat.gmSpatialModel <- function(object, ...){
     if(any(is.infinite(beta))) beta = NULL
     # neighbourhood
     ng = object@parameters
-    if(!is(ng, "gmGaussianMethodParameters")) stop("as.gstat: object@parameters must be of class 'gmGaussianMethodParameters'!")
+    if(!is(ng, "gmKrigingNeighbourhood")) stop("as.gstat: object@parameters must be of class 'gmGaussianMethodParameters'!")
     res = compo2gstatLR(coords=coords, compo=compo, V=Vinv, lrvgLMC=lrvgLMC, 
                         nscore=FALSE, formulaterm = formulaterm, prefix=prefix, beta=beta, 
                         nmax=ng$nmax, nmin=ng$nmin, omax=ng$omax, maxdist=ng$maxdist, force=ng$force)
     return(res)
   }else{
     # non-compositional case
-    
+    prefix = sub("1","",colnames(V)[1])
+    vgLMC <- object@model@structure
+    formulaterm = paste(as.character(object@model@formula), collapse="")
+    beta = object@model@beta
+    if(any(is.infinite(beta))) beta = NULL
+    # neighbourhood
+    ng = object@parameters
+    res = rmult2gstat(coords=coords, data=X, V=V, vgLMC=vgLMC, 
+                    nscore=FALSE, formulaterm = formulaterm, prefix=prefix, beta=beta, 
+                    nmax=ng$nmax, nmin=ng$nmin, omax=ng$omax, maxdist=ng$maxdist, force=ng$force)    
   }
 }
 
@@ -356,7 +365,8 @@ as.gmSpatialModel.gstat = function(object, V=NULL, ...){
 #' @param newdata a collection of locations where a prediction/simulation is desired; this is typically 
 #' a [sp::SpatialPoints()], a data.frame or similar of X-Y(-Z) coordinates; or perhaps for gridded data 
 #' an object of class  [sp::GridTopology()], [sp::SpatialGrid()] or [sp::SpatialPixels()]
-#' @param pars parameters describing the method to use, *encloded in an object of appropriate class* (see below)
+#' @param pars parameters describing the method to use, *enclosed in an object of appropriate class* 
+#' (according to the method; see below)
 #' @param ... further parameters for generic functionality, currently ignored
 #'
 #' @return Depending on the nature of `newdata`, the result will be a data container of the same kind, 
@@ -383,118 +393,177 @@ as.gmSpatialModel.gstat = function(object, V=NULL, ...){
 #' Conversely, to run a multipoint geostatistics algorithm, the first condition is that `object@model` contains a 
 #' training image. Additionally, `pars` must describe the characteristics of the algorithm to use. Currently, only
 #' direct sampling is available: it can be obtained by providing some parameter object created with a call to
-#' [DirectSamplingParameters()]. Currently it is also necessary that `newdata` is a gridded set of locations.  
-#' @export
-#' @family gmSpatialModel 
-predict.gmSpatialModel <-  function(object, newdata=NULL, pars=object@parameters, ...){
-  # deal with (co)kriging
-  if(is(pars, "gmNeighbourhoodSpecification")){
-    cat("starting cokriging \n")
-    object@parameters = pars
-    return(predict(as.gstat(object), newdata=newdata, ...))
-  }
-  # probe on simulation methods
-  if(is(pars, "gmDirectSamplingParameters")){
-    cat("starting direct sampling \n")
-    # extract training image
-    gt.ti = sp::getGridTopology(object@model)
-    dt.ti = as(object@model,"SpatialGridDataFrame")@data
-    # extract newdata mask
-    mask = getMask(newdata)
-    # fuse newdata, conditioning data and mask
-    if(is.null(newdata)){
-      gt.nw = NULL # object@grid
-      newdata = sp::SpatialPixelsDataFrame(points = as(object, "SpatialPoints"), data=object@data)  
-                    # tolerance = sqrt(sum(gt.nw@cellsize^2))/2 , grid=gt.nw)
-    }else if(is(newdata, "GridTopology")){
-      gt.nw = newdata
-      newdata = sp::SpatialPixelsDataFrame(points = as(object, "SpatialPoints"), data=object@data, 
-                                       tolerance = sqrt(sum(gt.nw@cellsize^2))/2 , grid=gt.nw)
-    }else if(is(newdata, "SpatialGrid")){
-      gt.nw = sp::getGridTopology(newdata)
-      newdata = sp::SpatialPixelsDataFrame(points = as(object, "SpatialPoints"), data=object@data, 
-                                       tolerance = sqrt(sum(gt.nw@cellsize^2))/2 , grid=gt.nw)
-    }else if(is(newdata, "SpatialPixels")){
-      gt.nw = sp::getGridTopology(newdata)
-      cc = rbind(sp::coordinates(newdata), sp::coordinates(object))
-      ### WARNING: This is how it works!! COrrect from SpatialPoints and data.frame
-      aux = matrix(NA, nrow=nrow(sp::coordinates(newdata)), ncol=ncol(object@data))
-      colnames(aux) = colnames(object@data)
-      dt = rbind( aux , object@data)
-      newdata = sp::SpatialPixelsDataFrame(points = sp::SpatialPoints(cc), data=dt, 
-                                    tolerance = sqrt(sum(gt.nw@cellsize^2))/2 , grid=gt.nw)
-    }else if(is(newdata, "SpatialPoints")){
-      gt.nw = object@model@grid
-      cc = rbind(sp::coordinates(object), sp::coordinates(newdata))
-      ### WARNING: NOT YET TESTED WHAT HAPPENS WITH DUPLICATE LOCATIONS!!! 
-      aux = matrix(NA, nrow=nrow(sp::coordinates(newdata)), ncol=ncol(object@data))
-      colnames(aux) = colnames(object@data)
-      dt = rbind( object@data, aux )
-      newdata = sp::SpatialPixelsDataFrame(points = sp::SpatialPoints(cc), data=dt,
-                     tolerance = sqrt(sum(gt.nw@cellsize^2))/2) # , grid=gt.nw)
-    }else if(is.data.frame(newdata)){
-      gt.nw = NULL # object@grid
-      cc = rbind(sp::coordinates(object), newdata[,1:2])
-      if( all( colnames(object@data) %in% colnames(newdata) ) ){
-        aux = as.matrix(newdata[,colnames(object@data)])
-      }else{
-        aux = matrix(NA, nrow=nrow(sp::coordinates(newdata)), ncol=ncol(object@data))
-      }
-      colnames(aux) = colnames(object@data)
-      ### WARNING: NOT YET TESTED WHAT HAPPENS WITH DUPLICATE LOCATIONS!!! 
-      dt = rbind( object@data, aux )
-      newdata = sp::SpatialPixelsDataFrame(points = sp::SpatialPoints(cc), data=dt)
-                                       # tolerance = sqrt(sum(gt.nw@cellsize^2))/2 , grid=gt.nw)
-    }
-    if(is.null(gt.nw)) gt.nw = sp::getGridTopology(newdata)
-    dt.nw = as(newdata,"SpatialGridDataFrame")@data
-    dt.ti = as(object@model,"SpatialGridDataFrame")@data
-    if(all(gt.nw@cellsize!=gt.ti@cellsize)) 
-      stop("predict.gmSpatialModel with gmDirectSamplingParameters: inferred grid topologies for newdata, conditioning data and model do not coincide")
-    if(is.null(mask)) mask = rep(TRUE, nrow(dt.nw))
-    #erg = gsi.DS4CoDa(n=pars$patternSize, f=pars$scanFraction, t=pars$gof, n_realiz=pars$nsim, 
-    #            nx_TI=gt.ti@cells.dim[1], ny_TI=gt.ti@cells.dim[2], 
-    #            nx_SimGrid= gt.nw@cells.dim[1], ny_SimGrid=gt.nw@cells.dim[2],
-    #            TI_input=as.matrix(dt.ti),
-    #            SimGrid_input=as.matrix(dt.nw), 
-    #            V = "I", W=gsi.getV(object@data), 
-    #            ivars_TI = colnames(dt.ti), 
-    #            SimGrid_mask = mask, 
-    #            invertMask = FALSE)
-    erg = gsi.DS(n=pars$patternSize, f=pars$scanFraction, t=pars$gof, n_realiz=pars$nsim, 
-                dim_TI=gt.ti@cells.dim, dim_SimGrid=gt.nw@cells.dim,   
-                TI_input=as.matrix(dt.ti), SimGrid_input=as.matrix(dt.nw),
-                ivars_TI = colnames(dt.ti), 
-                SimGrid_mask = mask, 
-                invertMask = FALSE)
-    erg = gmApply(erg, FUN=ilrInv, V=gsi.getV(object@data), orig=gsi.orig(object@data))
-    erg = sp::SpatialGridDataFrame(grid = gt.nw, data=erg)
-    return(erg)
-  }else if(is(pars, "gmSequentialSimulation")){
-    cat("starting SGs \n")
-    object@parameters = pars$ng
-    erg = predict(as.gstat(object), newdata=newdata, nsim=pars$nsim, debug.level=pars$debug.level, ...)
-    Dg = ncol(object@coords)
-    erg = DataFrameStack(erg[,-(1:Dg)], 
-            dimnames=list(
-                loc=1:nrow(erg), sim=1:pars$nsim,
-                var=colnames(object@data)
-            ),
-          stackDim="sim")
-    attr(erg, "coords") = newdata
-    return(erg)
-  }else if(is(pars, "gmTurningBands")){
-    cat("starting turning bands \n")
-  }else if(is(pars, "gmCholeskyDecomposition")){
-    cat("starting Choleski decomposition \n")
-  }
-  
-}
+#' [DirectSamplingParameters()]. This method requires `newdata` to be on a gridded set of locations (acceptable
+#' object classes are `sp::gridTopology`, `sp::SpatialGrid`, `sp::SpatialPixels`, `sp::SpatialPoints` or `data.frame`,
+#' for the last two a forced conversion to a grid will be attempted).  
+#' @family gmSpatialModel
+#' @name predict_gmSpatialModel
+NULL
 
+#' @rdname predict_gmSpatialModel
+setMethod("predict", signature(object="gmSpatialModel"),
+          function(object, newdata, pars, ...){
+            Predict(object, newdata, pars, ...)
+          })
+          
+
+
+#' @rdname predict_gmSpatialModel
+#' @include gmAnisotropy.R
+#' @include preparations.R
+#'  @export
+setMethod("Predict",signature(object="gmSpatialModel", newdata="ANY", pars="missing"),
+          function(object, newdata, pars, ...){
+            if(is.null(object$pars)) object$pars = KrigingNeighbourhood()
+            predict(object, newdata, pars = object$pars, ...)
+          }
+)
+
+
+#' @rdname predict_gmSpatialModel
+#' @include gmSpatialMethodParameters.R
+#' @export
+setMethod("Predict",signature(object="gmSpatialModel", newdata="ANY", pars="gmNeighbourhoodSpecification"),
+          function(object, newdata, pars, ...){
+            cat("starting cokriging \n")
+            object@parameters = pars
+            out = predict(as.gstat(object), newdata=newdata, ...)
+            return(out)
+          }
+)
+
+
+
+#' @rdname predict_gmSpatialModel
+#' @export
+setMethod("Predict",signature(object="gmSpatialModel", newdata="ANY", pars="gmTurningBands"),
+          function(object, newdata, pars, ...){
+            stop("Turning Bands method not yet interfaced here; use")
+            cat("starting turning bands \n")
+          }
+)
+
+
+#' @rdname predict_gmSpatialModel
+#' @export
+setMethod("Predict",signature(object="gmSpatialModel", newdata="ANY", pars="gmCholeskyDecomposition"),
+          function(object, newdata, pars, ...){
+            stop("Choleski decomposition method not yet implemented")
+            cat("starting Choleski decomposition \n")
+          }
+)
+
+
+
+
+#' @rdname predict_gmSpatialModel
+#' @export
+setMethod("Predict",signature(object="gmSpatialModel", newdata="ANY", pars="gmSequentialSimulation"),
+          function(object, newdata, pars, ...){
+            cat("starting SGs \n")
+            object@parameters = pars$ng
+            erg = predict(as.gstat(object), newdata=newdata, nsim=pars$nsim, debug.level=pars$debug.level, ...)
+            Dg = ncol(object@coords)
+            erg = DataFrameStack(erg[,-(1:Dg)], 
+                                 dimnames=list(
+                                   loc=1:nrow(erg), sim=1:pars$nsim,
+                                   var=colnames(object@data)
+                                 ),
+                                 stackDim="sim")
+            attr(erg, "coords") = newdata
+            return(erg)
+          }
+)
+
+
+
+#' @rdname predict_gmSpatialModel
+#' @export
+setMethod("Predict",signature(object="gmSpatialModel", newdata="ANY", pars="gmDirectSamplingParameters"),
+          function(object, newdata, pars, ...){
+            
+            cat("starting direct sampling \n")
+            # extract training image
+            gt.ti = sp::getGridTopology(object@model)
+            dt.ti = as(object@model,"SpatialGridDataFrame")@data
+            # extract newdata mask
+            mask = getMask(newdata)
+            # fuse newdata, conditioning data and mask
+            if(is.null(newdata)){
+              gt.nw = NULL # object@grid
+              newdata = sp::SpatialPixelsDataFrame(points = as(object, "SpatialPoints"), data=object@data)  
+              # tolerance = sqrt(sum(gt.nw@cellsize^2))/2 , grid=gt.nw)
+            }else if(is(newdata, "GridTopology")){
+              gt.nw = newdata
+              newdata = sp::SpatialPixelsDataFrame(points = as(object, "SpatialPoints"), data=object@data, 
+                                                   tolerance = sqrt(sum(gt.nw@cellsize^2))/2 , grid=gt.nw)
+            }else if(is(newdata, "SpatialGrid")){
+              gt.nw = sp::getGridTopology(newdata)
+              newdata = sp::SpatialPixelsDataFrame(points = as(object, "SpatialPoints"), data=object@data, 
+                                                   tolerance = sqrt(sum(gt.nw@cellsize^2))/2 , grid=gt.nw)
+            }else if(is(newdata, "SpatialPixels")){
+              gt.nw = sp::getGridTopology(newdata)
+              cc = rbind(sp::coordinates(newdata), sp::coordinates(object))
+              ### WARNING: This is how it works!! COrrect from SpatialPoints and data.frame
+              aux = matrix(NA, nrow=nrow(sp::coordinates(newdata)), ncol=ncol(object@data))
+              colnames(aux) = colnames(object@data)
+              dt = rbind( aux , object@data)
+              newdata = sp::SpatialPixelsDataFrame(points = sp::SpatialPoints(cc), data=dt, 
+                                                   tolerance = sqrt(sum(gt.nw@cellsize^2))/2 , grid=gt.nw)
+            }else if(is(newdata, "SpatialPoints")){
+              gt.nw = object@model@grid
+              cc = rbind(sp::coordinates(object), sp::coordinates(newdata))
+              ### WARNING: NOT YET TESTED WHAT HAPPENS WITH DUPLICATE LOCATIONS!!! 
+              aux = matrix(NA, nrow=nrow(sp::coordinates(newdata)), ncol=ncol(object@data))
+              colnames(aux) = colnames(object@data)
+              dt = rbind( object@data, aux )
+              newdata = sp::SpatialPixelsDataFrame(points = sp::SpatialPoints(cc), data=dt,
+                                                   tolerance = sqrt(sum(gt.nw@cellsize^2))/2) # , grid=gt.nw)
+            }else if(is.data.frame(newdata)){
+              gt.nw = NULL # object@grid
+              cc = rbind(sp::coordinates(object), newdata[,1:2])
+              if( all( colnames(object@data) %in% colnames(newdata) ) ){
+                aux = as.matrix(newdata[,colnames(object@data)])
+              }else{
+                aux = matrix(NA, nrow=nrow(sp::coordinates(newdata)), ncol=ncol(object@data))
+              }
+              colnames(aux) = colnames(object@data)
+              ### WARNING: NOT YET TESTED WHAT HAPPENS WITH DUPLICATE LOCATIONS!!! 
+              dt = rbind( object@data, aux )
+              newdata = sp::SpatialPixelsDataFrame(points = sp::SpatialPoints(cc), data=dt)
+              # tolerance = sqrt(sum(gt.nw@cellsize^2))/2 , grid=gt.nw)
+            }
+            if(is.null(gt.nw)) gt.nw = sp::getGridTopology(newdata)
+            dt.nw = as(newdata,"SpatialGridDataFrame")@data
+            dt.ti = as(object@model,"SpatialGridDataFrame")@data
+            if(all(gt.nw@cellsize!=gt.ti@cellsize)) 
+              stop("predict for gmSpatialModel with gmDirectSamplingParameters: inferred grid topologies for newdata, conditioning data and model do not coincide")
+            if(is.null(mask)) mask = rep(TRUE, nrow(dt.nw))
+            #erg = gsi.DS4CoDa(n=pars$patternSize, f=pars$scanFraction, t=pars$gof, n_realiz=pars$nsim, 
+            #            nx_TI=gt.ti@cells.dim[1], ny_TI=gt.ti@cells.dim[2], 
+            #            nx_SimGrid= gt.nw@cells.dim[1], ny_SimGrid=gt.nw@cells.dim[2],
+            #            TI_input=as.matrix(dt.ti),
+            #            SimGrid_input=as.matrix(dt.nw), 
+            #            V = "I", W=gsi.getV(object@data), 
+            #            ivars_TI = colnames(dt.ti), 
+            #            SimGrid_mask = mask, 
+            #            invertMask = FALSE)
+            erg = gsi.DS(n=pars$patternSize, f=pars$scanFraction, t=pars$gof, n_realiz=pars$nsim, 
+                         dim_TI=gt.ti@cells.dim, dim_SimGrid=gt.nw@cells.dim,   
+                         TI_input=as.matrix(dt.ti), SimGrid_input=as.matrix(dt.nw),
+                         ivars_TI = colnames(dt.ti), 
+                         SimGrid_mask = mask, 
+                         invertMask = FALSE)
+            erg = gmApply(erg, FUN=ilrInv, V=gsi.getV(object@data), orig=gsi.orig(object@data))
+            erg = sp::SpatialGridDataFrame(grid = gt.nw, data=erg)
+            return(erg)
+          }
+)
 
 
 #' @describeIn gmSpatialModel Compute a variogram, see [variogram_gmSpatialModel()] for details
 #' @inheritParams variogram_gmSpatialModel
+#' @include variograms.R
 #' @export
 setMethod("variogram", signature=c(object="gmSpatialModel"), 
           def=variogram_gmSpatialModel)
@@ -505,6 +574,7 @@ setMethod("variogram", signature=c(object="gmSpatialModel"),
 #' objects
 #' @inheritParams logratioVariogram
 #' @inheritParams logratioVariogram_gmSpatialModel
+#' @include compositionsCompatibility.R
 #' @export
 setMethod("logratioVariogram", "gmSpatialModel", logratioVariogram_gmSpatialModel)
 
@@ -513,6 +583,7 @@ setMethod("logratioVariogram", "gmSpatialModel", logratioVariogram_gmSpatialMode
 #' for details
 #' @inheritParams as.gstat
 #' @export
+#' @include gstatCompatibility.R
 setMethod("as.gstat", signature="gmSpatialModel", def=as.gstat.gmSpatialModel)
 
 

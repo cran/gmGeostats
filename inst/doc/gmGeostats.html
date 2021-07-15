@@ -14,6 +14,54 @@
 
 <title>Multivariate geostatistics with gmGeostats</title>
 
+<style type="text/css">
+a.anchor-section {margin-left: 10px; visibility: hidden; color: inherit;}
+a.anchor-section::before {content: '#';}
+.hasAnchor:hover a.anchor-section {visibility: visible;}
+</style>
+<script>// Anchor sections v1.0 written by Atsushi Yasumoto on Oct 3rd, 2020.
+document.addEventListener('DOMContentLoaded', function() {
+  // Do nothing if AnchorJS is used
+  if (typeof window.anchors === 'object' && anchors.hasOwnProperty('hasAnchorJSLink')) {
+    return;
+  }
+
+  const h = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+
+  // Do nothing if sections are already anchored
+  if (Array.from(h).some(x => x.classList.contains('hasAnchor'))) {
+    return null;
+  }
+
+  // Use section id when pandoc runs with --section-divs
+  const section_id = function(x) {
+    return ((x.classList.contains('section') || (x.tagName === 'SECTION'))
+            ? x.id : '');
+  };
+
+  // Add anchors
+  h.forEach(function(x) {
+    const id = x.id || section_id(x.parentElement);
+    if (id === '') {
+      return null;
+    }
+    let anchor = document.createElement('a');
+    anchor.href = '#' + id;
+    anchor.classList = ['anchor-section'];
+    x.classList.add('hasAnchor');
+    x.appendChild(anchor);
+  });
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -35,7 +83,7 @@ a.sourceLine { text-indent: -1em; padding-left: 1em; }
 pre.numberSource a.sourceLine
   { position: relative; left: -4em; }
 pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+  { content: attr(title);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
     border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
@@ -303,31 +351,31 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <div id="the-basics" class="section level2">
 <h2>The basics</h2>
-<p>“gmGeostats” is a package for multivariate geostatistics, focusing in the usage of data from restricted sampling spaces. Such data include positive data, compositional data, distributional data and the like. Most of the times, the geostatistical analysis of such data includes three steps:</p>
+<p>“gmGeostats” is a package for multivariate geostatistics, focusing in the usage of data from multivariate restricted sampling spaces. Such data include positive data, compositional data, distributional data and the like. Most of the times, the geostatistical analysis of such data includes three steps:</p>
 <ol style="list-style-type: decimal">
 <li>express your data as some vectors of real values, through a mapping. Such mappings can be isomorphisms (for Euclidean spaces) or embeddings (for regular manifolds)</li>
 <li>analyse the resulting multivariate data with vectorial methods (i.e. using cross-variograms, cokriging, cosimulation or distance based methods modified in such a way that they are rotation-invariant resp. affine equivariant)</li>
 <li>back-transform the interpolations/simulations to the original units</li>
 </ol>
 <p>The package is loaded, as usual with</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(gmGeostats)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="co">#&gt; Welcome to 'gmGeostats', a package for multivariate geostatistical analysis.</span></a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co">#&gt;  Note: use 'fit_lmc' instead of fit.lmc</span></a></code></pre></div>
-<p>and it fundamentally depends on packages “compositions”, “gstat” and “sp”. Other dependencies are more instrumental and less fundamental.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(gmGeostats)</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="co">#&gt; Welcome to &#39;gmGeostats&#39;, a package for multivariate geostatistical analysis.</span></a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="co">#&gt;  Note: use &#39;fit_lmc&#39; instead of fit.lmc</span></a></code></pre></div>
+<p>and it fundamentally depends on packages “compositions”, “gstat” and “sp”. Other dependencies are more instrumental and less fundamental. NOTE: if you separately need “compositions” or “gstat”, load these packages first, then load “gmGeostats”. This will ensure that the overloaded functions work properly for all three packages. Alternatively, use fully qualified names (e.g. <code>pkg::foo()</code>).</p>
 <p>This vignette very briefly presents the steps to follow in several analysis and modelling routes, illustrated with the case of compositional data. No explanations, theory or discussion is included.</p>
 </div>
 <div id="exploratory-analysis" class="section level2">
 <h2>Exploratory analysis</h2>
 <div id="descriptive-analysis" class="section level3">
 <h3>Descriptive analysis</h3>
-<p>The data can be visually inspected with scatterplots, in raw representation (<code>plot()</code>, <code>pairs()</code>), in ternary diagrams (<code>compositions::plot.acomp()</code>), and in scatterplots of logratio transformed data (use the transformations <code>pwlr()</code>, <code>alr()</code>, <code>clr()</code> or <code>ilr()</code> from package “compositions”, then <code>pairs()</code>). Function <code>pairs()</code> can be given panel functions such as e.g. <code>vp.lrdensityplot()</code>, <code>vp.kde2dplot()</code> or <code>vp.lrboxplot()</code> resp. for creating histograms of pairwise logratios, 2D kernel density maps on the scatterplots or boxplots of the pairwise logratios. Package “compositions” provides the class “acomp” to directly deal with the right representation in the several methods.</p>
-<p>Principal component analysis is also a strong help. For this, you need an isometry (not just an isomorphism). Transformation <code>clr()</code> is the best for this, and is actually automatically used when you do <code>princomp(acomp(YOURDATA))</code>. “gmGeostats” provides generalised diagonalisation methods, see <code>?genDiag</code> for details.</p>
+<p>The data can be visually inspected with scatterplots, in raw representation (<code>plot()</code>, <code>pairs()</code>), in ternary diagrams (<code>compositions::plot.acomp()</code>), and in scatterplots of logratio transformed data (use the transformations <code>pwlr()</code>, <code>alr()</code>, <code>clr()</code> or <code>ilr()</code> from package “compositions”, then <code>pairs()</code>). Function <code>pairs()</code> can be given panel functions such as e.g. <code>vp.lrdensityplot()</code>, <code>vp.kde2dplot()</code> or <code>vp.lrboxplot()</code> resp. for creating histograms of pairwise logratios, 2D kernel density maps on the scatterplots or boxplots of the pairwise logratios. Package “compositions” provides the class “acomp” to directly deal with the right representation in the several methods.</p>
+<p>Principal component analysis is also a strong help. For this, you need an isometry (not just an isomorphism). Transformation <code>clr()</code> is the best for this, and is actually automatically used when you do <code>princomp(acomp(YOURDATA))</code>. “gmGeostats” provides generalised diagonalisation methods to account for the spatial dependence, see <code>?genDiag</code> for details.</p>
 </div>
 <div id="spatial-analysis" class="section level3">
 <h3>Spatial analysis</h3>
-<p>Create your spatial objects by connecting the spatial coordinates to the multivariate observations via the functions <code>sp:SpatialPointsDataFrame()</code> or better the “gmGeostats” functions <code>make.gmMultivariateGaussianSpatialModel()</code> for multivariate data and <code>make.gmCompositionalGaussianSpatialModel()</code> for compositional data. This produces objects of spatial data container class “gmSpatialModel”, that are necessary for the rest of the analysis and modelling.</p>
+<p>Create your spatial objects by connecting the spatial coordinates to the multivariate observations via the functions <code>sp:SpatialPointsDataFrame()</code> or better the “gmGeostats” functions <code>make.gmMultivariateGaussianSpatialModel()</code> for multivariate data and <code>make.gmCompositionalGaussianSpatialModel()</code> for compositional data. The functions <code>make.gm******SpatialModel()</code> produces objects of spatial data container class “gmSpatialModel”, that are necessary for the rest of the analysis and modelling.</p>
 <p>Swath plots are available with command <code>swath()</code>. If you give it an “acomp” object you will obtain a matrix of logratio swath plots. Otherwise you will get an set of swath plots, one for each variable. Function <code>pairsmap()</code> works similarly, but produces bubble maps (you can control size and color of the symbols).</p>
-<p>Empirical variograms can be obtained with function <code>variogram()</code> out of the spatial data container. You can also use the function <code>logratioVariogram()</code> for compositional data. Both accept anisotropy. Their output can be plotted with <code>plot()</code>, which has specific methods for compositional and non-compositional data. In the case of anisotropic data, you can also use <code>image()</code> to visualise the variogram maps.</p>
+<p>Empirical variograms can be obtained with function <code>variogram()</code> out of the spatial data container. You can also use the function <code>logratioVariogram()</code> for compositional data. Both accept anisotropy. Their output can be plotted with <code>plot()</code>, which has specific methods for compositional and non-compositional data. In the case of anisotropic data, you can also use a method of <code>image()</code> to visualise the variogram maps, see <code>?image.logratioVariogramAnisotropy</code> for details.</p>
 <p>Finally you can also check for the strength of the spatial dependence with the test <code>noSpatCorr.test()</code>. This is a permutations test, which null hypothesis is that the data do not exhibit spatial autocorrelation.</p>
 </div>
 </div>
@@ -340,12 +388,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="variogram-and-neighbourhood-validation" class="section level3">
 <h3>Variogram and neighbourhood validation</h3>
-<p>Neighbourhood descriptions are created with function <code>KrigingNeighbourhood()</code>. Kriging neighbourhoods and LMC variogram models and can be attached to the “gmSpatialModel” objects at the moment of creation via <code>make.*()</code> functions, using arguments <code>ng</code> and <code>model</code>.</p>
-<p>Validation of the model or of the neighbourhood can then be obtained with the function <code>validate()</code>. This requires an <code>object</code> (the complete “gmSpatialModel”) and a <code>strategy</code>. Validation strategies are small S3-objects describing what will exactly be done in the validation. They can be quickly defined by means of configuration functions as <code>LeaveOneOut()</code> or <code>NfoldCrossValidation()</code>. The call to <code>validate()</code> will provide some output that can be evaluated with functions such as <code>xvErrorMeasures()</code></p>
+<p>Neighbourhood descriptions are created with function <code>KrigingNeighbourhood()</code>. Kriging neighbourhoods and LMC variogram models and can be attached to the “gmSpatialModel” objects at the moment of creation via <code>make.gm*()</code> functions, using arguments <code>ng</code> and <code>model</code> (this last one strictly requiring you to also specify the <code>formula</code> argument).</p>
+<p>Validation of the model or of the neighbourhood can then be obtained with the function <code>validate()</code>. This requires an <code>object</code> (the complete “gmSpatialModel”) and a <code>strategy</code>. Validation strategies are small S3-objects describing what will exactly be done in the validation. They can be quickly defined by means of configuration functions as <code>LeaveOneOut()</code> or <code>NfoldCrossValidation()</code>. The call to <code>validate()</code> will provide some output that can be evaluated with functions such as <code>xvErrorMeasures()</code>, <code>accuracy()</code> or <code>prediction()</code>.</p>
 </div>
 <div id="cokriging-and-mapping" class="section level3">
 <h3>Cokriging and mapping</h3>
-<p>This way of working is common to the package. You always build a model (with a <code>make.*()</code> function), define a method parameter object (created with a specific, verbose, helper function), and feed both to a common umbrella function describing what do you want to do: <code>validate()</code> or <code>predict()</code>, which also requires an argument <code>newdata</code> as is standard in R. The output can then be postprocessed by specific functions.</p>
+<p>This way of working is common to the package. You always build a model (with a <code>make.*()</code> function), define a method parameter object (created with a specific, verbose, helper function), and feed both to a common umbrella function describing what do you want to do: <code>validate()</code> or <code>predict()</code>, the second one also requires an argument <code>newdata</code> as is standard in R. The output can then be postprocessed by specific functions.</p>
 <p>The method parameter for cokriging is actually the neighbourhood. So, you can give <code>predict()</code> an object resulting from <code>KrigingNeighbourhood()</code>, otherwise it will take the standard one stored in the “gmSpatialModel”, or produce a global neighbourhood cokriging if no neighbourhood description is found.</p>
 <p>Output of <code>predict</code> for “gstat” objects (the current default) can be re-formed to compositional shape by means of the function <code>gsi.gstatCokriging2compo()</code>; there is an <code>gsi.gstatCokriging2rmult()</code> as well for multivariate data. Maps can be obtained with function <code>image_cokriged()</code>, that produces a choropleth map with legend, and returns the color scale (i.e. some breaks and a palette of colors) to be used, e.g. for plotting the initial data on top of the maps using the same color scale. NOTE: this funtion does NOT freeze the plot! Most probably you will need to call <code>par(mfrow=c(1,1))</code> to create a clean slate device for the next plot.</p>
 </div>
@@ -362,12 +410,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="postprocessing" class="section level3">
 <h3>Postprocessing</h3>
-<p>Multivariate cosimulation output can be seen analogue to a 3-dimensional array, with one dimension running along the simulated locations, one dimension along the realisations and one dimension along the variables. This structure is captured in “gmGeostats” with an object of class “DataFrameStack” (extending “data.frame” and mimicking arrays). Point-wise, simulation-wise and variable-wise ransformations on this array can be computed with function <code>gmApply()</code>, a wrapper on <code>base::apply()</code> allowing for an easier management of the dimensions of the simulation stack. Maps can also be produced by function <code>image_cokriged()</code>.</p>
+<p>Multivariate cosimulation output can be seen analogue to a 3-dimensional array, with one dimension running along the simulated locations, one dimension along the realisations and one dimension along the variables. This structure is captured in “gmGeostats” with an object of class “DataFrameStack” (extending “data.frame” and mimicking arrays). Point-wise, simulation-wise and variable-wise transformations on this array can be computed with function <code>gmApply()</code>, a wrapper on <code>base::apply()</code> allowing for an easier management of the dimensions of the simulation stack. Maps can also be produced by function <code>image_cokriged()</code>.</p>
 </div>
 </div>
 <div id="multipoint-simulation" class="section level2">
 <h2>Multipoint simulation</h2>
-<p>Multipoint cosimulation is available with the same strategy than Gaussian based simulation. One needs first to define a “gmSpatialModel” containing the conditioning data (the original data) and the stochastic model (the training image). Second, a simulation grid must be created, and provided to <code>predict()</code> as the <code>newdata</code> argument. And third, we must provide some method parameters defining the simulation algorithm to use: currently, only direct sampling is available, and its parameters can be obtained calling <code>DSpars()</code>.</p>
+<p>Multipoint cosimulation is available with the same strategy than Gaussian based simulation. One needs first to define a “gmSpatialModel” containing the conditioning data (the original data) and the stochastic model (the training image). Second, a simulation grid must be created, and provided to <code>predict()</code> as the <code>newdata</code> argument. And third, we must provide some method parameters defining the simulation algorithm to use: currently, only direct sampling is available, and its parameters can be constructed calling <code>DSpars()</code>.</p>
 <p>Training images are currently objects of class “SpatialPixelsDataFrame” or “SpatialGridDataFrame”, from package “sp”. The conditioning data will be migrated to the simulation grid internally; the grid topologies for simulation and training image will be checked for consistency.</p>
 </div>
 

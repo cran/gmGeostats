@@ -98,15 +98,18 @@ validate.LeaveOneOut = function(object, strategy, ...){
 #' @method validate NfoldCrossValidation
 #' @export
 validate.NfoldCrossValidation = function(object, strategy, ...){
+  # manage "gstat" case
   if("gstat" %in% class(object)){
     warning("validate: object provided is of class 'gstat', attempting 'gstat.cv(..., remove.all=TRUE, all.residuals=TRUE)'")
     return(gstat::gstat.cv(object, nfold=strategy$nfolds, remove.all = TRUE, all.residuals = TRUE))
   }
+  # manage "gmSpatialModel" case
   object = try(as.gmSpatialModel(object))
   if(class(object)=="try-error") stop("validate.NfoldCrossValidation: provided object not interpretable")
   # interpret the information about the n-folds provided
   n = strategy$nfolds
   m = nrow(object@data)
+  nms = rownames(object)
   if(length(n)==1){
     nmax = n
     n0 = rep(1:n, each=ceiling(m/n))
@@ -115,21 +118,27 @@ validate.NfoldCrossValidation = function(object, strategy, ...){
     nmax = max(n)
   }
   if(length(n)!=m) stop("validate.NfoldCrossValidation: provided n-fold info not interpretable (should be either an integer, or a grouping factor)")
+  # one fold validation function
   myfun = function(i){
     tk = (n==i)
     object0 = object
-    object0@data=object@data[!tk,]
-    object0@coords=object@coords[!tk,]
-    rs = predict(object0, newdata = object@coords[tk,])
+    object0@data=object@data[!tk,, drop=FALSE]
+    object0@coords=object@coords[!tk,, drop=FALSE]
+    rs = predict(object0, 
+                 newdata = sp::SpatialPoints(coords = object@coords[tk,, drop=FALSE], 
+                                         proj4string = sp::CRS(sp::proj4string(object)), 
+                                         bbox=sp::bbox(object))
+                 )
   }
+  # apply to each data slice
   requireNamespace("foreach", quietly = TRUE)
   if(!strategy$doAll) return(myfun(1))
   i = 1:nmax
-  res = foreach(i=i, .combine ="list") %dopar% myfun(i)
-  res = unsplit(res, f=n)
+  res = foreach(i=i, .combine ="rbind") %dopar% myfun(i)
+  # reorder and return
+  res = res[nms,] 
   return(res)
 }
-
 
 
 

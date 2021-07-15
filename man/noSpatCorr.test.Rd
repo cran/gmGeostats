@@ -54,13 +54,11 @@ Spatial objects with a "data" slot
 }}
 
 \examples{
-\donttest{ 
 data("jura", package="gstat")
 X = jura.pred[, 1:2]
 Z = data.frame(compositions::ilr(jura.pred[,-(1:6)]))
-noSpatCorr.test(Z=Z, X=X)
+## noSpatCorr.test(Z=Z, X=X)
 # now destroy the spatial structure reshuffling the coordinates:
-ip = sample(nrow(X))
-noSpatCorr.test(Z=Z, X=X[ip,]) 
-}
+## ip = sample(nrow(X))
+## noSpatCorr.test(Z=Z, X=X[ip,]) 
 }

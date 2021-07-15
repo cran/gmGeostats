@@ -430,7 +430,9 @@ RJD.rcomp <- RJD.acomp
 #'
 #' @return A data set or compositional object of the nature of the original data
 #' used for creating the genDiag object.
+#' @include gmAnisotropy.R
 #' @export
+#' @method predict genDiag
 #' @family generalised Diagonalisations
 #' @examples
 #' data("jura", package="gstat")
@@ -457,7 +459,6 @@ predict.genDiag = function (object, newdata=NULL, ...) {
   }
   return(Z)
 }
-
 
 
 #' Colored biplot for gemeralised diagonalisations

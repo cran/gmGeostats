@@ -200,6 +200,7 @@ setClassUnion(name="GridOrNothing", members = c("NULL", "GridTopology"))
 
 
 .onLoad <- function(libname, pkgname){
+
   ## set package options ---- 
     # grid organisation
     gridOrder = list(refpoint="topleft", cycle=1:2)
@@ -215,7 +216,8 @@ setClassUnion(name="GridOrNothing", members = c("NULL", "GridTopology"))
   invisible()  
 }
 
-.onUnload <- function(libname, pkgname){
+.onUnload <- function(libpath){
+  library.dynam.unload("gmGeostats", libpath)
   ## remove package options ---- 
   options(gmGeostats=NULL)
   

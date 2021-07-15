@@ -20,7 +20,7 @@ gsi.DS4CoDa <- function(n, f, t, n_realiz, nx_TI, ny_TI, nx_SimGrid, ny_SimGrid,
                         SimGrid_mask = ncol(SimGrid_input), invertMask = TRUE
                         ){
   .Deprecated(new = "gsi.DS", 
-              msg="gsi.DS4CoDa is deprecated; use gsi.DS or go via make.gm*-functions followed by DSpars and predict.gmSpatialModel")
+              msg="gsi.DS4CoDa is deprecated; use gsi.DS or go via make.gm*-functions followed by DSpars and predict for gmSpatialModel")
   ### extract elements
   # mask
   if(length(SimGrid_mask)==1){
@@ -226,7 +226,7 @@ gsi.DS4CoDa <- function(n, f, t, n_realiz, nx_TI, ny_TI, nx_SimGrid, ny_SimGrid,
 #' grid is simulated. The '@data' slot of these objects contains a [DataFrameStack()] with the stacking dimension
 #' running through the realisations. It is safer to use this functionality through the interface
 #' [make.gmCompositionalMPSSpatialModel()], then request a direct simulation with [DSpars()] and
-#' finally run it with [predict.gmSpatialModel()].
+#' finally run it with [predict_gmSpatialModel].
 #' @export
 #' @importFrom utils txtProgressBar setTxtProgressBar
 #' @importFrom stats complete.cases lm 
@@ -249,13 +249,13 @@ gsi.DS4CoDa <- function(n, f, t, n_realiz, nx_TI, ny_TI, nx_SimGrid, ny_SimGrid,
 #' image_cokriged(SimGrid, ivar="V1", breaks=o1$breaks, col=o1$col)
 #' image_cokriged(SimGrid, ivar="V2", breaks=o2$breaks, col=o2$col)
 #' image_cokriged(SimGrid, ivar="mask", breaks=c(-0.0001, 0.5, 1.001))
-#' res = gsi.DS(n=5, f=0.75, t=0.05, n_realiz=2, dim_TI=c(10,7),  dim_SimGrid=c(10,7), 
-#'        TI_input=as.matrix(TI_input), SimGrid_input=as.matrix(SimGrid), 
-#'        ivars_TI = c("V1", "V2"), SimGrid_mask="mask", invertMask=TRUE)
-#' image_cokriged(cbind(xy_TI, getStackElement(res,1)), ivar="V1", breaks=o1$breaks, col=o1$col)
-#' image_cokriged(cbind(xy_TI, getStackElement(res,2)), ivar="V1", breaks=o1$breaks, col=o1$col)
-#' image_cokriged(cbind(xy_TI, getStackElement(res,1)), ivar="V2", breaks=o2$breaks, col=o2$col)
-#' image_cokriged(cbind(xy_TI, getStackElement(res,2)), ivar="V2", breaks=o2$breaks, col=o2$col)
+#' ## res = gsi.DS(n=5, f=0.75, t=0.05, n_realiz=2, dim_TI=c(10,7),  dim_SimGrid=c(10,7), 
+#' ##        TI_input=as.matrix(TI_input), SimGrid_input=as.matrix(SimGrid), 
+#' ##        ivars_TI = c("V1", "V2"), SimGrid_mask="mask", invertMask=TRUE)
+#' ## image_cokriged(cbind(xy_TI, getStackElement(res,1)), ivar="V1", breaks=o1$breaks, col=o1$col)
+#' ## image_cokriged(cbind(xy_TI, getStackElement(res,2)), ivar="V1", breaks=o1$breaks, col=o1$col)
+#' ## image_cokriged(cbind(xy_TI, getStackElement(res,1)), ivar="V2", breaks=o2$breaks, col=o2$col)
+#' ## image_cokriged(cbind(xy_TI, getStackElement(res,2)), ivar="V2", breaks=o2$breaks, col=o2$col)
 gsi.DS <- function(n, f, t, n_realiz, 
                    dim_TI, dim_SimGrid,  
                    TI_input, SimGrid_input,

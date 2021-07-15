@@ -51,7 +51,7 @@ A \code{\link[sp:SpatialGridDataFrame]{sp::SpatialPixelsDataFrame()}} or  \code{
 grid is simulated. The '@data' slot of these objects contains a \code{\link[=DataFrameStack]{DataFrameStack()}} with the stacking dimension
 running through the realisations. It is safer to use this functionality through the interface
 \code{\link[=make.gmCompositionalMPSSpatialModel]{make.gmCompositionalMPSSpatialModel()}}, then request a direct simulation with \code{\link[=DSpars]{DSpars()}} and
-finally run it with \code{\link[=predict.gmSpatialModel]{predict.gmSpatialModel()}}.
+finally run it with \link{predict_gmSpatialModel}.
 }
 \description{
 This function implements in R the direct sampling algorithm
@@ -74,13 +74,13 @@ SimGrid[tk,3:4]=NA
 image_cokriged(SimGrid, ivar="V1", breaks=o1$breaks, col=o1$col)
 image_cokriged(SimGrid, ivar="V2", breaks=o2$breaks, col=o2$col)
 image_cokriged(SimGrid, ivar="mask", breaks=c(-0.0001, 0.5, 1.001))
-res = gsi.DS(n=5, f=0.75, t=0.05, n_realiz=2, dim_TI=c(10,7),  dim_SimGrid=c(10,7), 
-       TI_input=as.matrix(TI_input), SimGrid_input=as.matrix(SimGrid), 
-       ivars_TI = c("V1", "V2"), SimGrid_mask="mask", invertMask=TRUE)
-image_cokriged(cbind(xy_TI, getStackElement(res,1)), ivar="V1", breaks=o1$breaks, col=o1$col)
-image_cokriged(cbind(xy_TI, getStackElement(res,2)), ivar="V1", breaks=o1$breaks, col=o1$col)
-image_cokriged(cbind(xy_TI, getStackElement(res,1)), ivar="V2", breaks=o2$breaks, col=o2$col)
-image_cokriged(cbind(xy_TI, getStackElement(res,2)), ivar="V2", breaks=o2$breaks, col=o2$col)
+## res = gsi.DS(n=5, f=0.75, t=0.05, n_realiz=2, dim_TI=c(10,7),  dim_SimGrid=c(10,7), 
+##        TI_input=as.matrix(TI_input), SimGrid_input=as.matrix(SimGrid), 
+##        ivars_TI = c("V1", "V2"), SimGrid_mask="mask", invertMask=TRUE)
+## image_cokriged(cbind(xy_TI, getStackElement(res,1)), ivar="V1", breaks=o1$breaks, col=o1$col)
+## image_cokriged(cbind(xy_TI, getStackElement(res,2)), ivar="V1", breaks=o1$breaks, col=o1$col)
+## image_cokriged(cbind(xy_TI, getStackElement(res,1)), ivar="V2", breaks=o2$breaks, col=o2$col)
+## image_cokriged(cbind(xy_TI, getStackElement(res,2)), ivar="V2", breaks=o2$breaks, col=o2$col)
 }
 \author{
 Hassan Talebi (copyright holder), Raimon Tolosana-Delgado

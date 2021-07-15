@@ -36,7 +36,7 @@ Read the package vignette for an extended scheme of the package
 functionality. The fundamental steps are:
 
 ``` r
-## load the package and its dependencies
+## load the package (NOTE: do not load "compositions" or "gstat" afterwards!)
 library(gmGeostats)
 #> Welcome to 'gmGeostats', a package for multivariate geostatistical analysis.
 #>  Note: use 'fit_lmc' instead of fit.lmc
@@ -81,24 +81,46 @@ vm = gstat::vgm(model="Sph", range=25, nugget=1, psill=1)
 gsm.f = fit_lmc(v = vge, g = gsm, model = vm)
 
 ## plot
-variogramModelPlot(vge, model = gsm.f)
+variogramModelPlot(vge, model = gsm.f, col="red")
 ```
 
-<img src="man/figures/README-structural-1.png" width="100%" />
+<img src="man/figures/README-structural-1.png" width="100%" /> The
+resulting variogram model (`gsm.f$model` in case of a “gstat” object)
+can the be appended to the spatial model, with
 
-This model can then be validated, interpolated and/or simulated. The
-workflow for each of these tasks is always:
+    gsm = make.gmCompositionalGaussianSpatialModel(
+      data = Zc, coords = X, V = "alr", formula = ~1,
+      model = gsm.f$model
+    )
 
-1.- define some method parameters with a tailored function, e.g.
-`LeaveOneOut()` for validation, `KrigingNeighbourhood()` for cokriging
-or `SequentialSimulation()` for sequential Gaussian Simulation
+Other empirical structural functions (e.g. logratio variograms from
+package “compositions”) and their theoretical counterparts
+(e.g. “CompLinModCoReg” objects from “compositions” or “LMCAnisCompo”
+from “gmGeostats”) can also be estimated resp. fitted and given to the
+argument `model` of this call to
+`make.gmCompositionalGaussianSpatialModel`. Other additional arguments
+are the mean value in case of simple (co)kriging, or descriptors of the
+local neighbourhood (see `?make.gmCompositionalGaussianSpatialModel` for
+more information), both using the same parameter names as in
+`?gstat::gstat` for ease of use.
+
+The resulting geostatistical model (including conditioning data and
+structural model) can then be validated, interpolated and/or simulated.
+The workflow for each of these tasks is always:
+
+1.- define some method parameters with a tailored function,
+e.g. `LeaveOneOut()` for validation, `KrigingNeighbourhood()` for
+cokriging (the neighbourgood can also be appended to
+`make.*SpatialModel()`-calls) or `SequentialSimulation()` for sequential
+Gaussian Simulation
 
 2.- if desired, define some new locations where to interpolate or
-simulate, using `expand.grid()` or `sp::GridTopology()` or similar
+simulate, using `expand.grid()`, `sp::GridTopology()` or alternatives
+from other packages
 
-3.- call an appropriate function, specifying the model, potential new
-data, and the parameters created in the preceding steps; e.g.
-`validate(model, pars)` for validation, or `predict(model, newdata,
+3.- call an appropriate analysis function, specifying the model,
+potential new data, and the parameters created in the preceding steps;
+e.g. `validate(model, pars)` for validation, or `predict(model, newdata,
 pars)` for interpolation or simulation
 
 More information can be found in the package vignette.

@@ -57,6 +57,7 @@ Other accuracy functions:
 \code{\link{mean.accuracy}()},
 \code{\link{plot.accuracy}()},
 \code{\link{precision}()},
+\code{\link{xvErrorMeasures.default}()},
 \code{\link{xvErrorMeasures}()}
 }
 \concept{accuracy functions}

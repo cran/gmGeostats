@@ -153,8 +153,7 @@ anaForward <- function(x,Y,sigma0,sigma1=1+sigma0,steps=30,plt=FALSE,sphere=TRUE
      wY=checkDouble(weights,ncol(Y)),
      steps=checkInt(steps,1),
      sigma0=checkDouble(sigma0,1),
-     sigma1=checkDouble(sigma1,1),
-     PACKAGE = "gmGeostats"
+     sigma1=checkDouble(sigma1,1)#,     PACKAGE = "gmGeostats"
      )
   x<- t(structure(erg$x, dim=dim(x)))
   colnames(x) = paste("flow", 1:ncol(x), sep="")
@@ -237,8 +236,7 @@ anaBackward <- function(x,Y,sigma0,sigma1=1+sigma0,steps=30,plt=FALSE,sphere=TRU
      wY=checkDouble(weights,ncol(Y)),
      steps=checkInt(steps,1),
      sigma0=checkDouble(sigma0,1),
-     sigma1=checkDouble(sigma1,1),
-     PACKAGE = "gmGeostats"
+     sigma1=checkDouble(sigma1,1) #,     PACKAGE = "gmGeostats"
      )
   x<- t(structure(erg$x, dim=dim(x)))
   st(x,inv=TRUE)

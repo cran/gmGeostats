@@ -65,6 +65,7 @@ Other accuracy functions:
 \code{\link{mean.accuracy}()},
 \code{\link{precision}()},
 \code{\link{validate}()},
+\code{\link{xvErrorMeasures.default}()},
 \code{\link{xvErrorMeasures}()}
 }
 \concept{accuracy functions}

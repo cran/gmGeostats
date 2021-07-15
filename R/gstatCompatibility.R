@@ -1,4 +1,5 @@
 #### gstat easy/easier interface for multivariate data
+# setOldClass("gstat") ### breaks down
 
 #' Fit an LMC to an empirical variogram
 #' 
@@ -114,7 +115,7 @@ compo2gstatLR = function(coords, compo, V=ilrBase(compo),
   prefix = o$prefix
   V = o$V
   # compute data (in lrs or in normal scores), set variable names
-  Zlr = compositions::ilr(compo, V=V)  
+  Zlr = compositions::idt(compo, V=V)  
   if(nscore){
     source("nscore.R") # load the nscore.R functions
     prefix= paste("NS",prefix,sep="")
@@ -140,6 +141,44 @@ compo2gstatLR = function(coords, compo, V=ilrBase(compo),
   if(!is.null(lrvgLMC) & !nscore){
     # space for a future conversion of variation-variogram models to gstat-LR-variograms
     gg$model = as.variogramModel(lrvgLMC, V=V0, prefix=prefix)
+  }
+  # return
+  return(gg)
+}
+
+## version for rmult
+rmult2gstat = function(coords, data, V="cdt", 
+                         vgLMC=NULL, nscore=FALSE, 
+                         formulaterm = "~1", prefix=NULL, ...){
+  
+  P = ncol(data)
+  if(nscore){
+    source("nscore.R") # load the nscore.R functions
+    prefix= paste("NS",prefix,sep="")
+    Z = sapply(1:P, function(i){
+      rs = nscore(data[,i])
+      aux = rs$nscore
+      attr(aux,"trn.table") = rs$trn.table  # this ensures that the backtransformation is stored in the object
+      return(data.frame(aux))
+    })
+    Z = as.data.frame(Z)
+  }else{
+    Z = data
+  }
+  if(is.null(colnames(Z))) colnames(Z) = paste(prefix, 1:P, sep="")
+  # create gstat object
+  spatdescr = paste("~",c(paste(colnames(coords),collapse=" + ")), sep="")
+  gg = NULL
+  for(i in 1:P){
+    id = colnames(Z)[i]
+    frm = paste(id, formulaterm, sep="")
+    gg = gstat::gstat(gg, id=id, formula = stats::as.formula(frm), locations=stats::as.formula(spatdescr), data=data.frame(coords, Z), ...)
+  }
+  # if a logratio LMC was provided, convert it to gstat variogramModelList 
+  #     and attach it
+  if(!is.null(vgLMC) & !nscore){
+    # space for a future conversion of variation-variogram models to gstat-LR-variograms
+    gg$model = as.variogramModel(vgLMC, prefix=prefix)
   }
   # return
   return(gg)

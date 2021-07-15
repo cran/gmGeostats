@@ -32,13 +32,13 @@ Construct a regionalized compositional data container to be used for multipoint 
 }
 \seealso{
 \code{\link[=DirectSamplingParameters]{DirectSamplingParameters()}} for specifying a direct simulation method parameters,
-\code{\link[=predict.gmSpatialModel]{predict.gmSpatialModel()}} for running the simulation
+\link{predict_gmSpatialModel} for running the simulation
 
 Other gmSpatialModel: 
+\code{\link{Predict}()},
 \code{\link{as.gmSpatialModel}()},
 \code{\link{gmSpatialModel-class}},
 \code{\link{make.gmCompositionalGaussianSpatialModel}()},
-\code{\link{make.gmMultivariateGaussianSpatialModel}()},
-\code{\link{predict.gmSpatialModel}()}
+\code{\link{make.gmMultivariateGaussianSpatialModel}()}
 }
 \concept{gmSpatialModel}

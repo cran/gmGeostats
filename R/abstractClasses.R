@@ -4,16 +4,7 @@
 # S3 -> S4 classes
 # cat("creating spatial method parameter classes\n")
 
-#' @include gmAnisotropy.R
-#' @include gmValidationStrategy.R 
-#' @include variograms.R
-setOldClass("gmKrigingNeighbourhood")
-setOldClass("gmDirectSamplingParameters")
-setOldClass("gmTurningBands")
-setOldClass("gmSequentialSimulation")
-setOldClass("gmCholeskyDecomposition")
-setOldClass("NfoldCrossValidation")
-setOldClass("LeaveOneOut")
+
 
 # abstract classes
 # cat("creating spatial method parameter classes: superclass creation\n")
@@ -21,15 +12,18 @@ setOldClass("LeaveOneOut")
 #' @title Neighbourhood description
 #' @description abstract class, containing any specification of a spatial neighbourhood
 #' @export
+#' @include gmSpatialMethodParameters.R
+#' @include preparations.R
 setClassUnion(name="gmNeighbourhoodSpecification", members=c("gmKrigingNeighbourhood","NULL"))
 
 #' @title Validation strategy description
 #' @description abstract class, containing any specification of a validation strategy for spatial models
 #' @export
 setClassUnion(name="gmValidationStrategy", 
-              members=c("NULL",
+              members=c("NULL", 
                         "LeaveOneOut", 
                         "NfoldCrossValidation"))
+
 
 #' @title parameters for Multiple-Point Statistics methods
 #' @description abstract class, containing any parameter specification of a spatial multipoint algorithm 
@@ -72,8 +66,7 @@ setClassUnion(name="gmGaussianMethodParameters",
 #' 
 #' @export
 setClassUnion(name="gmSpatialMethodParameters", 
-              members=c("NULL",
-                        "gmNeighbourhoodSpecification",
+              members=c("gmNeighbourhoodSpecification",
                         "gmMPSParameters",
                         "gmValidationStrategy")
 )
@@ -99,6 +92,7 @@ setClassUnion(name="gmTrainingImage",
 #' @description abstract class, containing any specification of an unconditional
 #' spatial model 
 #' @export
+#' @include variograms.R
 setClassUnion(name="gmUnconditionalSpatialModel", 
               members=c("NULL",
                         "gmGaussianModel",

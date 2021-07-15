@@ -77,10 +77,10 @@ make.gmCompositionalGaussianSpatialModel(data=Zc, coords=X, V="alr")
 }
 \seealso{
 Other gmSpatialModel: 
+\code{\link{Predict}()},
 \code{\link{as.gmSpatialModel}()},
 \code{\link{make.gmCompositionalGaussianSpatialModel}()},
 \code{\link{make.gmCompositionalMPSSpatialModel}()},
-\code{\link{make.gmMultivariateGaussianSpatialModel}()},
-\code{\link{predict.gmSpatialModel}()}
+\code{\link{make.gmMultivariateGaussianSpatialModel}()}
 }
 \concept{gmSpatialModel}

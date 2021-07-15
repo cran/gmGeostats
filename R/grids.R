@@ -267,7 +267,7 @@ gsi.gstatCokriging2rmult.data.frame = function(COKresult, # output of predict.gs
   D = length(prednames)
   noms = sub(".pred", "", prednames)
   
-  prediccions = COKresult[,prednames, drop=FALSE]
+  prediccions = rmult(COKresult[,prednames, drop=FALSE])
   if(nscore){
     ## space to back-transform the predictions
     #if(is.null(gg))stop("To apply a nscore backtransformation, the gstat object must be provided!")
@@ -304,7 +304,7 @@ gsi.gstatCokriging2rmult.data.frame = function(COKresult, # output of predict.gs
     }
     attr(rg,"krigVar") = cvmat
   }
-  class(rg) = c("spatialGridRmult","rmult","data.frame")
+  class(rg) = c("spatialGridRmult","rmult")
   return(rg)
 }
 
@@ -391,7 +391,7 @@ spatialGridRmult = function(coords, data, dimcomp=2, dimsim=NA){
 #' for "spatialGridAcomp" and "spatialGridRmult", but the default method is able to 
 #' deal with "SpatialPointsDataFrame", "SpatialPixelsDataFrame" and "SpatialGridDataFrame"
 #' objects, and with the "data.frame" output of [gstat::predict.gstat()] and 
-#' [predict.gmSpatialModel()]
+#' [predict_gmSpatialModel]
 #' @param ... generic functionality, currently ignored
 #'
 #' @return Invisibly, a list with elements `breaks` and `col` containing the breaks 
