@@ -30,7 +30,7 @@ library(magrittr)
 
 ## Statistical scale and representation functions
 
-The statistical scale of a data layer is a subjective assessment of the way in which pairs of values of that layer need to be compared. Classical statistical scales after Stevens (XXXX) are the nominal (two values are either equal or they are different), ordinal (two values are either equal, or one is larger than the other), interval (values can be meaningfully compared by the mathematical operation of subtraction) and ratio (values are strictly positive and can be meaningfully compared by the operation of quotient). Other scales have been introduced, such as several compositional scales for data about the amounts and proportions of components forming a system (Aitchison, 1986; van den Boogaart and Tolosana-Delgado, 2013; van den Boogaart, Tolosana-Delgado and Bren, XXXX); for circular and spherical data; for distributional data; for positive definite matrices; etc.
+The statistical scale of a data layer is a subjective assessment of the way in which pairs of values of that layer need to be compared. Classical statistical scales after Stevens (1946) are the nominal (two values are either equal or they are different), ordinal (two values are either equal, or one is larger than the other), interval (values can be meaningfully compared by the mathematical operation of subtraction) and ratio (values are strictly positive and can be meaningfully compared by the operation of quotient). Other scales have been introduced, such as several compositional scales for data about the amounts and proportions of components forming a system (Aitchison, 1986; van den Boogaart and Tolosana-Delgado, 2013; van den Boogaart, Tolosana-Delgado and Bren, 2021); for circular and spherical data; for distributional data; for positive definite matrices; etc.
 
 A scale $s$ is then typically described by a way of computing the difference between two values $d_s(\cdot, \cdot)$, coupled with a description of the set $\mathcal{E}_s$ of values of that layer that are at all possible. In the case of circular data, the set of possible values is $[-\pi, \pi)$, and given the periodicity condition, the way to compare two values $a$ and $b$ is $(a-b)$ modulo $\pi$. 
 
@@ -70,6 +70,7 @@ cdt.circular = function(x, ...){
   return(rmult(z, orig=x))
 }
 ```
+It is important that your `cdt()` method makes use of the two main arguments of the `compositions::rmult()` function: `z` (for the transformed scores) and `orig` (for the untransformed data).
 
 3. create method of the function `compositions::cdtInv()` implementing the backrepresentation for data of your type (argument `z` expects the representation, and `orig` must be exactly what is set in this example; NOTICE the three dots at `compositions:::gsi.orig`)
 ```{r}
@@ -141,7 +142,7 @@ theta.prds.grid = gsi.gstatCokriging2rmult(theta.prds)
 theta.prds.back = backtransform(theta.prds.grid, as = cdt(Zdtc))
 summary(theta.prds.back)
 ```
-Note that the function `backtransform()` is available in package "compositions" from version 1.0.1-9002. To plot the result we might have to program a method for `image_cokriged` that should take care to fictionally reclass the backtransformed data to "spatialGridRmult" and choose a color sequence appropriate for the periodic nature of the data
+Note that the function `backtransform()` is available in package "compositions" from version 1.0.1-9002, and it expects as the second argument `as` a _transformed_ data set, typically the original one. To plot the result we might have to program a method for `image_cokriged` that should take care to fictionally reclass the backtransformed data to "spatialGridRmult" and choose a color sequence appropriate for the periodic nature of the data
 ```{r, fig.width=6, fig.height=8.5}
 image_cokriged.circular = function(x, ...){
   class(x) = c("spatialGridRmult", "rmult")
@@ -150,7 +151,7 @@ image_cokriged.circular = function(x, ...){
 image_cokriged(theta.prds.back, ivar="theta")
 ```
 
-## An excursion on superclasses classes 
+## An excursion on superclasses 
 
 "gmGeostats" uses a mixture of S3 and S4 classes to manage the several kinds of objects, S3 classes mostly preferred for simple configuration objects, models and data elements, and S4 classes mostly in use for large compound spatial models and data containers. S4 classes, though being somewhat more complex to handle and slightly slower, have the advantage to allow for multiple dispatch, which this package extensively uses. S4 classes require its fields (called "slots") to strictly belong to a specific class. To handle this condition, and at the same time allow for multiple methods of specification, estimation, fitting and prediction of spatial models and random functions, "gmGeostats" provides a series of abstract classes controlling allowing certain fields to contain certain kinds of objects:
 
@@ -184,7 +185,26 @@ The matrix contain a 1 if the row class is a subclass of the column class, and 0
 
 ## Future work
 
-In future extensions of this vignette we will discuss the way to create own structural functions (variograms) and estimation models/methods adapted to the nature of the data, and register them to the package (usage of `setIs()` and coercion in conjunction with the abstract classes mention, `validate()`- and `predict()`-methods, creation of own `make.gm****Model()` data containers, etc).
+In future extensions of this vignette we will discuss the way to create own structural functions (variograms) and estimation models/methods adapted to the nature of the data, and register them to the package (usage of `setIs()` and coercion in conjunction with the abstract classes mention, `validate()`- and `predict()`-methods, creation of own `make.gm****Model()` data containers, etc). We will continue with our illustrative example of circular data, using developments by Wackernagel (2003) and de Iaco et al (2013).
 
 
 
+## References
+
+
+Aitchison, J. (1986) _The Statistical Analysis of Compositional Data_ Chapman & Hall Ltd., London (UK). (Reprinted in 2003 with additional material by The Blackburn Press)
+
+
+Boogaart, K. G. v. d.; Tolosana-Delgado, R. (2013) _Analysing compositional data with R_, Springer, Heidelberg
+
+
+Boogaart, K.G. v.d.; Tolosana-Delgado, Raimon; Bren, Matevz (2021). compositions: Compositional Data Analysis. R package version 2.0-2. http://www.stat.boogaart.de/compositions/
+
+
+De Iaco, S.; Posa, D.; Palma, M. (2013) Complex-Valued Random Fields for Vectorial Data: Estimating and Modeling Aspects. _Mathematical Geosciences_ 45: 557–573
+
+
+Stevens, S. (1946) On the theory of scales of measurement. _Science_ 103: 677-680
+
+
+Wackernagel, H. (2003) _Multivariate geostatistics—an introduction with applications_, 3rd edn. Springer, Berlin 

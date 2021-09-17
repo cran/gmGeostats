@@ -6,10 +6,10 @@
  */
 // attention: comment this if not compiling
 #include <stdio.h>
-#include <Rinternals.h>
 #ifdef _OPENMP
 #include <omp.h>
 #endif
+#include <Rinternals.h>
 
 #define inR   // attention: this must be uncommented if not compiling
 

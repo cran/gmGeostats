@@ -77,7 +77,10 @@ setClassUnion(name="gmSpatialMethodParameters",
 
 #' @title MPS training image class
 #' @description abstract class, containing any specification of a multiple-point
-#' training image
+#' training image. This must be analogous to [sp::SpatialGridDataFrame()], and 
+#' implement a method for [sp::getGridTopology()] and to coerce it to 
+#' [sp::SpatialGridDataFrame-class]. 
+#' 
 #' @export
 #' @importClassesFrom sp SpatialGridDataFrame SpatialGrid GridTopology
 #' @importClassesFrom sp SpatialPixelsDataFrame SpatialPixels

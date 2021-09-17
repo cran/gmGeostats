@@ -699,7 +699,39 @@ as.LMCAnisCompo.variogramModelList <-
 
 #' @describeIn as.gmCgram Convert theoretical structural functions to gmCgram format
 #' @method as.gmCgram variogramModelList
-as.gmCgram.variogramModelList = function(m, ...) stop("not yet available") 
+as.gmCgram.variogramModelList = function(m, ...){ 
+    as.gmCgram(as.LMCAnisCompo(m, ...), ...)
+  }
 
+
+
+#' @describeIn as.gmCgram Convert theoretical structural functions to gmCgram format
+#' @method as.gmCgram variogramModel
+as.gmCgram.variogramModel = function(m, ...){
+  # extract nugget
+  isNugget = m$model=="Nug"
+  if(any(isNugget)){
+    nuggetValue = m[isNugget, "psill"]
+    m = m[!isNugget,, drop=FALSE]
+  }
+  # extract model names
+  modelName = gsi.validModels[paste("vg", m$model,sep=".")]
+  # if any model name is not identified
+  if(any(is.na(modelName))){
+    stop("as.gmCgram.variogramModel: found an unidentified variogram model; check content of internal variable gsi.valiModels to see which models are permissible")
+  }
+  # otherwise, extract parametres
+  tt = function(x) t(t(x))
+  out = setCgram(type = modelName[1], nugget = tt(nuggetValue), sill = tt(m[1, "psill"]), anisRanges = 
+             as.AnisotropyScaling(unlist(m[1, -(1:4)])), extraPar = m[1, "kappa"])
+  if(nrow(m)>1){
+    for(im in 1:nrow(m)){
+      out = out + setCgram(type = modelName[im], sill = tt(m[im, "psill"]), anisRanges = 
+                       as.AnisotropyScaling(unlist(m[im, -(1:4)])), extraPar = m[im, "kappa"])
+      
+    }
+  }
+  return(out)
+} 
 
 

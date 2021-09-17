@@ -1068,7 +1068,10 @@ gsi.midValues.azimuthInterval <- function(x){ (x[[1]]+x[[2]])/2 }
 
 # abstract classes
 #' @title Structural function model specification
-#' @description Abstract class, containing any specification of a variogram (or covariance) model
+#' @description Abstract class, containing any specification of a variogram (or covariance) model. 
+#' Members must implement a coercion method to
+#' class "gmCgram" (see [setCgram()] for an example), and (possibly) coercion to 
+#' class "variogramModel" or "variogramModelList" (see [gstat::vgm()])
 #' @export
 #' @include compositionsCompatibility.R
 #' @include gstatCompatibility.R
@@ -1143,7 +1146,10 @@ setClass("gmGaussianModel",
 
 # abstract classes
 #' @title Empirical structural function specification
-#' @description Abstract class, containing any specification of an empirical variogram (or covariance function, or variations)
+#' @description Abstract class, containing any specification of an empirical variogram 
+#' (or covariance function, or variations). Members must implement a coercion method to
+#' class "gmEVario" (see [gsi.EVario2D()] for an example), and (possibly) coercion to 
+#' class "gstatVariogram" (see [gstat::variogram()])
 #' @export
 #' @include compositionsCompatibility.R
 #' @include gstatCompatibility.R

@@ -5,5 +5,8 @@
 \alias{ModelStructuralFunctionSpecification-class}
 \title{Structural function model specification}
 \description{
-Abstract class, containing any specification of a variogram (or covariance) model
+Abstract class, containing any specification of a variogram (or covariance) model.
+Members must implement a coercion method to
+class "gmCgram" (see \code{\link[=setCgram]{setCgram()}} for an example), and (possibly) coercion to
+class "variogramModel" or "variogramModelList" (see \code{\link[gstat:vgm]{gstat::vgm()}})
 }

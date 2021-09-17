@@ -5,5 +5,8 @@
 \alias{EmpiricalStructuralFunctionSpecification-class}
 \title{Empirical structural function specification}
 \description{
-Abstract class, containing any specification of an empirical variogram (or covariance function, or variations)
+Abstract class, containing any specification of an empirical variogram
+(or covariance function, or variations). Members must implement a coercion method to
+class "gmEVario" (see \code{\link[=gsi.EVario2D]{gsi.EVario2D()}} for an example), and (possibly) coercion to
+class "gstatVariogram" (see \code{\link[gstat:variogram]{gstat::variogram()}})
 }

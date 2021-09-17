@@ -6,5 +6,7 @@
 \title{MPS training image class}
 \description{
 abstract class, containing any specification of a multiple-point
-training image
+training image. This must be analogous to \code{\link[sp:SpatialGridDataFrame]{sp::SpatialGridDataFrame()}}, and
+implement a method for \code{\link[sp:SpatialGrid]{sp::getGridTopology()}} and to coerce it to
+\link[sp:SpatialGridDataFrame-class]{sp::SpatialGridDataFrame}.
 }

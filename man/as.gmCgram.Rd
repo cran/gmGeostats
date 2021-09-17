@@ -2,11 +2,14 @@
 % Please edit documentation in R/gstatCompatibility.R, R/variograms.R
 \name{as.gmCgram.variogramModelList}
 \alias{as.gmCgram.variogramModelList}
+\alias{as.gmCgram.variogramModel}
 \alias{as.gmCgram}
 \alias{as.gmCgram.default}
 \title{Convert theoretical structural functions to gmCgram format}
 \usage{
 \method{as.gmCgram}{variogramModelList}(m, ...)
+
+\method{as.gmCgram}{variogramModel}(m, ...)
 
 as.gmCgram(m, ...)
 
@@ -30,6 +33,8 @@ of package gmGeostats
 \section{Methods (by class)}{
 \itemize{
 \item \code{variogramModelList}: Convert theoretical structural functions to gmCgram format
+
+\item \code{variogramModel}: Convert theoretical structural functions to gmCgram format
 
 \item \code{default}: Convert theoretical structural functions to gmCgram format
 }}

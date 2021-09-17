@@ -1,3 +1,20 @@
+# gmGeostats 0.10-9
+
+(release of polished 0.10.8.900x dev versions)
+* minor correction on C source code for compatibility with clang13
+
+# gmGeostats 0.10.8-9001
+
+* (2021-07-22) conversion methods between variogram models: `as.gmCgram()` methods for "variogramModel" and "variogramModelList" objects (from package "gstat")
+
+# gmGeostats 0.10.8-9000
+
+* (2021-07-15) documented abstract union classes, specifying required methods for the member classes
+
+# gmGeostats 0.10.8
+
+(release of polished 0.10.7.900x dev versions)
+
 # gmGeostats 0.10.7.9006
 
 * new vignette "How to register new layer datatypes", with a howto adapt gmGeostats to deal with your very special data type (with an example for regionalized circular data)

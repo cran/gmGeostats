@@ -51,7 +51,12 @@ as.AnisotropyScaling.AnisotropyScaling = function(x) x
 #' @export
 as.AnisotropyScaling.numeric = function(x){
   if(length(x)==2) return(anis2D.par2A(ratio=x[2], angle=x[1]))
-  if(length(x)==5) stop("as.AnisotropyScaling: 3D from 5-vector values not yet implemented") # return(anis3D.par2A(ratios=x[4:5], angles=x[1:3]))
+  if(length(x)==5){
+    if(sum( (x[4:5]-1)^2)<1e-12){
+      return(diag(3))
+    }
+    stop("as.AnisotropyScaling: 3D from arbitrary 5-vector values not yet implemented") # return(anis3D.par2A(ratios=x[4:5], angles=x[1:3]))
+  }
   stop("as.AnisotropyScaling.numeric: only works for length=2 1.angle+1.ratio, or lenth=5 3.angles+2.ratios")
 }
 
