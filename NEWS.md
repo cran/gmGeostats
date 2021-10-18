@@ -1,4 +1,14 @@
-# gmGeostats 0.10-9
+# gmGeostats 0.11.0
+
+* (2021-10-17) dependence from randomFields eliminated 
+* (2021-10-17) consolidated management of `predict()` methods for S3 and S4 objects, with the help of the internal function `Predict()` (not recommended to use)
+
+# gmGeostats 0.10.9-9001
+
+* (2021-09-30) minor bug corrected on the way fit_lmc passes its arguments to surrogate gstat and gmGeostats functions
+* (2021-10-01) management of `predict()` methods for S3 and S4 objects, with the help of the internal function `Predict()` (not recommended to use)
+
+# gmGeostats 0.10.9
 
 (release of polished 0.10.8.900x dev versions)
 * minor correction on C source code for compatibility with clang13

@@ -4,8 +4,9 @@
 \alias{Predict}
 \alias{predict}
 \alias{predict_gmSpatialModel}
+\alias{predict.gmSpatialModel}
 \alias{predict,gmSpatialModel-method}
-\alias{Predict,gmSpatialModel,ANY,missing-method}
+\alias{Predict,gmSpatialModel,ANY,ANY-method}
 \alias{Predict,gmSpatialModel,ANY,gmNeighbourhoodSpecification-method}
 \alias{Predict,gmSpatialModel,ANY,gmTurningBands-method}
 \alias{Predict,gmSpatialModel,ANY,gmCholeskyDecomposition-method}
@@ -17,9 +18,11 @@ Predict(object, newdata, pars, ...)
 
 predict(object, ...)
 
-\S4method{predict}{gmSpatialModel}(object, newdata, pars, ...)
+\method{predict}{gmSpatialModel}(object, newdata, pars = NULL, ...)
 
-\S4method{Predict}{gmSpatialModel,ANY,missing}(object, newdata, pars, ...)
+\S4method{predict}{gmSpatialModel}(object, newdata, pars = NULL, ...)
+
+\S4method{Predict}{gmSpatialModel,ANY,ANY}(object, newdata, pars, ...)
 
 \S4method{Predict}{gmSpatialModel,ANY,gmNeighbourhoodSpecification}(object, newdata, pars, ...)
 

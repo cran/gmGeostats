@@ -11,7 +11,15 @@
 \usage{
 fit_lmc(v, ...)
 
-\method{fit_lmc}{gstatVariogram}(v, g, model, ...)
+\method{fit_lmc}{gstatVariogram}(
+  v,
+  g,
+  model,
+  fit.ranges = FALSE,
+  fit.lmc = !fit.ranges,
+  correct.diagonal = 1,
+  ...
+)
 
 \method{fit_lmc}{default}(v, g, model, ...)
 
@@ -27,6 +35,13 @@ fit_lmc(v, ...)
 \item{g}{spatial data object, containing the original data}
 
 \item{model}{LMC or variogram model to fit}
+
+\item{fit.ranges}{logical, should ranges be modified? (default=FALSE)}
+
+\item{fit.lmc}{logical, should the nugget and partial sill matrices be modified (default=TRUE)}
+
+\item{correct.diagonal}{positive value slightly larger than 1, for multiplying the direct variogram
+models and reduce the risk of numerically negative eigenvalues}
 }
 \value{
 Method fit_lmc.gstatVariogram is a wrapper around \code{\link[gstat:fit.lmc]{gstat::fit.lmc()}}, that calls this function

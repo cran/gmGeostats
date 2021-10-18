@@ -283,6 +283,8 @@ make.gmCompositionalMPSSpatialModel = function(
 
 ### exporter to gstat -----
 as.gstat.gmSpatialModel <- function(object, ...){
+  # extra arguments
+  lldots = list(...)
   # data elements
   coords = sp::coordinates(object)
   X = compositions::rmult(object@data, V= gsi.getV(object@data), orig=gsi.orig(object@data))
@@ -306,10 +308,17 @@ as.gstat.gmSpatialModel <- function(object, ...){
     if(any(is.infinite(beta))) beta = NULL
     # neighbourhood
     ng = object@parameters
+    # manage manual changes of parameters given in dots...
+    for(nm in names(ng)){
+      tk = grep(nm, names(lldots))
+      if(length(tk)>1) ng[[tk]] = lldots[[tk]] 
+    }
+    # convert
     if(!is(ng, "gmKrigingNeighbourhood")) stop("as.gstat: object@parameters must be of class 'gmGaussianMethodParameters'!")
     res = compo2gstatLR(coords=coords, compo=compo, V=Vinv, lrvgLMC=lrvgLMC, 
                         nscore=FALSE, formulaterm = formulaterm, prefix=prefix, beta=beta, 
-                        nmax=ng$nmax, nmin=ng$nmin, omax=ng$omax, maxdist=ng$maxdist, force=ng$force)
+                        nmax=ng$nmax, nmin=ng$nmin, omax=ng$omax, maxdist=ng$maxdist, force=ng$force, 
+                        ...)
     return(res)
   }else{
     # non-compositional case
@@ -320,9 +329,15 @@ as.gstat.gmSpatialModel <- function(object, ...){
     if(any(is.infinite(beta))) beta = NULL
     # neighbourhood
     ng = object@parameters
+    # manage manual changes of parameters given in dots...
+    for(nm in names(ng)){
+      tk = grep(nm, names(lldots))
+      if(length(tk)>1) ng[[tk]] = lldots[[tk]] 
+    }
     res = rmult2gstat(coords=coords, data=X, V=V, vgLMC=vgLMC, 
                     nscore=FALSE, formulaterm = formulaterm, prefix=prefix, beta=beta, 
-                    nmax=ng$nmax, nmin=ng$nmin, omax=ng$omax, maxdist=ng$maxdist, force=ng$force)    
+                    nmax=ng$nmax, nmin=ng$nmin, omax=ng$omax, maxdist=ng$maxdist, force=ng$force,
+                    ...)    
   }
 }
 
@@ -400,24 +415,36 @@ as.gmSpatialModel.gstat = function(object, V=NULL, ...){
 #' @name predict_gmSpatialModel
 NULL
 
+
+
 #' @rdname predict_gmSpatialModel
-setMethod("predict", signature(object="gmSpatialModel"),
-          function(object, newdata, pars, ...){
-            Predict(object, newdata, pars, ...)
-          })
-          
+#' @export
+#' @method predict gmSpatialModel
+predict.gmSpatialModel <- function(object, newdata, pars=NULL, ...){
+  if(is.null(pars)){
+    return(Predict(object, newdata, ...))
+  }else{
+    return(Predict(object, newdata, pars, ...))
+  }
+}
+
+#' @rdname predict_gmSpatialModel
+#' @export
+setMethod("predict", signature(object="gmSpatialModel"), definition = predict.gmSpatialModel)
+
 
 
 #' @rdname predict_gmSpatialModel
 #' @include gmAnisotropy.R
 #' @include preparations.R
-#'  @export
-setMethod("Predict",signature(object="gmSpatialModel", newdata="ANY", pars="missing"),
-          function(object, newdata, pars, ...){
-            if(is.null(object$pars)) object$pars = KrigingNeighbourhood()
-            predict(object, newdata, pars = object$pars, ...)
+#' @export
+setMethod("Predict",signature(object="gmSpatialModel", newdata="ANY"),
+          function(object, newdata, ...){
+            if(is.null(object@parameters)) object@parameters = KrigingNeighbourhood() 
+            Predict(object, newdata, pars = object@parameters , ...)
           }
 )
+
 
 
 #' @rdname predict_gmSpatialModel

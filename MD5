@@ -1,6 +1,6 @@
-e45690535d9fbb6ef08d9fbe2d8efbb7 *DESCRIPTION
-38491092496170d7c18ce9271789d7e7 *NAMESPACE
-29aa3edacab52f008004b2f37a414266 *NEWS.md
+3a5cc0dfbdedbc04f804e0a5d8cc8028 *DESCRIPTION
+4ec8c6b825dec8d4806bcb68264c7bb5 *NAMESPACE
+899593fa33bc041c391382bde1a4aec2 *NEWS.md
 aafc9a77006dc54adc69138877f840d3 *R/Anamorphosis.R
 349ce29989da1d452993fbd9c7eb9db0 *R/abstractClasses.R
 43bc1c6aed7197e79752b0590df2fe21 *R/accuracy.R
@@ -14,10 +14,10 @@ a369a7085082cf2836fd4796d1b5cf29 *R/genDiag.R
 37062234ef11321c0a28b89f18056f76 *R/gmDataFrameStack.R
 dd103cb4df7bca0a60b6314824770192 *R/gmSimulation.R
 e64a3ae8baef3d03f77a04f55094d958 *R/gmSpatialMethodParameters.R
-f9e13795c649cdeadac6403927117a4d *R/gmSpatialModel.R
+fa68b741beddcc0d6895fed245dc6eae *R/gmSpatialModel.R
 accda60b5b06aa3841d17b67c7347757 *R/gmValidationStrategy.R
 cdf779207a4960f7ea17c5297dc34d43 *R/grids.R
-70f9abfa1202bde08ecd4ed1df48621e *R/gstatCompatibility.R
+0568b6174d77a7836d4f26c59937d092 *R/gstatCompatibility.R
 511d259ebf2309f11d1feb6a8d2ddb22 *R/mask.R
 5795745fbd09e76fb1cac67108d190f2 *R/preparations.R
 72fc0ef3a58dedd29df0d503b9c37019 *R/spSupport.R
@@ -34,9 +34,9 @@ d839f9f566ccfb47e94334254f5b8050 *data/NGSAustralia.rda
 01ec69c5df3116c86f5564539d0ca079 *inst/doc/gmGeostats.R
 ef646daef48eee194e5b74704f567703 *inst/doc/gmGeostats.Rmd
 9df3d16c238bbf342bf8eba758b805df *inst/doc/gmGeostats.html
-fd9145bd073f10b8612db5db0b9024c8 *inst/doc/register_new_layer_datatype.R
-de624df4a4b92e5a4dad5ac2de7e89e8 *inst/doc/register_new_layer_datatype.Rmd
-1267a32b2cf3a2712951dcb6179d8729 *inst/doc/register_new_layer_datatype.html
+39079dbc89cba39d2f778f03e4150c7c *inst/doc/register_new_layer_datatype.R
+a5413a1c1fb21850eee92f8704b60d50 *inst/doc/register_new_layer_datatype.Rmd
+3037ace3ac17eb66ccd21e744c133ab5 *inst/doc/register_new_layer_datatype.html
 e5335ba492f6da0b527f4ac4f8e02a2c *man/CholeskyDecomposition.Rd
 d0a1ba70589586206c76898c5a72166a *man/DSpars.Rd
 389e0e5a5bd9c7302acc83c9e1622d26 *man/DataFrameStack.data.frame.Rd
@@ -75,7 +75,7 @@ e15ea0366f48a544e43138adfcd002d6 *man/as.logratioVariogramAnisotropy.Rd
 81a3dcba63434e738527ed96dae04720 *man/constructMask.Rd
 667aea8764bf88a268d7019b7fdcef27 *man/dimnames.DataFrameStack.Rd
 9b015bed08e4e32e3287c33ff4a88072 *man/figures/README-structural-1.png
-d18d7ed70828da8b0c506dcbb5e55abf *man/fit_lmc.Rd
+9aa28e38e7d1055bcd79122ed9584862 *man/fit_lmc.Rd
 2b6ce21b7f2fbfddc1f39d7d929c698c *man/getMask.Rd
 8968b615c5a6b8b792ac4a94488d27c4 *man/getStackElement.Rd
 62afbaa3334a914ab1cf1879e39c7ba0 *man/getTellus.Rd
@@ -126,7 +126,7 @@ bfb19a0a1be6efcf1f3557f71983a893 *man/plus-.gmCgram.Rd
 18094392a39dcac3c1d7f26308c0c45c *man/precision.Rd
 7de858a6e33e259c3259108204052a6e *man/predict.LMCAnisCompo.Rd
 ec033aa6f22100cbd8e0867d8d765e26 *man/predict.genDiag.Rd
-3ddc11182de92c52033b75c52593605e *man/predict_gmSpatialModel.Rd
+c65eb58d82bfcaa6febe827d1f2e174c *man/predict_gmSpatialModel.Rd
 0aa8ae4ba3181ea5e7202b99b44e1e1d *man/print.mask.Rd
 5d5de2b5e26f88627763f4cfebc020e7 *man/pwlrmap.Rd
 d2995f4084854a194f855797ecc16f55 *man/setCgram.Rd
@@ -159,4 +159,4 @@ b4f8ac87e98a1b0eca2e0ce82cf12002 *src/Makevars
 5e29d8876b468e88d85786e09879f789 *src/Makevars.win
 d8099136d4adde755de632e80b8fc90c *src/gmGeostats.c
 ef646daef48eee194e5b74704f567703 *vignettes/gmGeostats.Rmd
-de624df4a4b92e5a4dad5ac2de7e89e8 *vignettes/register_new_layer_datatype.Rmd
+a5413a1c1fb21850eee92f8704b60d50 *vignettes/register_new_layer_datatype.Rmd

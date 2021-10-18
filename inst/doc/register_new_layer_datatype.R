@@ -8,7 +8,6 @@ knitr::opts_chunk$set(
 library(compositions)
 library(gstat)
 library(gmGeostats)
-library(RandomFields)
 library(magrittr)
 
 ## -----------------------------------------------------------------------------
@@ -40,19 +39,20 @@ cdtInv.circular = function(z, orig=compositions:::gsi.orig(x),...){
 }
 
 ## ----data_creation, fig.height=7, fig.width=7---------------------------------
-# simulate a random function
+## model setup
 set.seed(333275)
-model <- RMexp()
-x <- seq(0, 10, 0.1)
-z <- RFsimulate(model, x, x, n=1)
-# extract components 
-X = coordinates(z)
-Z = z@data
-# select some of them
-tk = sample(1:nrow(X), 1000)
-Xdt = X[tk,]
-Zdt = Z[tk,1]
-Zdtc = circular(Zdt,varname = "theta", conversion = 1)
+xdt = data.frame(x=0, y=0, z=0) # one point is necesary
+vg = vgm(model="Exp", psill=1, nugget=0, range=1) # variogram model
+gs = gstat(id="z", formula=z~1, locations = ~x+y , data=xdt, nmax=10, model=vg)
+## sample point coordinates  
+x <- runif(2000, min = 0, max = 10) # values between 0 and 10
+Xdt = data.frame(x=x[1:1000], y=x[1001:2000])
+# simulate random function
+Z = predict(gs, newdata=Xdt, nsim=1)
+# select columns
+Zdt = Z[,3]
+# define and plot data
+Zdtc = circular(Zdt, varname = "theta", conversion = 1)
 pairsmap(Zdtc, loc=Xdt)
 
 ## -----------------------------------------------------------------------------
@@ -80,6 +80,7 @@ theta.gg =
     )
 
 ## -----------------------------------------------------------------------------
+x <- seq(from=0, to=10, by=0.1)
 xx = expand.grid(x,x)
 colnames(xx) = colnames(Xdt)
 ng = KrigingNeighbourhood(nmax = 20, omax=7, maxdist=1)

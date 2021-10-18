@@ -30,10 +30,15 @@ fit_lmc  <- function(v, ...) UseMethod("fit_lmc", v)
 #' @describeIn fit_lmc wrapper around gstat::fit.lmc method
 #' @param g spatial data object, containing the original data
 #' @param model LMC or variogram model to fit
+#' @param fit.ranges logical, should ranges be modified? (default=FALSE)
+#' @param fit.lmc logical, should the nugget and partial sill matrices be modified (default=TRUE) 
+#' @param correct.diagonal positive value slightly larger than 1, for multiplying the direct variogram 
+#' models and reduce the risk of numerically negative eigenvalues
 #' @export
 #' @method fit_lmc gstatVariogram
-fit_lmc.gstatVariogram <- function(v, g, model,...){
-  res = gstat::fit.lmc(as.gstatVariogram(v, ...), as.gstat(g, ...), as.variogramModel(model, ...))
+fit_lmc.gstatVariogram <- function(v, g, model, fit.ranges = FALSE, fit.lmc = !fit.ranges, correct.diagonal = 1.0, ...){
+  res = gstat::fit.lmc(as.gstatVariogram(v, ...), as.gstat(g, ...), as.variogramModel(model, ...),
+                       fit.ranges = fit.ranges, fit.lmc = fit.lmc, correct.diagonal=correct.diagonal)
   class(res$model) = c("variogramModelList", "list")
   return(res)
 }
