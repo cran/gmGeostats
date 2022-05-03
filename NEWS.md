@@ -1,3 +1,17 @@
+# gmGeostats 0.11.0-9002
+
+* (2021-12-14) bugs in turning bands corrected: getUnitVec was producing a wrong sequence of directions, and bands for exponential and Gaussian variograms did not correct for the difference between parametric and effective range in the right way; 
+* (2021-12-08) anisotropy objects complete, restructured and everywhere correctly used: if `class(A)=="AnisotropyScaling"` and `class(M)=="AnisotropyRangeMatrix"` (the two possible classes), then `A %*% t(A) == solve(M)`; with them, `u = sqrt(h %*% solve(M, h))` can be used in a scalar variogram (i.e. `M` is a matrix of ranges and orientations), and `v = t(A) %*% h` an isotropic variogram (i.e. `u=sqrt(sum(v^2))`,  and `A` is a scaling matrix that makes the space isotropic)
+* (2021-12-08) bugs corrected in `gsi.EVario3D()`
+ 
+# gmGeostats 0.11.0-9001
+
+* (2021-11-05) bugs corrected in internal 2D empirical variogram function `gsi.EVario2D()` . First version of 3D internal variogram function `gsi.EVario3D()` available. Usage of these functions is only for specialists foreseen. In the near future a user-friendlier wrapper will be provided.
+
+# gmGeostats 0.11.0-9000
+
+* (2021-10-20) section on the vignette "register_new_layer_datatype.Rmd" about the definition and registration of empirical covariance for circular data.
+
 # gmGeostats 0.11.0
 
 * (2021-10-17) dependence from randomFields eliminated 

@@ -527,7 +527,7 @@ image_cokriged.spatialGridRmult<- function(x, ivar=1, isim=NULL, breaks=10, mask
     }else{
       X = x[,isim, ivar]
     }
-    if(!is.null(mask) & class(mask)=="mask"){
+    if(!is.null(mask) & inherits(mask,"mask")){
       if(!is.null(attr(mask, "fullgrid"))){
         X = unmask(data.frame(X), mask=mask)[,1]
         coords = sp::coordinates(attr(mask, "fullgrid"))

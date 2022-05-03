@@ -4,7 +4,14 @@
 \alias{SequentialSimulation}
 \title{Create a parameter set specifying a gaussian sequential simulation algorithm}
 \usage{
-SequentialSimulation(nsim = 1, ng = NULL, rank = Inf, debug.level = 1, ...)
+SequentialSimulation(
+  nsim = 1,
+  ng = NULL,
+  rank = Inf,
+  debug.level = 1,
+  seed = NULL,
+  ...
+)
 }
 \arguments{
 \item{nsim}{number of realisations desired}
@@ -15,6 +22,9 @@ SequentialSimulation(nsim = 1, ng = NULL, rank = Inf, debug.level = 1, ...)
 
 \item{debug.level}{degree of verbosity of results; negative values produce a progress bar; values can be
 extracted from \code{\link[gstat:predict.gstat]{gstat::predict.gstat()}}}
+
+\item{seed}{an object specifying if and how the random number generator should be
+initialized, see \code{?simulate} in base "stats" package}
 
 \item{...}{further parameters, currently ignored}
 }

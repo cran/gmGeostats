@@ -70,7 +70,11 @@ gsi.calcCgram <- function(X,Y,vgram,ijEqual=FALSE) {
   structure(erg$C,dim=c(d*nX,d*nY))
 }
 
-
+gsiGetUnitVec <- function(dimX,ip) {
+    erg = .C("getUnitvecR",dimX=checkInt(dimX,1),ip=checkInt(ip,1),unitvec=numeric(dimX))
+    unitvec = erg$unitvec
+    unitvec
+    }
 
 
 

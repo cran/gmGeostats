@@ -36,7 +36,7 @@
 KrigingNeighbourhood <- function(nmax=Inf, nmin=0, omax=0, maxdist=Inf, force=FALSE, anisotropy=NULL, ...){
   if(!is.null(anisotropy)){
     anisotropy = try(as.AnisotropyScaling(anisotropy))
-    if(class(anisotropy)=="try-error") stop("krigingNeighbourhood: anisotropy description provided cannot be parsed")
+    if(inherits(anisotropy,"try-error")) stop("krigingNeighbourhood: anisotropy description provided cannot be parsed")
   }
   # here space for checking that parameters are sensible
   
@@ -61,6 +61,8 @@ KrigingNeighbourhood <- function(nmax=Inf, nmin=0, omax=0, maxdist=Inf, force=FA
 #' @param scanFraction maximum fraction of the training image to be scanned on each iteration
 #' @param patternSize number of observations used for conditioning the simulation
 #' @param gof maximum acceptance discrepance between a data event in the training image and the conditioning data event
+#' @param seed an object specifying if and how the random number generator should be 
+#' initialized, see `?simulate` in base "stats" package
 #' @param ... further parameters, not used
 #'
 #' @return an S3-list of class "gmDirectSamplingParameters" containing the six elements given as arguments 
@@ -73,7 +75,7 @@ KrigingNeighbourhood <- function(nmax=Inf, nmin=0, omax=0, maxdist=Inf, force=FA
 #' @examples
 #' (dsp = DSpars(nsim=100, scanFraction=75, patternSize=6, gof=0.05))
 #' ## then run predict(..., pars=dsp)
-DSpars <- DirectSamplingParameters <- function(nsim=1, scanFraction=0.25, patternSize=10, gof=0.05, ...){
+DSpars <- DirectSamplingParameters <- function(nsim=1, scanFraction=0.25, patternSize=10, gof=0.05, seed=NULL, ...){
   ll = list(nsim=nsim, scanFraction=scanFraction, patternSize=patternSize, gof=gof, ...)
   class(ll) = "gmDirectSamplingParameters"
   return(ll)
@@ -93,6 +95,8 @@ DSpars <- DirectSamplingParameters <- function(nsim=1, scanFraction=0.25, patter
 #' @param rank currently ignored (future functionality: obtain a reduced-rank simulation)
 #' @param debug.level degree of verbosity of results; negative values produce a progress bar; values can be
 #' extracted from [gstat::predict.gstat()] 
+#' @param seed an object specifying if and how the random number generator should be 
+#' initialized, see `?simulate` in base "stats" package
 #' @param ... further parameters, currently ignored
 #'
 #' @return an S3-list of class "gmSequentialSimulation" containing the four elements given as arguments 
@@ -109,7 +113,7 @@ DSpars <- DirectSamplingParameters <- function(nsim=1, scanFraction=0.25, patter
 #' ng_local = KrigingNeighbourhood(maxdist=1, nmin=4, omax=5, force=TRUE)
 #' (sgs_local = SequentialSimulation(nsim=100, ng=ng_local, debug.level=-1))
 #' ## then run predict(..., pars=sgs_local)
-SequentialSimulation = function(nsim=1, ng=NULL, rank=Inf, debug.level=1, ...){
+SequentialSimulation = function(nsim=1, ng=NULL, rank=Inf, debug.level=1, seed=NULL, ...){
   if(is.null(ng)) warning("SequentialSimulation: local neighbourhood is required; calculations will be stopped if the spatial model object does not include it")
   res = list(nsim=nsim, ng=ng, rank=rank, debug.level=debug.level, ...)
   class(res) = "gmSequentialSimulation"
@@ -125,6 +129,8 @@ SequentialSimulation = function(nsim=1, ng=NULL, rank=Inf, debug.level=1, ...){
 #' 
 #' @param nsim number of realisations desired
 #' @param nBands number of bands desired for the decomposition of the 2D or 3D space in individual signals 
+#' @param seed an object specifying if and how the random number generator should be 
+#' initialized, see `?simulate` in base "stats" package
 #' @param ... further parameters, currently ignored
 #'
 #' @return an S3-list of class "gmTurningBands" containing the few elements given as arguments 
@@ -136,7 +142,7 @@ SequentialSimulation = function(nsim=1, ng=NULL, rank=Inf, debug.level=1, ...){
 #' @examples
 #' (tbs_local = TurningBands(nsim=100, nBands=300))
 #' ## then run predict(..., pars=tbs_local)
-TurningBands = function(nsim=1, nBands=1000,  ...){
+TurningBands = function(nsim=1, nBands=1000, seed=NULL, ...){
   res = list(nsim=nsim, nBands=nBands, ...)
   class(res) = "gmTurningBands"
   return(res)
@@ -149,6 +155,8 @@ TurningBands = function(nsim=1, nBands=1000,  ...){
 #' mostly for covariance or variogram-based gaussian random fields.
 #' 
 #' @param nsim number of realisations desired
+#' @param seed an object specifying if and how the random number generator should be 
+#' initialized, see `?simulate` in base "stats" package
 #' @param ... further parameters, currently ignored
 #'
 #' @return an S3-list of class "gmCholeskyDecomposition" containing the few elements given as arguments 
@@ -160,7 +168,7 @@ TurningBands = function(nsim=1, nBands=1000,  ...){
 #' @examples
 #' (chols_local = CholeskyDecomposition(nsim=100, nBands=300))
 #' ## then run predict(..., pars=chols_local)
-CholeskyDecomposition = function(nsim=1, ...){
+CholeskyDecomposition = function(nsim=1, seed=NULL, ...){
   res = list(nsim=nsim,  ...)
   class(res) = "gmCholeskyDecomposition"
   return(res)

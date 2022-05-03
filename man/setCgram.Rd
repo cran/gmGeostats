@@ -12,15 +12,14 @@
 \alias{vg.sph}
 \alias{vg.Spherical}
 \alias{gsi.validModels}
-\title{gmGeostats Variogram models
-set up a D-variate variogram models}
+\title{Generate D-variate variogram models}
 \usage{
 setCgram(type, nugget = sill * 0, sill, anisRanges, extraPar = 0)
 }
 \arguments{
-\item{type}{constant indicating the model of correlation function}
+\item{type}{model of correlation function. The function expects a constant, e.g. the internal constants 'vg.Gau' for Gaussian model or 'vg.Exp'. for exponential models. See examples for usage.}
 
-\item{nugget}{(DxD)-matrix for the nugget effect}
+\item{nugget}{(DxD)-matrix for the nugget effect. Default is a muted nugget (0).}
 
 \item{sill}{(DxD)-matrix for the partial sills of the correlation function}
 
@@ -33,16 +32,16 @@ an object of class "gmCgram" containing the linear model of corregionalization
 of the nugget and the structure given.
 }
 \description{
-gmGeostats Variogram models
-set up a D-variate variogram models
+Function to set up D-variate variogram models based on model type, the variogram parameters sill and nugget and a matrix describing the anisotropy of the range.
 }
 \details{
 The argument \code{type} must be an integer indicating the model to be used.
 Some constants are available to make reading code more understandable. That is, you can
-either write \code{1}, \code{vg.Sph} or \code{vg.Spherical}, they will all work and produce
-a spherical model. The same applies for the following models: \code{vg.Gauss=0};
-\code{vg.Exp=vg.Exponential=2}. These constants are available after calling
-\code{data("variogramModels")}.
+either write \code{1}, \code{vg.sph}, \code{vg.Sph} or \code{vg.Spherical}, they will all work and produce
+a spherical model. The same applies for the following models:
+\code{vg.Gauss = vg.Gau = vg.gau = 0};
+\verb{vg.Exponential = vg.Exp = vg. exp = 2}.
+These constants are available after calling \code{data("variogramModels")}.
 No other model is currently available, but this data object will be
 regularly updated.
 The constant vector \code{gsi.validModels} contains all currently valid models.

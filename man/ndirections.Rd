@@ -60,6 +60,7 @@ Returns the number of directions at which an empirical variogram was computed
 Other gmEVario functions: 
 \code{\link{as.gmEVario}()},
 \code{\link{gsi.EVario2D}()},
+\code{\link{gsi.EVario3D}()},
 \code{\link{plot.gmEVario}()},
 \code{\link{variogramModelPlot}()}
 

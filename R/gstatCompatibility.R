@@ -256,7 +256,7 @@ variogramModelPlot.gstatVariogram =
         vrnames = levels(model$id)[1]
       }else{
         ggtr = tryCatch(as.variogramModel(model))
-        if(class(ggtr)=="try-error"){
+        if(inherits(ggtr,"try-error")){
           stop("argument 'gg' must either be a variogramModel, a gstat object with a variogramModel, a variogramModelList object, or an object convertible to one") 
         }else{
           return(variogramModelPlot(vg=vg,  gg = ggtr, col = col, commonAxis = commonAxis, newfig = newfig, ...))
@@ -573,7 +573,6 @@ as.variogramModel.LMCAnisCompo <- function(m, V=NULL, prefix=NULL, ensurePSD=TRU
   eqtabmodels = factor(c(nugget="Nug", exp="Exp", sph="Sph", gau="Gau"), levels=levels(vgm()[,1]))
   models = eqtabmodels[sapply(1:ncol(m), function(j) m[,j]$model)]
   # express all sill matrices in the desired logratio 
-  # recode A in azimuth, range and range ratio
   for(j in 1:ncol(m)){
     aux = -0.5 * t(V) %*% m[,j]$sill  %*% V
     colnames(aux) <- rownames(aux) <- noms
@@ -586,6 +585,8 @@ as.variogramModel.LMCAnisCompo <- function(m, V=NULL, prefix=NULL, ensurePSD=TRU
     }
     m[,j]$sill = aux
   }
+  # recode A in azimuth, range and range ratio
+  # TODO: correct and extend to 3D (check consistency with `anis2D.par2A()` and `anish2Dist()`)
   anis = matrix(0, nrow=ncol(m), ncol=3)
   colnames(anis) = c("range", "ang1", "anis1")
   for(j in 1:ncol(m)){
@@ -691,7 +692,9 @@ as.LMCAnisCompo.variogramModelList <-
       model = eqtabmodels[ m[[1]]$model[i] ]
       sill = clrvar2variation(t(W) %*% darstellung(m, i)  %*% W)
       range = m[[1]]$range[i] * m[[1]]$anis1[i]
-      A = anis2D.par2A(ratio=m[[1]]$anis1[i], angle=m[[1]]$ang1[i])
+      # A = anis2D_par2A(ratio=m[[1]]$anis1[i], angle=m[[1]]$ang1[i], inv=FALSE)
+      A = anis_GSLIBpar2A(ratios=c(m[[1]]$anis1[i],m[[1]]$anis2[i]), 
+                          angles=c(m[[1]]$ang1[i],m[[1]]$ang2[i],m[[1]]$ang3[i]) )
       rs = list(model=model, range=range, A=A, sill=sill)
       class(rs) = "variostructure"
       return(rs)

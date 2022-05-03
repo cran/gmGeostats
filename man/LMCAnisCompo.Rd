@@ -20,7 +20,8 @@ LMCAnisCompo(
 
 \item{models}{string (or vector of strings) specifying which reference model(s) to use}
 
-\item{azimuths}{typically a vector providing, for each model, the direction of maximal continuity}
+\item{azimuths}{typically a vector providing, for each model, the direction
+of maximal continuity (measured from North clockwise)}
 
 \item{ranges}{typically a \code{G}-column matrix providing the minimal and maximal ranges, with one row per model
 (with \code{G} specified below)}

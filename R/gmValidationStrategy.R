@@ -87,7 +87,7 @@ validate.LeaveOneOut = function(object, strategy, ...){
     n = nrow(object@data)
   }else{
     object = try(as.gmSpatialModel(object))
-    if(class(object)=="try-error") stop("validate.LeaveOneOut: provided object not interpretable")
+    if(inherits(object,"try-error")) stop("validate.LeaveOneOut: provided object not interpretable")
     n = nrow(object@data)
   }
   v = validate(object, NfoldCrossValidation(nfolds=n, doAll=TRUE))
@@ -105,7 +105,7 @@ validate.NfoldCrossValidation = function(object, strategy, ...){
   }
   # manage "gmSpatialModel" case
   object = try(as.gmSpatialModel(object))
-  if(class(object)=="try-error") stop("validate.NfoldCrossValidation: provided object not interpretable")
+  if(inherits(object,"try-error")) stop("validate.NfoldCrossValidation: provided object not interpretable")
   # interpret the information about the n-folds provided
   n = strategy$nfolds
   m = nrow(object@data)

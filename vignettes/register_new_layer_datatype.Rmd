@@ -87,7 +87,7 @@ With these few lines of programming you could already be able to use "gmGeostats
 ## model setup
 set.seed(333275)
 xdt = data.frame(x=0, y=0, z=0) # one point is necesary
-vg = vgm(model="Exp", psill=1, nugget=0, range=1) # variogram model
+vg = vgm(model="Exp", psill=1, nugget=0, range=1, anis=c(30, 0.8)) # variogram model
 gs = gstat(id="z", formula=z~1, locations = ~x+y , data=xdt, nmax=10, model=vg)
 ## sample point coordinates  
 x <- runif(2000, min = 0, max = 10) # values between 0 and 10
@@ -105,7 +105,7 @@ Now we can proceed with the analysis. First we create the "gmSpatialModel" conta
 ```{r}
 theta.gg = 
   make.gmMultivariateGaussianSpatialModel(
-    data=cdt(Zdtc), coords = Xdt, # always set V="clr" in such cases!
+    data=cdt(Zdtc), coords = Xdt, # always use cdt in such cases!
     formula = ~1 # for ordinary (co)kriging
     )
 ```
@@ -114,9 +114,10 @@ compute and plot the variogram
 theta.vg = gmGeostats::variogram(theta.gg)
 plot(theta.vg)
 ```
-and model it, in this case with an exponental of effective range approximately 3, a sill of 0.5, and a nugget close to zero. All ways of modelling variograms are allowed, for instance with "gstat" variograms
+and model it, in this case with a combination of short range exponental (of effective range approximately 1), a long-range spherical (range approx 3), and a nugget zero. All ways of modelling variograms are allowed, for instance with "gstat" variograms
 ```{r, fig.width=7, fig.height=5}
-theta.md = gstat::vgm(model="Exp", range=1, psill=0.5)
+theta.md = gstat::vgm(model="Exp", range=1/3, psill=0.1) %>% 
+  {gstat::vgm(add.to=., model="Sph", range=3, psill=0.1)}
 theta.gs = fit_lmc(v=theta.vg, g = theta.gg, model = theta.md)
 plot(theta.vg, model=theta.gs$model)
 ```
@@ -129,7 +130,7 @@ theta.gg =
     model = theta.gs$model
     )
 ```
-The outcome can then be used for validation, prediction or simulation. Here we do cokriging on the same grid we simulated above
+The outcome can then be used for validation, prediction or simulation. Here we do cokriging on a $0.1$-step grid between $0$ and $10$
 ```{r}
 x <- seq(from=0, to=10, by=0.1)
 xx = expand.grid(x,x)
@@ -182,11 +183,150 @@ The matrix contain a 1 if the row class is a subclass of the column class, and 0
 
 
 
+## Adapted empirical structural functions
+
+### Brief theoretical background
+
+Directional data can be treated within the framework of complex random fields
+$$
+Z(x) = U(x) + i V(x)
+$$
+The structural tool for complex data is the complex covariance function (Wackernagel, 2003; de Iaco et al, 2013)
+$$
+C(h) = \underbrace{C_{UU}(h) + C_{VV}(h)}_{C^{Re}(h)} + i\underbrace{(C_{VU}(h)-C_{UV}(h))}_{C^{Im}(h)}
+$$
+where $C_{UU}$ and $C_{VV}$ are the direct **covariances** of resp. the real and imaginary part of the complex random field (in the case of the circular representation analogous to the direct covariances of $sin(.)$ and $cos(.)$), and $C_{UV}$ and $C_{VU}$ are the cross-covariance and real and imaginary part (analogous to the cross-covariance of $sin(.)$ and $cos(.)$). 
+
+### A first approach
+
+Let us thus define a function that computes $C^{Re}(h)$ and $C^{Im}(h)$ from $C_{UU}(h), C_{VV}(h)$ and $C_{UV}(h)$:
+
+```{r, fig.width=7, fig.height=5}
+# compute covariogram!
+theta.cvg = gmGeostats::variogram(theta.gg, covariogram=TRUE)
+class(theta.cvg)
+# structure of the gstatVariogram object
+head(theta.cvg)
+# values controlling the split in direct and cross-variograms
+theta.vg$id
+
+# function doing the recalculations
+recompute_complex_cov = function(cv){
+  # split the gstatVariogram structure in the individual vgrams
+  aux = split(cv[, -6], cv$id)
+  # ad-hoc function taking two vgrams and operating their gamma column
+  sumGamma = function(x,y, alpha=1){
+    x$gamma = x$gamma + alpha*y$gamma
+    return(x)
+  }
+  # compute C^{Im} and C^{Re}
+  aaxx = list(Im=sumGamma(aux$z1.z2, aux$z1.z2, -1), 
+              Re=sumGamma(aux$z1, aux$z2)
+              )
+  # undo the split
+  f = rep(c("Im", "Re"), each=nrow(aux$z1))
+  res = unsplit(aaxx, f)
+  res$id = as.factor(f)
+  # restore the class and return 
+  class(res) = class(cv)
+  return(res)
+}
+# do the calculations!
+theta.vg %>% recompute_complex_cov %>% plot
+```
+This is again a quick and dirty solution, as:
+
+1. by using the plotting capacities of "gstat" for an incompplete object we waste half the space of the plot;
+2. actually the current function can only deal with symmetric covariances (because of the way that gstat::variogram estimates the covariance), and
+3. hence the imaginary part is identically zero.
+
+### Non-symmetric covariance
+
+Hence, we need to improve the computations slightly. First we need to consider estimates for the whole 360$^o$, so that we can obtain $C_{VU}(h)=C_{UV}(-h)$, 
+```{r}
+# compute variogram for the whole circle, i.e. until 360 deg
+theta.cvg = gmGeostats::variogram(
+  theta.gg, covariogram=TRUE, alpha=(0:11)*30)
+# how are the directions structured?
+theta.cvg[theta.cvg$id=="z1", "dir.hor"]
+```
+and second we must modify our recomputing function to take into account this symmetry and the particular way the directions are stored in the object:
+```{r, fig.width=7, fig.height=5}
+# function doing the recalculations
+recompute_complex_cov_anis = function(cv){
+  # split the gstatVariogram structure in the individual vgrams
+  aux = split(cv[, -6], cv$id)
+  # ad-hoc function taking two vgrams and operating their gamma column
+  sumGamma = function(x,y, alpha=1){
+    y$gamma = x$gamma + alpha*y$gamma
+    return(y) # this time return the second argument!
+  }
+  N = nrow(aux[[1]])/2 
+  # compute C^{Im} and C^{Re}
+  aaxx = list(Im=sumGamma(aux$z1.z2[-(1:N),], aux$z1.z2[(1:N),], -1), 
+              Re=sumGamma(aux$z1[1:N,], aux$z2[1:N,])
+              )
+  # undo the split
+  f = rep(c("Im", "Re"), each=N)
+  res = unsplit(aaxx, f)
+  res$id = as.factor(f)
+  # restore the class and return 
+  class(res) = class(cv)
+  return(res)
+}
+
+theta.cvg %>% recompute_complex_cov_anis() %>% plot
+```
+
+Although the outcome is quite satisfactory, the code is currently tricky to use, as it requires for instance that one computes covariograms for a whole set of directions over the 360$^o$, which is not common. 
+
+### A tailored function
+
+As a consequence, we should produce a tailored function that takes responsibility over all these details 
+```{r}
+circularCovariogram = function(g, dirs=4){
+  # case dirs is only the number of desired directions
+  if(length(dirs)==1){
+    delta = 180/dirs
+    dirs = delta*(0:(dirs-1))
+  }
+  # extend the nr of directions to the whole circle
+  dirs = c(dirs, 180 + dirs)
+  # compute the covariogram
+  cvg = gmGeostats::variogram(g, covariogram=TRUE, alpha=dirs)
+  # recast and set the new class label
+  rcvg = recompute_complex_cov_anis(cvg)
+  class(rcvg) = c("circularCovariogram", class(cvg))
+  return(rcvg)
+}
+```
+
+The goal of extending the class marker with a specific class for this type of structural function is to be able to produce later on specific fitting behaviors adapted to this kind of data, like the one presented in De Iaco et al (2013). This will be discussed in the following sections. In the meantime, what we need is a way to recast this class back to "gstatVariogram", to keep compatibility. For this, we just need to create a method for the function "as.gstatVariogram", as well as register our new class as a subclass of the abstract class "EmpiricalStructuralFunctionSpecification":
+```{r}
+# which arguments has as.gstatVariogram?
+args(as.gstatVariogram)
+# new method:
+as.gstatVariogram.circularCovariogram = function(vgemp, ...){
+  class(vgemp) = class(vgemp)[-1] # drop the extra class marker
+  return(vgemp) # return result
+}
+# export the ad-hoc S3 class to S4
+setOldClass("circularCovariogram")
+# declare the new class an "EmpiricalStructuralFunctionSpecification"
+setIs("circularCovariogram", "EmpiricalStructuralFunctionSpecification")
+
+# check that all went right:
+theta.cvg = circularCovariogram(theta.gg, dirs = 6)
+is(theta.cvg, "circularCovariogram")
+is(theta.cvg, "gstatVariogram")
+is(theta.cvg, "data.frame")
+is(theta.cvg, "EmpiricalStructuralFunctionSpecification")
+```
 
 
 ## Future work
 
-In future extensions of this vignette we will discuss the way to create own structural functions (variograms) and estimation models/methods adapted to the nature of the data, and register them to the package (usage of `setIs()` and coercion in conjunction with the abstract classes mention, `validate()`- and `predict()`-methods, creation of own `make.gm****Model()` data containers, etc). We will continue with our illustrative example of circular data, using developments by Wackernagel (2003) and de Iaco et al (2013).
+In future extensions of this vignette we will discuss the way to fit covariance models to circular covariograms, setup estimation models/methods adapted to the nature of the data, and show other examples of how to register them to the package (usage of `setIs()` and coercion in conjunction with the abstract classes mentioned, `validate()`- and `predict()`-methods, creation of own `make.gm****Model()` data containers, etc). We will continue with our illustrative example of circular data, using developments by Wackernagel (2003) and de Iaco et al (2013).
 
 
 

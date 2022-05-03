@@ -2,8 +2,10 @@
 % Please edit documentation in R/gmAnisotropy.R
 \name{as.AnisotropyScaling}
 \alias{as.AnisotropyScaling}
-\alias{as.AnisotropyScaling.AnisotropyScaling}
 \alias{as.AnisotropyScaling.numeric}
+\alias{as.AnisotropyScaling.AnisotropyScaling}
+\alias{as.AnisotropyScaling.double}
+\alias{as.AnisotropyScaling.AnisotropyRangeMatrix}
 \title{Convert to anisotropy scaling matrix}
 \usage{
 as.AnisotropyScaling(x)
@@ -11,13 +13,15 @@ as.AnisotropyScaling(x)
 \method{as.AnisotropyScaling}{AnisotropyScaling}(x)
 
 \method{as.AnisotropyScaling}{numeric}(x)
+
+\method{as.AnisotropyScaling}{AnisotropyRangeMatrix}(x)
 }
 \arguments{
 \item{x}{an object convertible to an anisotropy scaling matrix; see details}
 }
 \value{
 A matrix \eqn{A} such that for any lag vector \eqn{h}, the variogram model turns
-isotropic in terms of \eqn{u=A\cdot h}.
+isotropic in terms of \eqn{u'=h'\cdot A}.
 }
 \description{
 Convert an anisotropy specification to a scaling matrix
@@ -29,15 +33,29 @@ degrees, clockwise from North) and the anisotropy ratio of short/long range. In 
 these are: 1,2) the azimuth and the dip of the direction of maximal continuity; 3) the
 angle of rotation around the axis of the first direction; 4,5) the anisotropy ratios of
 the ranges of the second/first and third/first directions of maximal continuity. All angles
-are given in degrees, all ratios must be smaller or equal to 1.
+are given in degrees, all ratios must be smaller or equal to 1. This follows gstat (and hence
+GSlib) conventions; see gstat::vgm() for details.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{AnisotropyScaling}: Convert to anisotropy scaling matrix
+\item \code{AnisotropyScaling}: identity method
 
-\item \code{numeric}: Convert to anisotropy scaling matrix
+\item \code{numeric}: from a vector of numbers
+
+\item \code{AnisotropyRangeMatrix}: from an AnisotropicRangeMatrix
 }}
 
 \examples{
-as.AnisotropyScaling(c(30,0.5))
+( l = anis_GSLIBpar2A(angles=30, ratios=0.5))
+( ll = unclass(l) )
+as.AnisotropyScaling(ll)
 }
+\seealso{
+Other anisotropy: 
+\code{\link{AnisotropyRangeMatrix}()},
+\code{\link{AnisotropyScaling}()},
+\code{\link{anis_GSLIBpar2A}()},
+\code{\link{as.AnisotropyRangeMatrix}()},
+\code{\link{is.anisotropySpecification}()}
+}
+\concept{anisotropy}

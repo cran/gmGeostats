@@ -5,7 +5,14 @@
 \alias{DirectSamplingParameters}
 \title{Create a parameter set specifying a direct sampling algorithm}
 \usage{
-DSpars(nsim = 1, scanFraction = 0.25, patternSize = 10, gof = 0.05, ...)
+DSpars(
+  nsim = 1,
+  scanFraction = 0.25,
+  patternSize = 10,
+  gof = 0.05,
+  seed = NULL,
+  ...
+)
 }
 \arguments{
 \item{nsim}{number of realisations desired (attention: current algorithm is slow, start with small values!)}
@@ -15,6 +22,9 @@ DSpars(nsim = 1, scanFraction = 0.25, patternSize = 10, gof = 0.05, ...)
 \item{patternSize}{number of observations used for conditioning the simulation}
 
 \item{gof}{maximum acceptance discrepance between a data event in the training image and the conditioning data event}
+
+\item{seed}{an object specifying if and how the random number generator should be
+initialized, see \code{?simulate} in base "stats" package}
 
 \item{...}{further parameters, not used}
 }

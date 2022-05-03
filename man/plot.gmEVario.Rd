@@ -70,6 +70,7 @@ plot(vge, pch=22, lty=1, bg="grey")
 Other gmEVario functions: 
 \code{\link{as.gmEVario}()},
 \code{\link{gsi.EVario2D}()},
+\code{\link{gsi.EVario3D}()},
 \code{\link{ndirections}()},
 \code{\link{variogramModelPlot}()}
 }

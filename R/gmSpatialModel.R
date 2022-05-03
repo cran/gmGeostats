@@ -301,7 +301,7 @@ as.gstat.gmSpatialModel <- function(object, ...){
     if(is.null(aux <- object@model@structure)){
       lrvgLMC = NULL
     }else{
-      lrvgLMC = as.LMCAnisCompo(aux, V=V) 
+      lrvgLMC = as.LMCAnisCompo(aux, V=Vinv) 
     }
     formulaterm = paste(as.character(object@model@formula), collapse="")
     beta = object@model@beta
@@ -369,6 +369,7 @@ as.gmSpatialModel.gstat = function(object, V=NULL, ...){
   stop("as.gmSpatialModel.gstat: not yet implemented")
 }
 
+## predict and simulate methods -------------
 
 #' Predict method for objects of class 'gmSpatialModel'
 #' 
@@ -681,5 +682,4 @@ setMethod("as.gstat", signature="gmSpatialModel", def=as.gstat.gmSpatialModel)
 #        return(from)
 #      }
 #)
-
 

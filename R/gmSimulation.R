@@ -419,7 +419,7 @@ gsi.DS <- function(n, f, t, n_realiz,
   }else if(is.character(ivars_TI)){
      varnames_out = ivars_TI
   }
-  if(length(varnames_out)!=D | class(varnames_out)=="try-error") varnames_out = paste("v", 1:D, sep="")
+  if(length(varnames_out)!=D | inherits(varnames_out,"try-error")) varnames_out = paste("v", 1:D, sep="")
   dm = list(loc=1:length(mask), var=varnames_out, sim=paste("sim", 1:n_realiz, sep="") )
   
   SimGrid_list = lapply(SimGrid_list, function(x){

@@ -4,12 +4,15 @@
 \alias{TurningBands}
 \title{Create a parameter set specifying a turning bands simulation algorithm}
 \usage{
-TurningBands(nsim = 1, nBands = 1000, ...)
+TurningBands(nsim = 1, nBands = 1000, seed = NULL, ...)
 }
 \arguments{
 \item{nsim}{number of realisations desired}
 
 \item{nBands}{number of bands desired for the decomposition of the 2D or 3D space in individual signals}
+
+\item{seed}{an object specifying if and how the random number generator should be
+initialized, see \code{?simulate} in base "stats" package}
 
 \item{...}{further parameters, currently ignored}
 }

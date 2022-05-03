@@ -80,12 +80,12 @@ constructMask = function(grid, method="maxdist", maxval=NULL, x=NULL){
       x = data.frame(sp::coordinates(x), x@data)
     }
     x = try(as.data.frame(x))
-    if(class(x)=="try-error") stop("constructMask: provided object x should be a data.frame or convertible to it for method 'maxdist'")
+    if(inherits(x,"try-error")) stop("constructMask: provided object x should be a data.frame or convertible to it for method 'maxdist'")
     out = gsi.masking.nearest(grid0, x, maxdist=maxval)
   }else if(m=="sillprop"){
     if(is.null(x))
       stop("constructMask: sillprop method requires a variogram model")
-    if(class(x)=="gstat") x = x$model
+    if(inherits(x,"gstat")) x = x$model
     if(is(x,"gmSpatialModel")) x = x@model@structure
     if(is(x, "ModelStructuralFunctionSpecification")) as.variogramModel(x)
     maxval = ifelse(is.null(maxval), 0.99, maxval)
@@ -166,7 +166,7 @@ gsi.masking.nearest = function(grid, x, maxdist){
 gsi.masking.polygon = function(grid, poly){
   requireNamespace("sp", quietly = TRUE)
   poly = try(as(poly, "SpatialPolygons"))
-  if(class(poly)=="try-error")
+  if(inherits(poly,"try-error"))
     stop("object 'poly' cannot be coerced to SpatialPolygons")
   FUN = function(i){
     poly = poly@polygons[[i]]@Polygons[[1]]@coords
@@ -260,7 +260,7 @@ setMask <- function(x,...) UseMethod("setMask", x)
 #' to specify the matrix of spatial coordinates (all `setMask` methods including it)
 setMask.default <- function(x, mask, coordinates = 1:2, ...){
   x = as.data.frame(x)
-  if(class(mask)=="mask") attributes(mask) = NULL
+  if(inherits(mask,"mask")) attributes(mask) = NULL
   if(is.null(dim(coordinates) )){
     fullgrid = x[,coordinates]
   }else{
@@ -281,7 +281,7 @@ setMask.data.frame <- setMask.default
 #' @method setMask DataFrameStack
 #' @export
 setMask.DataFrameStack <- function(x, mask, coordinates=attr(x, "coordinates"), ...){
-  if(class(mask)=="mask") attributes(mask) = NULL
+  if(inherits(mask,"mask")) attributes(mask) = NULL
   cc = coordinates
   x = x[mask,,drop=FALSE]
   attr(mask, "fullgrid") = cc
@@ -298,7 +298,7 @@ setMask.SpatialGrid <- function(x, mask, ...){
   r = order(+cc[,2],+cc[,1])
   o = 1:nrow(cc)
   r = o[r]
-  if(class(mask)=="mask") attributes(mask) = NULL
+  if(inherits(mask,"mask")) attributes(mask) = NULL
   maskaux = mask[o]
   cc = cc[maskaux,, drop=FALSE]
   cc = sp::SpatialPoints(coords = cc, proj4string = sp::CRS(sp::proj4string(x)), 
@@ -331,7 +331,7 @@ setMask.GridTopology <- function(x, mask, ...){
 #' @importClassesFrom sp SpatialPoints
 setMask.SpatialPoints <- function(x, mask, ...){
   cc = sp::coordinates(x)
-  if(class(mask)=="mask") attributes(mask) = NULL
+  if(inherits(mask,"mask")) attributes(mask) = NULL
   cc = cc[mask,,drop=FALSE]
   if("data" %in% slotNames(x)){
     dt = x@data
@@ -433,7 +433,7 @@ unmask.SpatialPixels <- function(x, mask=NULL, fullgrid =attr(mask, "fullgrid"),
   if(is(fullgrid, "SpatialGrid")) fullgrid = sp::getGridTopology(fullgrid)
   # compute number of points
   npoints <- try( prod(fullgrid@cells.dim))
-  if(class(npoints)=="try-error") stop("unmask.SpatialPixels: provided fullgrid could not be intepreted as a grid")
+  if(inherits(npoints,"try-error")) stop("unmask.SpatialPixels: provided fullgrid could not be intepreted as a grid")
   # construct mask
   if(is.null(mask)){
     mask = rep(FALSE, npoints)

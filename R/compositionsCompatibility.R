@@ -61,7 +61,7 @@ logratioVariogram_acomp <- function(data=comp, loc, ..., azimuth=0, azimuth.tol=
 logratioVariogram_gmSpatialModel <- function(data, ..., azimuth=0, azimuth.tol=180/length(azimuth)){
   coords = sp::coordinates(data)
   comp = tryCatch(gsi.orig(data@data))
-  if(class(comp)=="try-catch") stop("logratioVariogram.gmSpatialModel: provided data is not compositional!")
+  if(inherits(comp,"try-catch")) stop("logratioVariogram.gmSpatialModel: provided data is not compositional!")
   if(length(azimuth)>1) return(gsi.logratioVariogramAnisotropy(comp, coords, ..., azimuths=azimuth, azimuth.tol=azimuth.tol))
   logratioVariogram.default(comp, loc=coords, ...)    
 }
@@ -553,6 +553,8 @@ fit_lmc.logratioVariogramAnisotropy <- function(v, g, model, ...){
 
 #################################################
 ## anisotropic variogram models and accesory functions 
+# h : matrix of nx3 (or nx2) lag vectors
+# A : isotropizing matrix
 anish2Dist <- function (h, A = NULL){
   if (is.data.frame(h)) 
     h <- as.matrix(h)
@@ -606,7 +608,8 @@ anvgram.nugget = function (h, nugget = 0, sill = 0, range = 1, A = NULL, ...){
 #'
 #' @param Z compositional data set, used to derive the compositional dimension and colnames
 #' @param models string (or vector of strings) specifying which reference model(s) to use 
-#' @param azimuths typically a vector providing, for each model, the direction of maximal continuity
+#' @param azimuths typically a vector providing, for each model, the direction 
+#' of maximal continuity (measured from North clockwise)
 #' @param ranges typically a `G`-column matrix providing the minimal and maximal ranges, with one row per model
 #' (with `G` specified below)
 #' @param sillarray array of sills for each model. It can be null (to be estimated in the future). If specified, 
@@ -634,6 +637,12 @@ LMCAnisCompo = function(Z, models=c("nugget", "sph", "sph"),
   DD = D*(D+1)/2
   dd = d*D/2
   K = length(models)
+  # check dimension of azimuths
+  if(length(dim(azimuths))==0){
+    dim(azimuths) = c(length(azimuths),1)
+  }else if( !(ncol(azimuths) %in% c(1,3))){
+    stop("LMCAnisCompo: `azimuths` should be a (column)vector in 2D, or a 3-column matrix in 3D")
+  }
   
   # consider the sill matrices and try to interpret its shapes
   if(is.null(sillarray)){
@@ -676,7 +685,7 @@ LMCAnisCompo = function(Z, models=c("nugget", "sph", "sph"),
     sill = darstellung(sillarray, i)
     range = ranges[i,2]
     # if(G==2)
-    A = anis2D.par2A(ratio=ranges[i,2]/ranges[i,1], angle=azimuths[i])
+    A = anis_GSLIBpar2A(ratios=ranges[i,-1]/ranges[i,1], angles=azimuths[i,] )
     # elseif(G==3) and so on...
     rs = list(model=model, range=range, A=A, sill=sill)
     class(rs) = "variostructure"
@@ -825,7 +834,7 @@ as.CompLinModCoReg.LMCAnisCompo = function(v, ...){
 #     vvgg = rep(par[1], min(length(hh), nrow(hh)))
 #     for(istruc in 1:length(variomodelpars$models)){
 #       fn = paste("anvgram", variomodelpars$models[istruc], sep=".")
-#       A = anis2D.par2A(par[istruc*4+2], par[istruc*4+3])
+#       A = anis2D_par2A(par[istruc*4+2], par[istruc*4+3])
 #       g = eval(call(fn, h=hh, range=par[istruc*4], sill=par[istruc*4+1], A=A))
 #       # g = eval(call(fn, h=hh, range=par[istruc*4], sill=par[istruc*4+1]))
 #       vvgg = vvgg + g
@@ -1289,7 +1298,7 @@ as.gmCgram.LMCAnisCompo = function(m, V=attr(m,"contrasts"),
   }
   # put anisotropy L matrix
   inonugget = which(m["model",]!="nugget")
-  Ms = sapply(inonugget, function(i) gsi.powM(m["A",i][[1]], -2))
+  Ms = sapply(inonugget, function(i) as.AnisotropyRangeMatrix.AnisotropyScaling(m["A",i][[1]]) )
   dim(Ms) = c(dim(m["A",1][[1]]),length(inonugget))
   output$M = aperm(Ms, c(3,1,2))
   # put sills

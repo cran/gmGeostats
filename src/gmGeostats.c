@@ -9,6 +9,9 @@
 #ifdef _OPENMP
 #include <omp.h>
 #endif
+
+#define USE_FC_LEN_T
+
 #include <Rinternals.h>
 
 #define inR   // attention: this must be uncommented if not compiling
@@ -18,6 +21,10 @@
 #include <Rmath.h>
 #include <R_ext/BLAS.h>
 #include <R_ext/Lapack.h> 
+#endif
+
+#ifndef FCONE
+# define FCONE
 #endif
 
 #define maxIntervals 1000
@@ -52,7 +59,7 @@ double invBitExp2(int i) {
 }
 
 
-/* invBitExp2
+/* invBitExp
  inverts the sequence of the digits in b-adict representation. 
  this is used for the generation of almost equally space directions in 3D
  
@@ -140,7 +147,7 @@ const int *ijEqual
   if( m<1 || m>3)
     error("Can not handel spatial dimensions outside 1-3");
   int outBufSize=d*d*nX*nY;
-  int i,j,k,ev,lx,ly,s;
+  int i,j,k,lx,ly,s; /* 20220424: ev removed */
   double delta[3];
   double v[3];
   double h2,h,val;
@@ -212,7 +219,7 @@ const double *extra /* extra parameter (unused), for consistency with other cova
    * projs points. Return that wave */	
   int i;
   double phase,amp,omega,d1;   
-  omega = norm_rand()  * M_SQRT2 / range; 
+  omega = norm_rand()  * M_SQRT2 / range * M_SQRT_3; /* sqrt(3) needed to produce effective range*/
   phase = unif_rand() * M_2PI;
   amp  = M_SQRT2; /* Lantuejoul (2002), page 191 */
   for(i=0;i<n;i++) {
@@ -283,13 +290,12 @@ void fbandExp(int n, /* number of locations */
     const double *extra /* extra parameter (unused), for consistency with other covariances */
 ){
   int i,j,ns;
-  double d1,x0,x1,sign,effrange;
+  double d1,x0,x1,sign;
   /* Lantuejoul (2002), page 196 */ 
   /* Find the smallest proj; select a random exponential point "x0" left 
    * from it with lambda "2range" away. Domain = (x0, max(projs)) */
   sign = unif_rand()>0.5? 1 : -1; /* start + or - randomly */
-  effrange = range;  /*  ATTENTION: 3*range, but range is inverted ??? */
-  x0 = projs[0];  /* does min exist?? */
+  x0 = projs[0];  
   x1 = projs[0];
   for(i=1;i<n;i++) {
     if( projs[i]>x1 )
@@ -297,7 +303,7 @@ void fbandExp(int n, /* number of locations */
     else if( projs[i]<x0 )
       x0=projs[i];
   }  
-  x0 -= 2*effrange*exp_rand();
+  x0 -= 2*range*exp_rand();
   
   /* Partition the domain with a Poisson point process of lambda=2range. */
   ns = 0;
@@ -305,7 +311,7 @@ void fbandExp(int n, /* number of locations */
   while( doubleBuf[ns]<x1 ){
     if( ns>=maxIntervals )
       error("fbandExp: too small range; merge with nugget?");
-    doubleBuf[ns+1] = doubleBuf[ns] + 2*effrange*exp_rand();
+    doubleBuf[ns+1] = doubleBuf[ns] + 2*range*exp_rand();
     ns ++;
   }
   /* Assign values*/
@@ -329,12 +335,12 @@ void getUnitvec(
 ) {
   /* weak discrepancy sequence of pseudorandom directions in 2D or 3D:
    * Lantuejoul (2002), page 194, after Freulon (1992) */			  
-  int i;
+  /* 20220424: removed int i; */ 
   double d1,d2,d3;
   if(dimX>3)
     error("no expression for unit vectors in dimension larger than 3");
   if( dimX==3) {
-    d1=invBitExp2(ip)*M_2_PI;
+    d1=invBitExp2(ip)*2*M_PI;
     d2=invBitExp(ip,3);
     d3 = sqrt(1-d2*d2); 
     unitvec[2] = d2;
@@ -350,6 +356,20 @@ void getUnitvec(
   }
 }
 
+
+
+static R_NativePrimitiveArgType getUnitvecR_t[] = {  /* INTSXP,REALSXP */
+  /* dimX,    iP,  unitvec */
+  INTSXP,INTSXP,REALSXP
+};
+
+
+void getUnitvecR(int * dimX,
+		 int * ip,
+		 double *unitvec
+		 ) {
+  getUnitvec(*dimX,*ip,unitvec);
+}
 
 
 static R_NativePrimitiveArgType CMVTurningBands_t[] = {  /* INTSXP,REALSXP */
@@ -374,9 +394,9 @@ void CMVTurningBands(
   const int maxCgramType=2;
   const int nsim=dimZ[2];
   int i,j,k,s,ss,ev;
-  double d1,d2,d3;
+  double d1,d2; /* 20220424: removed ,d3; */
   const double sqrtNBands=sqrt((double) *nBands);
-  double phase,amp;
+  double phase; /* 20220424: removed ,amp; */
   const int n=dimX[0];
   const int m=dimX[1];
   const int d=dimZ[0];
@@ -399,50 +419,50 @@ void CMVTurningBands(
       for(j=0;j<d;j++)
         Z[d*i+j]=0.0;
     for(s=0;s<*nBands;s++){/* band */
-  getUnitvec(3, s+1, &(omega[0])); /* obtain a direction; always in 3D, in order for the spherical variogram to be correct */
-  //getUnitvec(m, s+1, omega); /* obtain a direction */
-  for(ss=0;ss< *nCgrams;ss++) { /* variogram structure */
-  if( typeCgram[ss]<0 || typeCgram[ss] > maxCgramType )
-    error("CMVTurningBands: Unknown variogram type");
-  /* project all data onto the direction */
-  for(i=0;i<n;i++){ /* location */
-  for(j=0;j<m;j++) {
-    v[j]=0;
-    for(k=0;k<m;k++)
-      v[j]+=A[ss+ *nCgrams *(j+m*k)]*X[i+n*k];
-  }
-  projs[i]=0;
-    for(j=0;j<m;j++){ /* spatial dimension */
-  projs[i]+=omega[j]*v[j];
-    }
-  }
-  /* for each eigenvalue, ... */
-  for(ev=0;ev<d;ev++) { /* eigenvector */
-  /* ... obtain a curve at all proj points following the covariance model */  
-  (*bandSim[typeCgram[ss]])(n,projs,band,1.0,moreCgramData+ss);  
-    /* this function takes the projs and returns on band the  the curve */
-    /* ... multiply the eigenvector by the curve, and accumulate */
+      getUnitvec(3, s+1, &(omega[0])); /* obtain a direction; always in 3D, in order for the spherical variogram to be correct */
+      //getUnitvec(m, s+1, omega); /* obtain a direction */
+      for(ss=0;ss< *nCgrams;ss++) { /* variogram structure */
+        if( typeCgram[ss]<0 || typeCgram[ss] > maxCgramType )
+           error("CMVTurningBands: Unknown variogram type");
+        /* project all data onto the direction */
+        for(i=0;i<n;i++){ /* location */
+         for(j=0;j<m;j++) {
+          v[j]=0;
+          for(k=0;k<m;k++)
+           v[j]+=A[ss+ *nCgrams *(j+m*k)]*X[i+n*k];
+         }
+         projs[i]=0;
+         for(j=0;j<m;j++){ /* spatial dimension */
+          projs[i]+=omega[j]*v[j];
+         }
+        }
+        /* for each eigenvalue, ... */
+        for(ev=0;ev<d;ev++) { /* eigenvector */
+         /* ... obtain a curve at all proj points following the covariance model */  
+         (*bandSim[typeCgram[ss]])(n,projs,band,1.0,moreCgramData+ss);  
+         /* this function takes the projs and returns on band the  the curve */
+         /* ... multiply the eigenvector by the curve, and accumulate */
 #ifdef _OPENMP
 #pragma omp parallel for		             \
     if(!omp_in_parallel()&&0)		        \
       num_threads(omp_get_num_procs())	\
       default(shared) private(i,j,d2) 
-    for(i=0;i<n;i++){ /* location */
-    for(j=0;j<d;j++){ /* variable */
-    d2 = sqrtSill[ss + *nCgrams *(j+d*ev)]*band[i]; 
-      Z[d*i+j]+=d2;  
-    }	  
-    }
+         for(i=0;i<n;i++){ /* location */
+          for(j=0;j<d;j++){ /* variable */
+           d2 = sqrtSill[ss + *nCgrams *(j+d*ev)]*band[i]; 
+           Z[d*i+j]+=d2;  
+          }	  
+         }
 #else
-    for(i=0;i<n;i++){ /* location */
-    for(j=0;j<d;j++){ /* variable */
-    d2 = sqrtSill[ss + *nCgrams *(j+d*ev)]*band[i]; 
-      Z[d*i+j]+=d2;  
-    }	  
-    }
+         for(i=0;i<n;i++){ /* location */
+          for(j=0;j<d;j++){ /* variable */
+           d2 = sqrtSill[ss + *nCgrams *(j+d*ev)]*band[i]; 
+           Z[d*i+j]+=d2;  
+          }	  
+         }
 #endif
-  }
-  }
+        }
+      }
     } 
     /* Rescale*/
     for(i=0;i<n;i++)
@@ -492,7 +512,7 @@ void CCondSim(
     double *cbuf,  /* BUF: Buffer of length d*d*nin */
     double *dbuf  /* BUF: Buffer of length d*nin*nsim */
 ) {
-  const int maxCgramType=2;
+  /* 20220424 removed: , const int maxCgramType=2; */
   const int n=dimX[0];
   const int m=dimX[1];
   const int d=dimZin[0];
@@ -507,9 +527,9 @@ void CCondSim(
   const double zero=0.0;
   const double one=1.0;
   const double minus1=-1.0;
-  int i,j,k,s,ss,ev,l;
+  int i,j,k; /* 20220424 removed: ,s,ss,ev,l; */
   int sim,shift;
-  double d1,d2,d3,cv;
+  /* 20220424 removed: double d1,d2,d3,cv; */
   const int dimXin[2] = {nin,m}; 
   const int dimXout[2] = {1,m};
   const int dimCbuf[4] = {d,nin,d,1};
@@ -580,7 +600,7 @@ void CCondSim(
                &oneI,
                &zero,
                dbuf+dmnin*sim,
-               &oneI);
+               &oneI FCONE);
     }
 #else
     for(sim=0;sim<nsim;sim++) {
@@ -594,7 +614,7 @@ void CCondSim(
                &oneI,
                &zero,
                dbuf+dmnin*sim,
-               &oneI);
+               &oneI FCONE);
     }
 #endif
     // /* points in*/
@@ -659,7 +679,7 @@ void CCondSim(
                    &oneI,
                    &one,
                    Z+i*d+nd*sim,
-                   &oneI);
+                   &oneI FCONE);
         }
 #else
         for(sim=0;sim<nsim;sim++) {
@@ -673,7 +693,7 @@ void CCondSim(
                    &oneI,
                    &one,
                    Z+i*d+nd*sim,
-                   &oneI);
+                   &oneI FCONE);
         }
 #endif
     }
@@ -872,8 +892,10 @@ static R_CMethodDef cMethods[] = {
   {"CCondSim", (DL_FUNC) & CCondSim, 18,  CCondSim_t},
   {"anaForwardC", (DL_FUNC) &anaForwardC, 8, anaForwardC_t},
   {"anaBackwardC", (DL_FUNC) &anaBackwardC, 8, anaBackwardC_t},
+  {"getUnitvecR", (DL_FUNC) &getUnitvecR, 3, getUnitvecR_t},
   {NULL, NULL, 0}
 };
+
 
 //{"CMVTurningBands2", (DL_FUNC) &CMVTurningBands2, 11, CMVTurningBands2_t},
 

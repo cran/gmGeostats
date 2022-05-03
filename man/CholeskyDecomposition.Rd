@@ -4,10 +4,13 @@
 \alias{CholeskyDecomposition}
 \title{Create a parameter set specifying a LU decomposition simulation algorithm}
 \usage{
-CholeskyDecomposition(nsim = 1, ...)
+CholeskyDecomposition(nsim = 1, seed = NULL, ...)
 }
 \arguments{
 \item{nsim}{number of realisations desired}
+
+\item{seed}{an object specifying if and how the random number generator should be
+initialized, see \code{?simulate} in base "stats" package}
 
 \item{...}{further parameters, currently ignored}
 }
