@@ -246,13 +246,13 @@ variogramModelPlot.gstatVariogram =
       model = lapply(noms, function(i) gstat::vgm(model="Sph", psill=0, range=1, nugget=0))
       names(model)=noms
     }else{
-      if("variogramModelList" %in% class(model)){
+      if(is(model, "variogramModelList")){
         vrnames = names(model)
         vrnames = vrnames[-grep(".", vrnames, fixed=TRUE)]
-      }else if("gstat" %in% class(model)){
+      }else if(is(model, "gstat")){
         vrnames = names(model$data)
         model = model$model
-      }else if("variogramModel" %in% class(model) ){
+      }else if(is(model,"variogramModel") ){
         vrnames = levels(model$id)[1]
       }else{
         ggtr = tryCatch(as.variogramModel(model))

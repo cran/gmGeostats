@@ -81,7 +81,7 @@ validate <- function(object, strategy, ...) UseMethod("validate", strategy)
 #' @method validate LeaveOneOut
 #' @export
 validate.LeaveOneOut = function(object, strategy, ...){
-  if("gstat" %in% class(object)){
+  if(inherits(object,what="gstat",which=FALSE)){
     n = nrow(object$data[[1]]$data)
   }else if(is(object, "gmSpatialModel")){
     n = nrow(object@data)
@@ -99,7 +99,7 @@ validate.LeaveOneOut = function(object, strategy, ...){
 #' @export
 validate.NfoldCrossValidation = function(object, strategy, ...){
   # manage "gstat" case
-  if("gstat" %in% class(object)){
+  if(is(object,"gstat")){
     warning("validate: object provided is of class 'gstat', attempting 'gstat.cv(..., remove.all=TRUE, all.residuals=TRUE)'")
     return(gstat::gstat.cv(object, nfold=strategy$nfolds, remove.all = TRUE, all.residuals = TRUE))
   }

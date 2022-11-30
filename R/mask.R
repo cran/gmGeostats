@@ -377,7 +377,7 @@ unmask <- function(x,...) UseMethod("unmask", x)
 #' a "unmask.DataFrameStack" produces a "unmask.DataFrameStack"; 
 #' a "SpatialPoints" produces a "SpatialPoints"; and finally
 #' a "SpatialPixels" produces either a "SpatialPixels" or a "SpatialGrid" (if it is full).
-#' Note that only in the case that `class(x)=="SpatialPixels"` is `mask` required,
+#' Note that only in the case that `is(x,"SpatialPixels")=TRUE` is `mask` required,
 #' for the other methods all arguments have reasonable defaults.
 #' @export
 unmask.data.frame <- function(x, mask=attr(x,"mask"), fullgrid = attr(mask, "fullgrid"), 

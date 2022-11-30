@@ -131,7 +131,7 @@ Maf = function(x,...) UseMethod("Maf",x)
 #' spatial imaging, Stanford University, Palo Alto, USA, 14pp.
 #' 
 #' Tichavsky, P. and Yeredor, A., 2009. Fast approximate joint diagonalization 
-#' incorporating weight matrices. IEEE Transactions on Signal Processing 57, 878 – 891.
+#' incorporating weight matrices. IEEE Transactions on Signal Processing 57, 878 ??? 891.
 #' 
 #' @family generalised Diagonalisations
 #'
@@ -192,7 +192,7 @@ Maf.data.frame <- function(x, vg, i=2,...){
   res = list(sdev=sdevs, loadings = W, center=mn, scale=rep(1, ncol(x)),
              n.obs=nrow(x), scores = facscores, C1=C1, C2=C2, eigenvalues = eigenvalues[ord], 
              invLoadings=Winv)
-  if(class(x)!="data.frame"){
+  if(!is(x,"data.frame")){
     res$Center = cdtInv(mn)
     res$InvLoadings = cdtInv(Winv, orig=x)
     res$InvDownLoadings = cdtInv(-Winv, orig=x)
@@ -447,7 +447,7 @@ predict.genDiag = function (object, newdata=NULL, ...) {
   requireNamespace("compositions", quietly=TRUE)
   if(is.null(newdata))
     newdata = object$scores
-  if("data.frame" %in% class(newdata))
+  if(is(newdata, "data.frame"))
     newdata = as.matrix(newdata)
   Z = newdata %*% unclass(object$invLoadings)
   if("Center" %in% names(object)){
@@ -478,9 +478,9 @@ predict.genDiag = function (object, newdata=NULL, ...) {
 #' @importFrom compositions coloredBiplot
 #' @method coloredBiplot genDiag
 #' 
-#' @references Mueller, Tolosana-Delgado, Grunsky and McKinley (2021) Biplots for 
-#' Compositional Data Derived from Generalised Joint Diagonalization Methods. 
-#' Applied Computational Geosciences (under review)
+#' @references Mueller, Tolosana-Delgado, Grunsky and McKinley (2020) Biplots for 
+#' compositional data derived from generalised joint diagonalization methods. 
+#' Applied Computational Geosciences 8:100044 \doi{10.1016/j.acags.2020.100044}
 #'
 #' @examples
 #' data("jura", package="gstat")

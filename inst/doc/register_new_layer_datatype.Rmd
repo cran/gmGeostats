@@ -236,13 +236,13 @@ theta.vg %>% recompute_complex_cov %>% plot
 ```
 This is again a quick and dirty solution, as:
 
-1. by using the plotting capacities of "gstat" for an incompplete object we waste half the space of the plot;
+1. by using the plotting capacities of "gstat" for an incomplete object we waste half the space of the plot;
 2. actually the current function can only deal with symmetric covariances (because of the way that gstat::variogram estimates the covariance), and
 3. hence the imaginary part is identically zero.
 
 ### Non-symmetric covariance
 
-Hence, we need to improve the computations slightly. First we need to consider estimates for the whole 360$^o$, so that we can obtain $C_{VU}(h)=C_{UV}(-h)$, 
+We need to improve the computations slightly. First we need to consider estimates for the whole 360$^o$, so that we can obtain $C_{VU}(h)=C_{UV}(-h)$, 
 ```{r}
 # compute variogram for the whole circle, i.e. until 360 deg
 theta.cvg = gmGeostats::variogram(
@@ -342,10 +342,10 @@ Boogaart, K. G. v. d.; Tolosana-Delgado, R. (2013) _Analysing compositional data
 Boogaart, K.G. v.d.; Tolosana-Delgado, Raimon; Bren, Matevz (2021). compositions: Compositional Data Analysis. R package version 2.0-2. http://www.stat.boogaart.de/compositions/
 
 
-De Iaco, S.; Posa, D.; Palma, M. (2013) Complex-Valued Random Fields for Vectorial Data: Estimating and Modeling Aspects. _Mathematical Geosciences_ 45: 557–573
+De Iaco, S.; Posa, D.; Palma, M. (2013) Complex-Valued Random Fields for Vectorial Data: Estimating and Modeling Aspects. _Mathematical Geosciences_ 45: 557???573
 
 
 Stevens, S. (1946) On the theory of scales of measurement. _Science_ 103: 677-680
 
 
-Wackernagel, H. (2003) _Multivariate geostatistics—an introduction with applications_, 3rd edn. Springer, Berlin 
+Wackernagel, H. (2003) _Multivariate geostatistics???an introduction with applications_, 3rd edn. Springer, Berlin 

@@ -217,7 +217,7 @@ Switzer P. and Green A.A., 1984. Min/Max autocorrelation factors for multivariat
 spatial imaging, Stanford University, Palo Alto, USA, 14pp.
 
 Tichavsky, P. and Yeredor, A., 2009. Fast approximate joint diagonalization
-incorporating weight matrices. IEEE Transactions on Signal Processing 57, 878 – 891.
+incorporating weight matrices. IEEE Transactions on Signal Processing 57, 878 ??? 891.
 }
 \seealso{
 Other generalised Diagonalisations: 

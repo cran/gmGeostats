@@ -6,11 +6,11 @@
 \alias{accuracy.DataFrameStack}
 \title{Compute accuracy and precision}
 \usage{
-accuracy(x, ...)
+accuracy(object, ...)
 
 \method{accuracy}{data.frame}(
-  x,
-  observed = x$observed,
+  object,
+  observed = object$observed,
   prob = seq(from = 0, to = 1, by = 0.05),
   method = "kriging",
   outMahalanobis = FALSE,
@@ -19,9 +19,9 @@ accuracy(x, ...)
 )
 
 \method{accuracy}{DataFrameStack}(
-  x,
+  object,
   observed,
-  ivars = intersect(colnames(observed), dimnames(x)[[noStackDim(x)]]),
+  ivars = intersect(colnames(observed), dimnames(object)[[noStackDim(object)]]),
   prob = seq(from = 0, to = 1, by = 0.05),
   method = ifelse(length(ivars) == 1, "simulation", "Mahalanobis"),
   outMahalanobis = FALSE,
@@ -29,7 +29,7 @@ accuracy(x, ...)
 )
 }
 \arguments{
-\item{x}{data container for the predictions (plus cokriging error variances/covariance) or simulations (and eventually for the true values in univariate problems)}
+\item{object}{data container for the predictions (plus cokriging error variances/covariance) or simulations (and eventually for the true values in univariate problems)}
 
 \item{...}{generic functionality, currently ignored}
 
@@ -38,14 +38,14 @@ accuracy(x, ...)
 \item{prob}{sequence of cutoff probabilities to use for the calculations}
 
 \item{method}{which method was used for generating the predictions/simulations?
-one of c("kriging", "cokriging", "simulation") for \code{x} of class "data.frame", or of
-c("simulation", "mahalanobis", "flow") for \code{x} of class \code{\link[=DataFrameStack]{DataFrameStack()}}.}
+one of c("kriging", "cokriging", "simulation") for \code{object} of class "data.frame", or of
+c("simulation", "mahalanobis", "flow") for \code{object} of class \code{\link[=DataFrameStack]{DataFrameStack()}}.}
 
 \item{outMahalanobis}{if TRUE, do not do the final accuracy calculations and return the Mahalanobis
 norms of the residuals; if FALSE do the accuracy calculations}
 
 \item{ivar}{if \code{method}="kriging" or "cokriging" you can also specify here one single variable name
-to consider for univariate accuracy; this variable name must exist both in \code{x}
+to consider for univariate accuracy; this variable name must exist both in \code{object}
 (including "pred" and "var" prefixes or suffixes in the column names) and in \code{observed};
 this might require renaming the columns of these files!}
 
@@ -62,18 +62,18 @@ Computes goodness-of-fit measures (accuracy, precision and joint goodness) adapt
 definition of Deutsch (1997).
 }
 \details{
-For method "kriging", \code{x} must contain columns with names including the string "pred" for predictions
+For method "kriging", \code{object} must contain columns with names including the string "pred" for predictions
 and "var" for the kriging variance; the observed values can also be included as an extra column with name "observed",
-or else additionally provided in argument \code{observed}. For method "cokriging", the columns of \code{x} must contain
+or else additionally provided in argument \code{observed}. For method "cokriging", the columns of \code{object} must contain
 predictions, cokriging variances and cokriging covariances in columns including the strings "pred", "var" resp. "cov",
 and observed values can only be provided via \code{observed} argument. Note that these are the natural formats when
 using \code{\link[gstat:predict.gstat]{gstat::predict.gstat()}} and other (co)kriging functions of that package.
 
 For univariate and multivariate cokriging results (methods "kriging" and "cokriging"), the coverage values are computed based on the
 Mahalanobis square error, the (square) distance between prediction and true value, using as the positive definite bilinear form
-of the distance the variance-covariance cokriging matrix. The rationale is that, under the  assumption
-that the random field is Gaussian, the distribution of this Mahalanobis square error is known
-to follow a \eqn{\chi^2(\nu)} with degrees of freedom \eqn{\nu} equal to the number of variables. Having this
+of the distance the variance-covariance cokriging matrix. The rationale is that, under the assumption
+that the random field is Gaussian, the distribution of this Mahalanobis square error should
+follow a \eqn{\chi^2(\nu)} with degrees of freedom \eqn{\nu} equal to the number of variables. Having this
 reference distribution allows us to compute confidence intervals for that Mahalanobis square error, and then
 count how many of the actually observed errors are included on each one of the intervals (the \emph{coverage}).
 For a perfect adjustment to the distribution, the plot of coverage vs. nominal confidence (see \link{plot.accuracy})
@@ -82,9 +82,9 @@ did not make use of the \eqn{\chi^2(1)} distribution, but instead derived the de
 from the standard normal distribution appearing by normalizing the residual with the kriging variance; the result is the
 same.
 
-For method "simulation" and object \code{x} is a data.frame, the variable names containing the realisations must
-contain the string "sim", and \code{observed} must be a vector with as many elements as rows has \code{x}. If
-\code{x} is a \code{\link[=DataFrameStack]{DataFrameStack()}}, then it is assumed that the stacking dimension is running through the realisations;
+For method "simulation" and object \code{object} is a data.frame, the variable names containing the realisations must
+contain the string "sim", and \code{observed} must be a vector with as many elements as rows has \code{object}. If
+\code{object} is a \code{\link[=DataFrameStack]{DataFrameStack()}}, then it is assumed that the stacking dimension is running through the realisations;
 the true values must still be given in \code{observed}.
 In both cases, the method is based on ranks:
 with them we can calculate which is the frequency of simulations being more extreme than the observed value.
@@ -92,7 +92,7 @@ This calculation is done considering bilateral intervals around the median of (r
 for each location separately.
 
 Method "mahalanobis" ("Mahalanobis" also works) is the analogous for multivariate simulations. It
-only works for \code{x} of class \code{\link[=DataFrameStack]{DataFrameStack()}}, and requires the stacking dimension to run through
+only works for \code{object} of class \code{\link[=DataFrameStack]{DataFrameStack()}}, and requires the stacking dimension to run through
 the realisations and the other two dimensions to coincide with the dimensions of \code{observed}, i.e.
 giving locations by rows and variables by columns. In this case, a covariance matrix will be computed
 and this will be used to compute the Mahalanobis square error defined above in method "cokriging":
@@ -113,6 +113,11 @@ method "mahalanobis".
 \item \code{DataFrameStack}: Compute accuracy and precision
 }}
 
+\references{
+Mueller, Selia and Tolosana-Delgado (2023) Multivariate cross-validation
+and measures of accuracy and precision.
+Mathematical Geosciences (under review).
+}
 \seealso{
 Other accuracy functions: 
 \code{\link{mean.accuracy}()},

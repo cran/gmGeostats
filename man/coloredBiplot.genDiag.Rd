@@ -37,9 +37,9 @@ mf
 compositions::coloredBiplot(mf, xlabs.col=as.integer(jura.pred$Rock)+2)
 }
 \references{
-Mueller, Tolosana-Delgado, Grunsky and McKinley (2021) Biplots for
-Compositional Data Derived from Generalised Joint Diagonalization Methods.
-Applied Computational Geosciences (under review)
+Mueller, Tolosana-Delgado, Grunsky and McKinley (2020) Biplots for
+compositional data derived from generalised joint diagonalization methods.
+Applied Computational Geosciences 8:100044 \doi{10.1016/j.acags.2020.100044}
 }
 \seealso{
 Other generalised Diagonalisations: 

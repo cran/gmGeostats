@@ -64,7 +64,7 @@ a "data.frame" produced a "data.frame";
 a "unmask.DataFrameStack" produces a "unmask.DataFrameStack";
 a "SpatialPoints" produces a "SpatialPoints"; and finally
 a "SpatialPixels" produces either a "SpatialPixels" or a "SpatialGrid" (if it is full).
-Note that only in the case that \code{class(x)=="SpatialPixels"} is \code{mask} required,
+Note that only in the case that \code{is(x,"SpatialPixels")=TRUE} is \code{mask} required,
 for the other methods all arguments have reasonable defaults.
 }
 \description{

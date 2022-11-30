@@ -1,3 +1,14 @@
+# gmGeostats 0.11.2
+
+* (2022-11-22) flag '-lstdc++' removed from makevars.
+* (2022-11-15) minor bugs in accuracy calculations corrected. References improved.
+* (2022-08-15) bug in turning bands for spherical variogram corrected.
+
+
+# gmGeostats 0.11.1
+
+* (2022-05-03) minor changes to adapt to more stringent standards for class determination, for variable definition in C code, and for calls to FORTRAN routines from C code involving string arguments.
+
 # gmGeostats 0.11.0-9002
 
 * (2021-12-14) bugs in turning bands corrected: getUnitVec was producing a wrong sequence of directions, and bands for exponential and Gaussian variograms did not correct for the difference between parametric and effective range in the right way; 

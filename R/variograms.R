@@ -132,7 +132,7 @@ setCgram = function(type, nugget=sill*0, sill, anisRanges, extraPar=0){
 #' vm = v1+v2
 "+.gmCgram" <- function(x,y) {
   y = as.gmCgram(y)
-  stopifnot(class(y)=="gmCgram",
+  stopifnot(is(y,"gmCgram"),
             dim(x$sill)[-1]==dim(y$sill)[-1],
             dim(x$M)[-1]==dim(y$M)[-1])
   myfun = function(A,B){

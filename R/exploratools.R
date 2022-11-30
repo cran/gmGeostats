@@ -433,7 +433,7 @@ swath.default <- function(data,  # data (matrix, rmult, aplus, rplus or data.fra
   col0 = spectralcolors(10)[10]
   
   # isometric representation
-  if("data.frame" %in% class(data)) data = compositions::rmult(as.matrix(data), V=gsi.getV(data), orig=gsi.orig(data))
+  if(is(data, "data.frame")) data = compositions::rmult(as.matrix(data), V=gsi.getV(data), orig=gsi.orig(data))
   comp = idt(data)
   
   # dimensions
@@ -463,7 +463,7 @@ swath.default <- function(data,  # data (matrix, rmult, aplus, rplus or data.fra
         a = stats::loess(comp[,k]~loc)
         DescTools::lines.loess(a, col=col0)
       }
-    }else if("list" %in% class(withLoess) & requireNamespace("DescTools")){
+    }else if(is(withLoess, "list") & requireNamespace("DescTools")){
       args = withLoess
       if(!("col" %in% names(args))) args$col = col0
       args$x = stats::loess(comp[,k]~loc)
@@ -549,7 +549,7 @@ swath.acomp <- function(data,  # composition (rcomp, acomp, ccomp)
               a = stats::loess(Zpwlr[,k]~loc)
               DescTools::lines.loess(a, col=col0)
             }
-          }else if("list" %in% class(withLoess)){
+          }else if(is(withLoess, "list")){
             args = withLoess
             if(!("col" %in% names(args))) args$col = col0
             args$x = stats::loess(Zpwlr[,k]~loc)

@@ -218,8 +218,14 @@ const double *extra /* extra parameter (unused), for consistency with other cova
    * where projs were calculated. Evaluate a wave of random phase at the
    * projs points. Return that wave */	
   int i;
-  double phase,amp,omega,d1;   
-  omega = norm_rand()  * M_SQRT2 / range * M_SQRT_3; /* sqrt(3) needed to produce effective range*/
+  double phase,amp,omega,d1,o1,o2,o3;   
+  /* omega = norm_rand()  * M_SQRT2 / range * M_SQRT_3; /* sqrt(3) needed to produce effective range*/
+  // chi(3) distributed radial frequency, with random sign
+  o1 = norm_rand();
+  o2 = norm_rand();
+  o3 = norm_rand();
+  omega = sqrt(o1*o1 + o2*o2 + o3*o3) * sign(o1);
+  omega = omega * M_SQRT2 / range * M_SQRT_3; /* sqrt(3) needed to produce effective range*/
   phase = unif_rand() * M_2PI;
   amp  = M_SQRT2; /* Lantuejoul (2002), page 191 */
   for(i=0;i<n;i++) {

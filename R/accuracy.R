@@ -5,7 +5,7 @@
 #' Computes goodness-of-fit measures (accuracy, precision and joint goodness) adapted or extended from the 
 #' definition of Deutsch (1997).
 #'
-#' @param x data container for the predictions (plus cokriging error variances/covariance) or simulations (and eventually for the true values in univariate problems)
+#' @param object data container for the predictions (plus cokriging error variances/covariance) or simulations (and eventually for the true values in univariate problems)
 #' @param ... generic functionality, currently ignored
 #'
 #' @return If `outMahalanobis=TRUE` (the primary use), this function returns a two-column dataset of class
@@ -13,18 +13,18 @@
 #' the actual coverage of the intervals of each of these probabilities. If `outMahalanobis=FALSE`, the output
 #' is a vector (for prediction) or matrix (for simulation) of Mahalanobis error norms.
 #' 
-#' @details For method "kriging", `x` must contain columns with names including the string "pred" for predictions
+#' @details For method "kriging", `object` must contain columns with names including the string "pred" for predictions
 #' and "var" for the kriging variance; the observed values can also be included as an extra column with name "observed",
-#' or else additionally provided in argument `observed`. For method "cokriging", the columns of `x` must contain
+#' or else additionally provided in argument `observed`. For method "cokriging", the columns of `object` must contain
 #' predictions, cokriging variances and cokriging covariances in columns including the strings "pred", "var" resp. "cov",
 #' and observed values can only be provided via `observed` argument. Note that these are the natural formats when
 #' using [gstat::predict.gstat()] and other (co)kriging functions of that package.
 #' 
 #' For univariate and multivariate cokriging results (methods "kriging" and "cokriging"), the coverage values are computed based on the
 #' Mahalanobis square error, the (square) distance between prediction and true value, using as the positive definite bilinear form 
-#' of the distance the variance-covariance cokriging matrix. The rationale is that, under the  assumption
-#' that the random field is Gaussian, the distribution of this Mahalanobis square error is known
-#' to follow a \eqn{\chi^2(\nu)} with degrees of freedom \eqn{\nu} equal to the number of variables. Having this
+#' of the distance the variance-covariance cokriging matrix. The rationale is that, under the assumption
+#' that the random field is Gaussian, the distribution of this Mahalanobis square error should
+#' follow a \eqn{\chi^2(\nu)} with degrees of freedom \eqn{\nu} equal to the number of variables. Having this
 #' reference distribution allows us to compute confidence intervals for that Mahalanobis square error, and then 
 #' count how many of the actually observed errors are included on each one of the intervals (the *coverage*).
 #' For a perfect adjustment to the distribution, the plot of coverage vs. nominal confidence (see [plot.accuracy])
@@ -33,9 +33,9 @@
 #' from the standard normal distribution appearing by normalizing the residual with the kriging variance; the result is the
 #' same. 
 #' 
-#' For method "simulation" and object `x` is a data.frame, the variable names containing the realisations must 
-#' contain the string "sim", and `observed` must be a vector with as many elements as rows has `x`. If 
-#' `x` is a [DataFrameStack()], then it is assumed that the stacking dimension is running through the realisations;
+#' For method "simulation" and object `object` is a data.frame, the variable names containing the realisations must 
+#' contain the string "sim", and `observed` must be a vector with as many elements as rows has `object`. If 
+#' `object` is a [DataFrameStack()], then it is assumed that the stacking dimension is running through the realisations;
 #' the true values must still be given in `observed`.
 #' In both cases, the method is based on ranks:
 #' with them we can calculate which is the frequency of simulations being more extreme than the observed value.
@@ -43,7 +43,7 @@
 #' for each location separately. 
 #' 
 #' Method "mahalanobis" ("Mahalanobis" also works) is the analogous for multivariate simulations. It
-#' only works for `x` of class [DataFrameStack()], and requires the stacking dimension to run through
+#' only works for `object` of class [DataFrameStack()], and requires the stacking dimension to run through
 #' the realisations and the other two dimensions to coincide with the dimensions of `observed`, i.e.
 #' giving locations by rows and variables by columns. In this case, a covariance matrix will be computed
 #' and this will be used to compute the Mahalanobis square error defined above in method "cokriging": 
@@ -59,7 +59,12 @@
 #' 
 #' @export
 #' @family accuracy functions
-accuracy <- function(x,...) UseMethod("accuracy", x)
+#' @references Mueller, Selia and Tolosana-Delgado (2023) Multivariate cross-validation
+#' and measures of accuracy and precision. 
+#' Mathematical Geosciences (under review).
+#' 
+#' 
+accuracy <- function(object,...) UseMethod("accuracy", object)
 
 
 
@@ -68,19 +73,20 @@ accuracy <- function(x,...) UseMethod("accuracy", x)
 #' @param observed either a vector- or matrix-like object of the true values
 #' @param prob sequence of cutoff probabilities to use for the calculations
 #' @param method which method was used for generating the predictions/simulations? 
-#' one of c("kriging", "cokriging", "simulation") for `x` of class "data.frame", or of
-#' c("simulation", "mahalanobis", "flow") for `x` of class [DataFrameStack()].
+#' one of c("kriging", "cokriging", "simulation") for `object` of class "data.frame", or of
+#' c("simulation", "mahalanobis", "flow") for `object` of class [DataFrameStack()].
 #' @param outMahalanobis if TRUE, do not do the final accuracy calculations and return the Mahalanobis
 #' norms of the residuals; if FALSE do the accuracy calculations
 #' @param ivar if `method`="kriging" or "cokriging" you can also specify here one single variable name 
-#' to consider for univariate accuracy; this variable name must exist both in `x` 
+#' to consider for univariate accuracy; this variable name must exist both in `object` 
 #' (including "pred" and "var" prefixes or suffixes in the column names) and in `observed`;
 #' this might require renaming the columns of these files!
 #' @export
-accuracy.data.frame <- function(x, observed=x$observed, 
+accuracy.data.frame <- function(object, observed=object$observed, 
                                 prob = seq(from=0, to=1, by=0.05),
                                 method="kriging", outMahalanobis=FALSE, 
                                 ivar, ...){
+  x = object # after v 0.11.9003, 'accuracy' first argument is renamed to 'object' for compatibility with tidymodels 
   methods = c("kriging", "cokriging", "simulation")
   mm = methods[pmatch(method, methods)]
   if(!missing(ivar)){
@@ -88,7 +94,7 @@ accuracy.data.frame <- function(x, observed=x$observed,
     iPred = intersect(grep(ivar, colnames(x)), grep("pred", colnames(x)))
     iVar = intersect(grep(ivar, colnames(x)), grep("var", colnames(x)))
     if(any(sapply(list(iTrue, iPred, iVar), length)!=1))
-      stop("accuracy: univariate case by specifying an `ivar` requires the named variable to occur ONCE in `observed` and once in `x`, here prefixed or suffixed with `pred` and `var` to identify kriging predictions and variances")
+      stop("accuracy: univariate case by specifying an `ivar` requires the named variable to occur ONCE in `observed` and once in `object`, here prefixed or suffixed with `pred` and `var` to identify kriging predictions and variances")
     mm = "kriging"
     observed = observed[,iTrue]
     x = x[, c(iPred, iVar)]
@@ -125,7 +131,7 @@ accuracy.data.frame <- function(x, observed=x$observed,
   if(outMahalanobis)
     return(mynorms)
   # cases for kriging and cokriging
-  qqq = stats::qchisq(prob,df=D)
+  qqq = stats::qchisq(prob,df=D)   # TODO: this could be Hotelling's T^2 distributed? 
   aa = outer(mynorms,qqq,"<=")
   a = colMeans(aa)
   erg = data.frame(p=prob, accuracy=a)
@@ -139,19 +145,20 @@ accuracy.data.frame <- function(x, observed=x$observed,
 #' @param ivars in multivariate cases, a vector of names of the variables to analyse (or one single variable name)
 #' @method accuracy DataFrameStack
 #' @export
-accuracy.DataFrameStack <- function(x, observed, 
-                                    ivars = intersect(colnames(observed), dimnames(x)[[noStackDim(x)]]),
+accuracy.DataFrameStack <- function(object, observed, 
+                                    ivars = intersect(colnames(observed), dimnames(object)[[noStackDim(object)]]),
                                     prob = seq(from=0, to=1, by=0.05),
                                     method = ifelse(length(ivars)==1, "simulation", "Mahalanobis"),
                                     outMahalanobis=FALSE, ...){
+  x = object  # after v 0.11.9003, 'accuracy' first argument is renamed to 'object' for compatibility with tidymodels 
   methods = c("simulation", "Mahalanobis","mahalanobis", "flow")
   mm = methods[pmatch(method, methods)]
   oneAcc.sim = function(sims, true){
-    rks = rank(c(true,sims))
+    rks = rank(c(true,as.matrix(sims)))
     2*abs(rks[1]/(1+length(sims))-0.5)
   }
   oneAcc.assim = function(sims, true){
-    rks = rank(c(true,sims))
+    rks = rank(c(true,as.matrix(sims)))
     rks[1]/(1+length(sims))
   }
   
@@ -160,7 +167,7 @@ accuracy.DataFrameStack <- function(x, observed,
       warning("accuracy: outMahalanobis=TRUE not valid with method='simulation'")
     if(nrow(x)!=length(observed))
       if(nrow(x)!=nrow(observed))
-        stop("accuracy: dimensions of x and observed do not match")
+        stop("accuracy: dimensions of `object` and `observed` do not match")
     sims = as.matrix(gmApply(x, FUN=function(xx)xx[,ivars, drop=FALSE]))
     res = sapply(1:nrow(sims), function(i) oneAcc.sim(sims[i,], observed[i, ivars, drop=FALSE]))
     aa = outer(res, prob, "<=")
@@ -406,7 +413,7 @@ xvErrorMeasures.data.frame = function(x, observed=x$observed, output="MSDR1",
     preds = sapply(unclass(xreord), cbind)
     obs = as.matrix(observed)
     resids = preds-obs
-    if(output=="ME") return(mean(resids, na.rm=TRUE))
+    if(output=="ME") return(colMeans(resids, na.rm=TRUE))
     if(output=="MSE") return(mean(rowSums(resids^2, na.rm=T), na.rm=TRUE))
     if(output=="MSDR2"){
       myvar = function(j) covs[,j,j]

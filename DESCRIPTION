@@ -1,6 +1,6 @@
 Package: gmGeostats
-Version: 0.11.1
-Date: 2022-05-03
+Version: 0.11.2
+Date: 2022-11-30
 Title: Geostatistics for Compositional Analysis
 Authors@R: c(person(given = "Raimon", 
         family = "Tolosana-Delgado", 
@@ -35,7 +35,7 @@ Description: Support for geostatistical analysis of multivariate data,
          The methods mainly follow Tolosana-Delgado, Mueller and van den
          Boogaart (2018) <doi:10.1007/s11004-018-9769-3>.
 License: CC BY-SA 4.0 | GPL (>= 2)
-URL: https://gitlab.hzdr.de/geomet/gmGeostats
+URL: https://codebase.helmholtz.cloud/geomet/gmGeostats
 Copyright: (C) 2020 by Helmholtz-Zentrum Dresden-Rossendorf and Edith
         Cowan University; gsi.DS code by Hassan Talebi
 RoxygenNote: 7.1.1
@@ -50,7 +50,7 @@ Collate: 'Anamorphosis.R' 'preparations.R' 'gstatCompatibility.R'
         'gmValidationStrategy.R' 'grids.R' 'mask.R' 'spSupport.R'
         'uncorrelationTest.R' 'zzz.R'
 NeedsCompilation: yes
-Packaged: 2022-05-03 13:12:41 UTC; tolosa53
+Packaged: 2022-11-30 14:51:29 UTC; tolosa53
 Author: Raimon Tolosana-Delgado [aut] (<https://orcid.org/0000-0001-9847-0462>),
   Ute Mueller [aut],
   K. Gerald van den Boogaart [ctb, cre],
@@ -59,4 +59,4 @@ Author: Raimon Tolosana-Delgado [aut] (<https://orcid.org/0000-0001-9847-0462>),
   Edith Cowan University [cph]
 Maintainer: K. Gerald van den Boogaart <support@boogaart.de>
 Repository: CRAN
-Date/Publication: 2022-05-03 13:30:10 UTC
+Date/Publication: 2022-11-30 15:20:02 UTC

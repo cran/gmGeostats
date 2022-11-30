@@ -36,7 +36,7 @@ logratioVariogram <- function(data, ...) UseMethod("logratioVariogram", data)
 #' @param comp an alias for `data`, provided for back-compatibility with compositions::logratioVariogram 
 logratioVariogram.default <- function(data, loc, ..., comp=data){
   res = try(compositions::logratioVariogram(comp=acomp(comp), loc=loc, ...), silent=TRUE)
-  if(class(res)!="try-error") return(res)
+  if(!inherits(res, what="try-error", which=FALSE)) return(res)
   res = compositions::logratioVariogram(data=acomp(comp), loc=loc, ...)
 }
   
