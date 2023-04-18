@@ -28,7 +28,8 @@
 }
 \value{
 This function is called for its effect of producing a figure.
-Additionally, the graphical parameters active \emph{prior to calling this function} are returned invisibly.
+Additionally, the graphical parameters active \emph{prior to calling this function} are
+returned invisibly.
 }
 \description{
 Image method to obtain variogram maps for anisotropic logratio variograms

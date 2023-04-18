@@ -1,6 +1,6 @@
 Package: gmGeostats
-Version: 0.11.2
-Date: 2022-11-30
+Version: 0.11.3
+Date: 2023-04-17
 Title: Geostatistics for Compositional Analysis
 Authors@R: c(person(given = "Raimon", 
         family = "Tolosana-Delgado", 
@@ -28,8 +28,8 @@ Suggests: FNN, JADE, jointDiag, DescTools, knitr, rmarkdown (>= 2.3),
 Imports: methods, gstat, compositions (>= 2.0), sp, boot, foreach,
         utils, RColorBrewer
 Description: Support for geostatistical analysis of multivariate data, 
-         in particular data with restrictions, e.g. positive amounts data, 
-         compositional data, distributional data, microstructural data, etc. 
+         in particular data with restrictions, e.g. positive amounts, 
+         compositions, distributional data, microstructural data, etc. 
          It includes descriptive analysis and modelling for such data, both 
          from a two-point Gaussian perspective and multipoint perspective.
          The methods mainly follow Tolosana-Delgado, Mueller and van den
@@ -50,7 +50,7 @@ Collate: 'Anamorphosis.R' 'preparations.R' 'gstatCompatibility.R'
         'gmValidationStrategy.R' 'grids.R' 'mask.R' 'spSupport.R'
         'uncorrelationTest.R' 'zzz.R'
 NeedsCompilation: yes
-Packaged: 2022-11-30 14:51:29 UTC; tolosa53
+Packaged: 2023-04-17 14:25:39 UTC; tolosa53
 Author: Raimon Tolosana-Delgado [aut] (<https://orcid.org/0000-0001-9847-0462>),
   Ute Mueller [aut],
   K. Gerald van den Boogaart [ctb, cre],
@@ -59,4 +59,4 @@ Author: Raimon Tolosana-Delgado [aut] (<https://orcid.org/0000-0001-9847-0462>),
   Edith Cowan University [cph]
 Maintainer: K. Gerald van den Boogaart <support@boogaart.de>
 Repository: CRAN
-Date/Publication: 2022-11-30 15:20:02 UTC
+Date/Publication: 2023-04-18 11:50:12 UTC

@@ -17,8 +17,22 @@
 
 \item{...}{extra arguments for generic functionality}
 }
+\value{
+If just some of c("ME","MSE","MSDR") are requested, the output is a named
+vector with the desired quantities. If only "Mahalanobis" is requested, the output is a vector
+of Mahalanobis square errors. If you mix up things and ask for "Mahalanobis" and some of
+the quantities mentioned above, the result will be a named list with the requested quantities.
+}
 \description{
 Compute one or more error measures from cross-validation output
+}
+\details{
+"ME" stands for \emph{mean error} (average of the differences between true values and predicted values),
+"MSE" stands for \emph{mean square error} (average of the square differences between true values and predicted values),
+and "MSDR" for \emph{mean squared deviation ratio} (average of the square between true values and predicted values
+each normalized by its kriging variance). These quantities are classically used in evaluating
+output results of validation exercises of one single variable.
+For multivariate cases, see \code{\link[=xvErrorMeasures.data.frame]{xvErrorMeasures.data.frame()}}.
 }
 \seealso{
 Other accuracy functions: 

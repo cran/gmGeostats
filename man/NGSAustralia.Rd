@@ -29,8 +29,8 @@ detection limit are reported as minus the detection limit, as standardised in pa
 \item The samples were complemented with information about their belonging to one of the
 major crustal blocks (MCB) of Australia.
 \item Easting and Northing coordinates were computed using the Lambert conformal conic projection of
-Australia (earth ellipsoid GRS80; standard parallels: 18°S and 36ºS latitude; central meridian:
-134ºE longitude).
+Australia (earth ellipsoid GRS80; standard parallels: 18S and 36S latitude; central meridian:
+134E longitude).
 }
 
 #' @format A tibble, a data set of compound class c("tbl_df", "tbl", "data.frame") with 5259
@@ -48,7 +48,7 @@ observations and 76 variables:
 \item{REGION}{One of the three geo-regions of the data set: "EAST", "WEST" or "EUCLA"}
 \item{DUPLICATE CODE}{Marker for duplicate samples, for quality control}
 \item{SAMPLEID}{ID of the sample}
-\item{GRAIN SIZE}{Particle size of the soil sample, one of "<2 mm" (coarse) or "<75 µm" (fine)}
+\item{GRAIN SIZE}{Particle size of the soil sample, one of "<2 mm" (coarse) or "<75 um" (fine)}
 \item{DEPTH}{Sampling depth, one of: "TOS" (top soil) or "BOS" (bottom soil)}
 \item{CODE}{A combination of \verb{Grain Size} and \code{DEPTH}, one of "Tc" "Tf" "Bc" "Bf", standing for TOS coarse, TOS fine, BOS coarse and BOS fine, respectively}
 \item{\verb{Ag ICP-MS mg/kg 0.03}}{concemtration of Silver in that sample, analysed with inductive coupled plasma mass spectrometry (ICP-MS), with a detection limit of 0.03ppm}

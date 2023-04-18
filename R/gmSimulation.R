@@ -96,7 +96,7 @@ gsi.DS4CoDa <- function(n, f, t, n_realiz, nx_TI, ny_TI, nx_SimGrid, ny_SimGrid,
   #pb = list()
   #myfun = function(ii){
   for(ii in 1:n_realiz){
-    cat(paste("\n Realization number #",ii, "\n"))
+    message(paste("\n Realization number #",ii))
     
     # Defining a fully random path for simulation
     list_sim <- which(maskArray[,,1] & is.na(SimGrid_ilr_list[[ii]][,,1]), arr.ind = TRUE)
@@ -330,7 +330,7 @@ gsi.DS <- function(n, f, t, n_realiz,
   #pb = list()
   #myfun = function(ii){
   for(ii in 1:n_realiz){
-    cat(paste("\n Realization number #",ii, "\n"))
+    message(paste("\n Realization number #",ii))
     
     # Defining a fully random path for simulation
     list_sim <- which(mask_array[,,,drop=T] & is.na(SimGrid_list[[ii]][,,,1]), arr.ind = TRUE)

@@ -1,3 +1,8 @@
+# gmGeostats 0.11.3
+
+* (2023-04-13) batch of hidden methods exported to the namespace (mostly for `as.*()` functions converting between different representations of empirical variograms and of geostatistical models)
+* (2023-04-04) C routines called as symbols and not name strings; non-ASCII characters removed
+
 # gmGeostats 0.11.2
 
 * (2022-11-22) flag '-lstdc++' removed from makevars.

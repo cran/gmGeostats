@@ -66,7 +66,7 @@ vge["lags",1]
 }
 \seealso{
 Other gmEVario functions: 
-\code{\link{as.gmEVario}()},
+\code{\link{as.gmEVario.gstatVariogram}()},
 \code{\link{gsi.EVario3D}()},
 \code{\link{ndirections}()},
 \code{\link{plot.gmEVario}()},

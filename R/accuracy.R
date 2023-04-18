@@ -311,6 +311,10 @@ precision.accuracy <- function(x, ...){
 plot.accuracy <- function(x, xlim=c(0,1), ylim=c(0,1), xaxs="i", yaxs="i", type="o", col="red", asp=1,
                           xlab="confidence", ylab="coverage", pty="s", main="accuracy plot",
                           colref=col[1], ...){
+
+  oldpar <- par(no.readonly = TRUE)
+  on.exit(par(oldpar))
+  
   par(pty=pty)
   plot(x$p, x$accuracy, xaxs=xaxs, yaxs=yaxs, xlim=xlim, ylim=ylim, type=type, col=col, asp=asp,
        xlab=xlab, ylab=ylab, main=main, ...)
@@ -338,7 +342,18 @@ xvErrorMeasures <- function(x,...) UseMethod("xvErrorMeasures", x)
 #' @param output  which output do you want? a vector of one or several of  c("ME","MSE","MSDR","Mahalanobis")
 #' @param ... extra arguments for generic functionality
 #'
+#' @return If just some of c("ME","MSE","MSDR") are requested, the output is a named
+#' vector with the desired quantities. If only "Mahalanobis" is requested, the output is a vector 
+#' of Mahalanobis square errors. If you mix up things and ask for "Mahalanobis" and some of
+#' the quantities mentioned above, the result will be a named list with the requested quantities. 
 #' 
+#' @details "ME" stands for *mean error* (average of the differences between true values and predicted values), 
+#' "MSE" stands for *mean square error* (average of the square differences between true values and predicted values), 
+#' and "MSDR" for *mean squared deviation ratio* (average of the square between true values and predicted values
+#' each normalized by its kriging variance). These quantities are classically used in evaluating 
+#' output results of validation exercises of one single variable.
+#' For multivariate cases, see [xvErrorMeasures.data.frame()].  
+#'  
 #' @export
 #' @method xvErrorMeasures default
 #' @family accuracy functions
@@ -378,7 +393,7 @@ xvErrorMeasures.default <- function(x, krigVar, observed, output="MSDR1", ...){
 #' "MSE" stands for *mean square error* (average of the square differences between true values and predicted values), 
 #' and "MSDR" for *mean squared deviation ratio* (average of the square between true values and predicted values
 #' each normalized by its kriging variance). These quantities are classically used in evaluating 
-#' output results of validation excercices of one single variable.
+#' output results of validation exercises of one single variable.
 #' For multivariate cases, "ME" (a vector) and "MSE" (a scalar) work as well, 
 #' while two different definitions of a multivariate 
 #' mean squared deviation ratio can be given:

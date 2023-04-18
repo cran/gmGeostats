@@ -95,7 +95,7 @@ pointpairs2polargrid = function(loc, #
     dfaz = diff(azimuths)[1]
     aux = c(azimuths[1]-0.5*dfaz, azimuths+0.5*dfaz)
     aux = pi/2-aux
-    image.polargrid(r = dists, phi = aux, tt, breaks = unique(quantile(tt[tt!=0], probs=seq(0,1,0.1))))
+    image_polargrid(r = dists, phi = aux, tt, breaks = unique(quantile(tt[tt!=0], probs=seq(0,1,0.1))))
   }
   return(tt)
 }
@@ -139,7 +139,7 @@ imageOneAnisVario = function(avg, v1=NULL, v2=NULL){
   z[is.nan(z)]=NA
   dim(z) = c(length(r)-1, length(phi)-1)
   # plot it
-  image.polargrid(r,phi2,z,add=TRUE)
+  image_polargrid(r,phi2,z,add=TRUE)
 }
 #################################################
 
@@ -148,7 +148,7 @@ imageOneAnisVario = function(avg, v1=NULL, v2=NULL){
 #################################################
 ## Utility function to 
 #### generate a colored polar sector diagram ---------
-image.polargrid = function(
+image_polargrid = function(
   r = seq(0, 1, length.out = nrow(z)), # radii
   phi = seq(0, 2*pi, length.out = ncol(z)),  #  angles 
   z,  # elevation

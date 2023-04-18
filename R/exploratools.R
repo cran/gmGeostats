@@ -89,9 +89,7 @@ pwlrmap = function(loc,   # XY coordinates (matrix or data frame)
                    ){
   # set of maps where the symbols are chosen according to each possible pwlr, in 
   # a scale given by the user
-  opar = par()
-  opar = par_remove_readonly(opar)
-  
+  opar =  par(no.readonly = TRUE)
   if(closeplot) on.exit(par(opar))
   # dimensions
   D = ncol(comp)
@@ -195,6 +193,7 @@ pairsmap <- function(data, ...) UseMethod("pairsmap", data)
 
 #' @describeIn pairsmap Multiple maps
 #' @method pairsmap SpatialPointsDataFrame
+#' @export
 pairsmap.SpatialPointsDataFrame <- function(data, ...){
   pairsmap.default(data@data, loc=sp::coordinates(data), ...)
 }
@@ -225,8 +224,7 @@ pairsmap.default <- function(data,   # data to represent
                    closeplot=TRUE,
                    ...
 ){
-  opar = par()
-  opar = par_remove_readonly(opar)
+  opar = par(no.readonly = TRUE)
   if(closeplot) on.exit(par(opar))
   # dimensions
   D = ncol(data)
@@ -426,9 +424,7 @@ swath.default <- function(data,  # data (matrix, rmult, aplus, rplus or data.fra
   if(is(data, "Spatial")) return(swath_SpatialPointsDataFrame(data=data, loc=loc, pch=pch, xlab=xlab, mfrow=mfrow,
                                                     withLoess=withLoess, commonScale=commonScale, ...))
   # preparations
-  opar = par()
-  opar = par_remove_readonly(opar)
-  
+  opar = par(no.readonly = TRUE)
   on.exit(par(opar))
   col0 = spectralcolors(10)[10]
   
@@ -497,9 +493,7 @@ swath.acomp <- function(data,  # composition (rcomp, acomp, ccomp)
     # set of swath plots for each possible pwlr, eventually with a loess line 
 
     # preparations
-    opar = par()
-    opar = par_remove_readonly(opar)
-    
+    opar = par(no.readonly = TRUE)
     on.exit(par(opar))
     col0 = spectralcolors(10)[10]
     comp = data

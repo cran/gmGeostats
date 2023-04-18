@@ -306,7 +306,9 @@ logratioVariogram1 = function(comp, loc, maxdist=max(dist(loc))/2,
 #' @param ... additional arguments for generic functionality (currently ignored)
 #'
 #' @return This function is called for its effect of producing a figure. 
-#' Additionally, the graphical parameters active *prior to calling this function* are returned invisibly.
+#' Additionally, the graphical parameters active *prior to calling this function* are 
+#' returned invisibly.
+#' 
 #' @export
 #'
 #' @examples
@@ -323,7 +325,9 @@ image.logratioVariogramAnisotropy = function(x, jointColor=FALSE, breaks=NULL,
                                              probs = seq(0,1,0.1), col = spectralcolors,
                                              ...){
   lrvg = x
-  o = par()
+  opar = par(no.readonly = TRUE)
+  on.exit(opar)
+  
   # construct the polar grid
   r = attr(lrvg, "lags")
   rlim = range(r)
@@ -356,19 +360,19 @@ image.logratioVariogramAnisotropy = function(x, jointColor=FALSE, breaks=NULL,
         # plot it
         if(jointColor){
           if(is.function(col)) col=col(length(breaks)-1)
-          image.polargrid(r,phi2,z,add=TRUE, breaks=breaks, col=col)
+          image_polargrid(r,phi2,z,add=TRUE, breaks=breaks, col=col)
         }else{
           if(is.null(breaks)){
             if(is.function(col)) col=col(length(breaks)-1)
-            image.polargrid(r,phi2,z,add=TRUE, col=col)
+            image_polargrid(r,phi2,z,add=TRUE, col=col)
           }else{
             if(is.function(col)) col=col(length(probs)-1)
-            image.polargrid(r,phi2,z,add=TRUE, col=col, probs=probs)
+            image_polargrid(r,phi2,z,add=TRUE, col=col, probs=probs)
           }
         }  
       }
     }}   
-  invisible(o)
+  invisible(opar)
 }
 #################################################
 
@@ -480,9 +484,7 @@ plot.logratioVariogramAnisotropy = function(x, azimuths=colnames(x),
   } 
   
   # set the matrix of figures
-  opar = par()
-  opar = par_remove_readonly(opar)
-  
+  opar = par(no.readonly = TRUE)
   if(closeplot) on.exit(par(opar))
   
   
@@ -1102,10 +1104,14 @@ variogramModelPlot.logratioVariogram <- function(vg, model = NULL,   # gstat  or
 
 
 ## as.gmEVario (empirical) -----
-# @describeIn as.gmEVario
+#' @describeIn as.gmEVario logratioVariogram method not yet available
+#' @method as.gmEVario logratioVariogram 
+#' @export
 as.gmEVario.logratioVariogram = function(vgemp, ...) stop("not yet available")
 
-# @describeIn as.gmEVario
+#' @describeIn as.gmEVario logratioVariogramAnisotropy method not yet available
+#' @method as.gmEVario logratioVariogramAnisotropy 
+#' @export
 as.gmEVario.logratioVariogramAnisotropy = function(vgemp, ...) stop("not yet available")
 
 
@@ -1123,11 +1129,17 @@ as.gmEVario.logratioVariogramAnisotropy = function(vgemp, ...) stop("not yet ava
 #'
 #' @return the same model in the new format.
 #' @export
-#' @aliases as.logratioVariogram.logratioVariogram as.logratioVariogram.gmEVario
+# @aliases as.logratioVariogram.logratioVariogram as.logratioVariogram.gmEVario
 as.logratioVariogram <- function(vgemp,...) UseMethod("as.logratioVariogram",vgemp)
 
+#' @describeIn as.logratioVariogram identity method
+#' @method as.logratioVariogram logratioVariogram
+#' @export
 as.logratioVariogram.logratioVariogram <- function(vgemp, ...) vgemp
 
+#' @describeIn as.logratioVariogram method for gmEVario objects (not yet available)
+#' @method as.logratioVariogram gmEVario
+#' @export
 as.logratioVariogram.gmEVario  = function(vgemp, ...){ 
   stop("not yet available")
 }
@@ -1196,6 +1208,7 @@ as.LMCAnisCompo <- function(m, ...)  UseMethod("as.LMCAnisCompo",m)
 
 #' @describeIn as.LMCAnisCompo Recast compositional variogram model to format LMCAnisCompo
 #' @method as.LMCAnisCompo LMCAnisCompo
+#' @export
 as.LMCAnisCompo.LMCAnisCompo <- function(m, ...) m
 
 
@@ -1203,6 +1216,7 @@ as.LMCAnisCompo.LMCAnisCompo <- function(m, ...) m
 #' @method as.LMCAnisCompo gmCgram
 #' @param V eventually, a specification of the way `m` is presently represented
 #' @param orignames eventually, vector of names of the components, if `V` is provided and it does not have rownnames
+#' @export
 as.LMCAnisCompo.gmCgram = function(m, V=NULL, orignames=rownames(V), ...){
   stop("not yet available")
 } 
@@ -1267,7 +1281,11 @@ gsi.extractCompLMCstructures = function(m){
 
 
 ## as.gmCgram (LMC) -------
-# @describeIn as.gmCgram
+#' @describeIn as.gmCgram method for "LMCAnisCompo" variogram model objects
+#' @param V original logratio matrix used in the definition of "LMCAnisCompo"
+#' @param orignames original variable names of the composition
+#' @export
+#' @method as.gmCgram LMCAnisCompo
 as.gmCgram.LMCAnisCompo = function(m, V=attr(m,"contrasts"), 
                                    orignames=rownames(m["sill",1]$sill), ...){
   # produce constants

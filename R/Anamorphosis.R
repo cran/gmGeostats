@@ -145,7 +145,7 @@ anaForward <- function(x,Y,sigma0,sigma1=1+sigma0,steps=30,plt=FALSE,sphere=TRUE
   #h=1/steps
   #if( plt )
   #    plot(x[,1:2],pch=".")
-  erg<-.C("anaForwardC",
+  erg<-.C(anaForwardC,
      dimX=checkInt(dim(x),2),
      x=checkDouble(x),
      dimY=checkInt(dim(Y),2),
@@ -228,7 +228,7 @@ anaBackward <- function(x,Y,sigma0,sigma1=1+sigma0,steps=30,plt=FALSE,sphere=TRU
   }
   Y<-t(st(Y))
   x <- t(x)
-  erg<-.C("anaBackwardC",
+  erg<-.C(anaBackwardC,
      dimX=checkInt(dim(x),2),
      x=checkDouble(x),
      dimY=checkInt(dim(Y),2),
@@ -268,12 +268,13 @@ anaBackward <- function(x,Y,sigma0,sigma1=1+sigma0,steps=30,plt=FALSE,sphere=TRU
 #' library(compositions)
 #' data("jura", package="gstat")
 #' Y = acomp(jura.pred[,c(10,12,13)])
-#' par(mfrow=c(1,1))
+#' oldpar = par(mfrow = c(1,1))
 #' plot(Y)
 #' sph = sphTrans(Y)
 #' class(sph)
 #' z = sph(Y)
 #' plot(z)
+#' par(oldpar)
 #' cor(cbind(z, ilr(Y)))
 #' colMeans(cbind(z, ilr(Y)))
 sphTrans <- function(Y,...) UseMethod("sphTrans",Y)

@@ -50,7 +50,7 @@ gsi.calcCgram <- function(X,Y,vgram,ijEqual=FALSE) {
   nY<-nrow(Y)
   k <- length(vgram$type)
   dimC = c(d,nX,d,nY)
-  erg<- .C("CcalcCgram",
+  erg<- .C(CcalcCgram,
            dimX=checkInt(dim(X),2),
            ldX=checkInt(dim(X)[1],1),
            X=checkDouble(X),
@@ -70,8 +70,9 @@ gsi.calcCgram <- function(X,Y,vgram,ijEqual=FALSE) {
   structure(erg$C,dim=c(d*nX,d*nY))
 }
 
+#' @useDynLib gmGeostats getUnitvecR
 gsiGetUnitVec <- function(dimX,ip) {
-    erg = .C("getUnitvecR",dimX=checkInt(dimX,1),ip=checkInt(ip,1),unitvec=numeric(dimX))
+    erg = .C(getUnitvecR,dimX=checkInt(dimX,1),ip=checkInt(ip,1),unitvec=numeric(dimX))
     unitvec = erg$unitvec
     unitvec
     }
@@ -119,7 +120,7 @@ gsi.TurningBands <- function(X,vgram,nBands,nsim=NULL) {
   }
   # run!
   if( is.null(nsim) ) {
-    erg<-.C("CMVTurningBands",
+    erg<-.C(CMVTurningBands,
             dimX=checkInt(dim(X),2),
             X=checkDouble(X,prod(dim(X))),
             dimZ=checkInt(c(d,nrow(X),1),3),
@@ -137,7 +138,7 @@ gsi.TurningBands <- function(X,vgram,nBands,nsim=NULL) {
   } else {
     nsim <- checkInt(nsim,1)
     stopifnot(nsim>0)
-    erg<-.C("CMVTurningBands",
+    erg<-.C(CMVTurningBands,
             dimX=checkInt(dim(X),2),
             X=checkDouble(X,prod(dim(X))),
             dimZ=checkInt(c(d,nrow(X),nsim),3),
@@ -209,7 +210,7 @@ gsi.CondTurningBands <- function(Xout, Xin, Zin, vgram,
     vgram$M = M
     m = 3
   }
-  erg <- .C("CCondSim",
+  erg <- .C(CCondSim,
             dimZin=checkInt(dimZin,2),
             Zin   =checkDouble(Zin),
             Cinv  =checkDouble(Cinv,length(Zin)^2),

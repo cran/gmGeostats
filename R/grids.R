@@ -467,6 +467,9 @@ image_cokriged.default <- function(x, ivar=3,
     if(legendPos) legendPos = "top"
   }
   if(!is.logical(legendPos)){
+    oldpar <- par(no.readonly = TRUE)
+    on.exit(par(oldpar))
+    
     # make sure where the color legend goes
     par(oma=c(1,1,1,1))
     if(legendPos %in% c("top","left")){

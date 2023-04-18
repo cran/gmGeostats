@@ -66,7 +66,7 @@ as.AnisotropyScaling.AnisotropyScaling = function(x){
 #' @describeIn as.AnisotropyScaling  from a vector of numbers
 #' @method as.AnisotropyScaling numeric
 #' @export
-as.AnisotropyScaling.double <-as.AnisotropyScaling.numeric <- function(x){
+as.AnisotropyScaling.numeric <- function(x){
   if(length(dim(x))==0){
     if(length(x)==2) return(anis2D_par2A(ratio=x[2], angle=x[1], inv=TRUE))
     if(length(x)==5) return(anis3D_par2A(ratios=x[4:5], angles=x[1:3], inv=TRUE))

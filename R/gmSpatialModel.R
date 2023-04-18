@@ -357,6 +357,7 @@ as.gmSpatialModel <- function(object, ...) UseMethod("as.gmSpatialModel", object
 
 #' @describeIn as.gmSpatialModel Recast spatial object to gmSpatialModel format
 #' @method as.gmSpatialModel default
+#' @export
 as.gmSpatialModel.default = function(object, ...) object
 
 
@@ -365,6 +366,7 @@ as.gmSpatialModel.default = function(object, ...) object
 #' were used to express it? Thsi can be either one string of "alr", "ilr" or "clr", or else a 
 #' (Dx(D-1))-element matrix of logcontrasts to pass from compositions to logratios
 #' @method as.gmSpatialModel gstat
+#' @export
 as.gmSpatialModel.gstat = function(object, V=NULL, ...){
   stop("as.gmSpatialModel.gstat: not yet implemented")
 }
@@ -453,7 +455,7 @@ setMethod("Predict",signature(object="gmSpatialModel", newdata="ANY"),
 #' @export
 setMethod("Predict",signature(object="gmSpatialModel", newdata="ANY", pars="gmNeighbourhoodSpecification"),
           function(object, newdata, pars, ...){
-            cat("starting cokriging \n")
+            message("starting cokriging")
             object@parameters = pars
             out = predict(as.gstat(object), newdata=newdata, ...)
             return(out)
@@ -467,7 +469,7 @@ setMethod("Predict",signature(object="gmSpatialModel", newdata="ANY", pars="gmNe
 setMethod("Predict",signature(object="gmSpatialModel", newdata="ANY", pars="gmTurningBands"),
           function(object, newdata, pars, ...){
             stop("Turning Bands method not yet interfaced here; use")
-            cat("starting turning bands \n")
+            message("starting turning bands")
           }
 )
 
@@ -477,7 +479,7 @@ setMethod("Predict",signature(object="gmSpatialModel", newdata="ANY", pars="gmTu
 setMethod("Predict",signature(object="gmSpatialModel", newdata="ANY", pars="gmCholeskyDecomposition"),
           function(object, newdata, pars, ...){
             stop("Choleski decomposition method not yet implemented")
-            cat("starting Choleski decomposition \n")
+            message("starting Choleski decomposition")
           }
 )
 
@@ -488,7 +490,7 @@ setMethod("Predict",signature(object="gmSpatialModel", newdata="ANY", pars="gmCh
 #' @export
 setMethod("Predict",signature(object="gmSpatialModel", newdata="ANY", pars="gmSequentialSimulation"),
           function(object, newdata, pars, ...){
-            cat("starting SGs \n")
+            message("starting SGs")
             object@parameters = pars$ng
             erg = predict(as.gstat(object), newdata=newdata, nsim=pars$nsim, debug.level=pars$debug.level, ...)
             Dg = ncol(object@coords)
@@ -510,7 +512,7 @@ setMethod("Predict",signature(object="gmSpatialModel", newdata="ANY", pars="gmSe
 setMethod("Predict",signature(object="gmSpatialModel", newdata="ANY", pars="gmDirectSamplingParameters"),
           function(object, newdata, pars, ...){
             
-            cat("starting direct sampling \n")
+            message("starting direct sampling")
             # extract training image
             gt.ti = sp::getGridTopology(object@model)
             dt.ti = as(object@model,"SpatialGridDataFrame")@data

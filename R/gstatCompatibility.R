@@ -264,10 +264,9 @@ variogramModelPlot.gstatVariogram =
       } 
     }
     d = length(vrnames)
-    # plot empirical vario!
-    opar = par()
-    opar = par_remove_readonly(opar)
     
+    # plot empirical vario!
+    opar = par(no.readonly = TRUE)
     if(closeplot) on.exit(par(opar))
     
     if(newfig) par(mfrow=c(d,d), mar=c(1,1,1,1)+0.5, oma=c(0,3,3,0))  
@@ -344,13 +343,21 @@ variogramModelPlot.gstatVariogram =
 
 
 ## as gmEVario
-# @describeIn as.gmEVario
-# @export
+#' @describeIn as.gmEVario gstatVariogram method not yet available
+#' @method as.gmEVario gstatVariogram 
+#' @export
 as.gmEVario.gstatVariogram = function(vgemp, ...) stop("not yet available")
 
 ## as.logratioVariogram (empirical) -------
 # transforms a gstat empirical variogram into a logratioVariogram object (evtl. with anisotropy)
 # @describeIn as.logratioVariogram
+#' @describeIn as.logratioVariogram method for gstatVariogram objects
+#' @method as.logratioVariogram gstatVariogram
+#' @export
+#' @param V matrix or name of the logratio transformation used
+#' @param tol tolerance for generalized inverse (eventually for clr case; defaults to 1e-12)
+#' @param orignames names of the original component (default NULL)
+#' @param symmetrize do you want a whole circle of directions? (default FALSE)
 as.logratioVariogram.gstatVariogram = function(vgemp,  # gstatVariogram object, emprical logratio variogram
                                                V=NULL, # matrix or name of the logratio transformation used
                                                tol=1e-12, # tolerance for generalized inverse (eventually for clr case)
@@ -443,11 +450,13 @@ as.gstatVariogram <- function(vgemp, ...) UseMethod("as.gstatVariogram", vgemp)
 
 #' @describeIn as.gstatVariogram Represent an empirical variogram in "gstatVariogram" format
 #' @method as.gstatVariogram default
+#' @export
 as.gstatVariogram.default <- function(vgemp, ...) vgemp
 
 
-#' @describeIn as.gstatVariogram Represent an empirical variogram in "gstatVariogram" format
+#' @describeIn as.gstatVariogram Represent an empirical variogram in "gstatVariogram" format (not yet available)
 #' @method as.gstatVariogram gmEVario
+#' @export
 as.gstatVariogram.gmEVario <- function(vgemp,...) stop("not yet available")
 
 #' @describeIn as.gstatVariogram Represent an empirical variogram in "gstatVariogram" format
@@ -707,6 +716,7 @@ as.LMCAnisCompo.variogramModelList <-
 
 #' @describeIn as.gmCgram Convert theoretical structural functions to gmCgram format
 #' @method as.gmCgram variogramModelList
+#' @export
 as.gmCgram.variogramModelList = function(m, ...){ 
     as.gmCgram(as.LMCAnisCompo(m, ...), ...)
   }
@@ -715,6 +725,7 @@ as.gmCgram.variogramModelList = function(m, ...){
 
 #' @describeIn as.gmCgram Convert theoretical structural functions to gmCgram format
 #' @method as.gmCgram variogramModel
+#' @export
 as.gmCgram.variogramModel = function(m, ...){
   # extract nugget
   isNugget = m$model=="Nug"

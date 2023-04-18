@@ -58,7 +58,7 @@ Returns the number of directions at which an empirical variogram was computed
 \code{\link[=logratioVariogram]{logratioVariogram()}}, \code{\link[gstat:variogram]{gstat::variogram()}}
 
 Other gmEVario functions: 
-\code{\link{as.gmEVario}()},
+\code{\link{as.gmEVario.gstatVariogram}()},
 \code{\link{gsi.EVario2D}()},
 \code{\link{gsi.EVario3D}()},
 \code{\link{plot.gmEVario}()},

@@ -50,7 +50,7 @@ for details.
 \itemize{
 \item \code{default}: Represent an empirical variogram in "gstatVariogram" format
 
-\item \code{gmEVario}: Represent an empirical variogram in "gstatVariogram" format
+\item \code{gmEVario}: Represent an empirical variogram in "gstatVariogram" format (not yet available)
 
 \item \code{logratioVariogram}: Represent an empirical variogram in "gstatVariogram" format
 

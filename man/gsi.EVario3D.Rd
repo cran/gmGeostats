@@ -53,7 +53,7 @@ compute the empirical variogram or covariance function in a 3D case study
 }
 \seealso{
 Other gmEVario functions: 
-\code{\link{as.gmEVario}()},
+\code{\link{as.gmEVario.gstatVariogram}()},
 \code{\link{gsi.EVario2D}()},
 \code{\link{ndirections}()},
 \code{\link{plot.gmEVario}()},

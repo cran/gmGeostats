@@ -74,7 +74,7 @@ Other variogramModelPlot:
 \code{\link{variogramModelPlot.logratioVariogram}()}
 
 Other gmEVario functions: 
-\code{\link{as.gmEVario}()},
+\code{\link{as.gmEVario.gstatVariogram}()},
 \code{\link{gsi.EVario2D}()},
 \code{\link{gsi.EVario3D}()},
 \code{\link{ndirections}()},

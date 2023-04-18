@@ -28,7 +28,7 @@
 #' xyz.df = data.frame(xy, z = rnorm(29*23)*ifelse(abs(xy$x-xy$y)<3, 1, NA)+(xy$x+xy$y)/2)
 #' mask.df = constructMask(grid = xy, method = "maxdist", maxval = 3, x=xyz.df)
 #' image(mask.df)
-#' par(mfrow=c(1,1))
+#' oldpar = par(mfrow = c(1,1))
 #' mask.df
 #' xyz.df.masked = setMask(xyz.df, mask.df)
 #' dim(xyz.df.masked)
@@ -46,17 +46,20 @@
 #' aux = sp::SpatialPixelsDataFrame(grid = xy.gt, data=xyz.df, points = xy.sp)
 #' xyz.sgdf = as(aux, "SpatialGridDataFrame")
 #' image_cokriged(xyz.sgdf, ivar="z")
+#' ## reorder the data in the grid and plot again
 #' par(mfrow=c(1,1))
 #' ms = function(x) sortDataInGrid(x, grid=xy.gt)
 #' mask.gt = constructMask(grid = xy.gt, method = "maxdist", maxval = 3, x=xyz.sgdf)
 #' image(x,y,matrix(ms(xyz.sgdf@data$z), nrow=23, ncol=29))  
 #' image(x,y,matrix(ms(mask.gt), nrow=23, ncol=29))  
 #' image(mask.gt)
+#' ## work with the mask and plot again
 #' par(mfrow=c(1,1))
 #' xyz.sgdf.masked = setMask(x = xyz.sgdf, mask = mask.gt)
 #' getMask(xyz.sgdf.masked)
 #' image(x,y,matrix(ms(xyz.sgdf@data$z), nrow=23, ncol=29))  
 #' points(xyz.sgdf.masked@coords)
+#' par(oldpar)
 constructMask = function(grid, method="maxdist", maxval=NULL, x=NULL){
   methods = c("maxdist", "sillprop", "point2poly") 
   m = methods[pmatch(method, methods)] 
@@ -458,6 +461,7 @@ unmask.SpatialPixels <- function(x, mask=NULL, fullgrid =attr(mask, "fullgrid"),
 #' @describeIn unmask.data.frame Unmask a masked object
 #' @method unmask SpatialPoints
 #' @importClassesFrom sp SpatialPoints
+#' @export
 unmask.SpatialPoints <- function(x, mask=attr(x@data,"mask"), 
                                  fullgrid = attr(mask, "fullgrid"), 
                                  forceCheck=FALSE, ...){

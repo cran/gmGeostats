@@ -68,7 +68,7 @@ plot(vge, pch=22, lty=1, bg="grey")
 }
 \seealso{
 Other gmEVario functions: 
-\code{\link{as.gmEVario}()},
+\code{\link{as.gmEVario.gstatVariogram}()},
 \code{\link{gsi.EVario2D}()},
 \code{\link{gsi.EVario3D}()},
 \code{\link{ndirections}()},

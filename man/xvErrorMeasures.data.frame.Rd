@@ -51,7 +51,7 @@ Compute one or more error measures from cross-validation output
 "MSE" stands for \emph{mean square error} (average of the square differences between true values and predicted values),
 and "MSDR" for \emph{mean squared deviation ratio} (average of the square between true values and predicted values
 each normalized by its kriging variance). These quantities are classically used in evaluating
-output results of validation excercices of one single variable.
+output results of validation exercises of one single variable.
 For multivariate cases, "ME" (a vector) and "MSE" (a scalar) work as well,
 while two different definitions of a multivariate
 mean squared deviation ratio can be given:

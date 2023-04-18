@@ -389,9 +389,7 @@ plot.gmCgram = function(x, xlim.up=NULL, xlim.lo=NULL, vdir.up= NULL, vdir.lo= N
     xseq.lo = seq(from=xlim.lo[1], to=xlim.lo[2], length.out=xlength)
   }else{ xseq.lo=NULL}
 
-  opar = par()
-  opar = par_remove_readonly(opar)
-
+  opar = par(no.readonly = TRUE)
   if(closeplot) on.exit(par(opar))
 
   getVdens = function(vdir, xseq){
@@ -936,9 +934,7 @@ plot.gmEVario = function(x, xlim.up=NULL, xlim.lo=NULL, vdir.up= NULL, vdir.lo= 
     }
   }
 
-  opar = par()
-  opar = par_remove_readonly(opar)
-
+  opar = par(no.readonly = TRUE)
   if(closeplot) on.exit(par(opar))
 
   myplot = function(...) matplot(type=type, ylab="", xlab="",xaxt="n", ...)
@@ -1002,11 +998,14 @@ plot.gmEVario = function(x, xlim.up=NULL, xlim.lo=NULL, vdir.up= NULL, vdir.lo= 
 #' (for compositional data) and \code{gstatVariogram}
 #' (from package \code{gstat}).
 #' @export
-#' @aliases as.gmEVario.gstatVariogram as.gmEVario.logratioVariogram
-#'  as.gmEVario.logratioVariogramAnisotropy
-#'
 #' @family gmEVario functions
+# @aliases as.gmEVario.gstatVariogram as.gmEVario.logratioVariogram
+#  as.gmEVario.logratioVariogramAnisotropy
 as.gmEVario  <- function(vgemp,...){ UseMethod("as.gmEVario",vgemp)}
+
+#' @describeIn as.gmEVario default method
+#' @method as.gmEVario default 
+#' @export
 as.gmEVario.default  <- function(vgemp,...) vgemp
 
 
@@ -1182,14 +1181,30 @@ print.directionClass = function(x, complete=TRUE, ...){
 
 
 
+#' Express a direction as a director vector
+#' 
+#' Internal methods to express a direction (in 2D or 3D) as director
+#' vector(s). These functions are not intended for direct use.
+#'
+#' @param x value of the direction in a certain representation
+#' @param ... extra parameters for generic functionality
+#'
+#' @return A 2- or 3- column matrix which rows represents the unit
+#' director vector of each direction specified.
+#' @export
+as.directorVector <- function(x, ...) UseMethod("as.directorVector",x)
 
-as.directorVector <- function(x){ UseMethod("as.directorVector",x) }
 
+#' @describeIn as.directorVector default method
 #' @method as.directorVector default
-as.directorVector.default = function(x,...) x
+#' @export
+as.directorVector.default = function(x, ...) x
 
+#' @describeIn as.directorVector method for azimuths
 #' @method as.directorVector azimuth
-as.directorVector.azimuth = function(x, D=2){
+#' @param D dimension currently used (D=2 default; otherwise D=3; other values are not accepted)
+#' @export
+as.directorVector.azimuth = function(x, D=2, ...){
   res = cbind(cos(pi/2-x), sin(pi/2-x))
   if(D>2){
     res = cbind(res, matrix(0, ncol=D-2, nrow=nrow(res)))
@@ -1198,8 +1213,10 @@ as.directorVector.azimuth = function(x, D=2){
   return(gsi.directorVector(res))
 }
 
+#' @describeIn as.directorVector method for azimuthIntervals
 #' @method as.directorVector azimuthInterval
-as.directorVector.azimuthInterval = function(x, D=2){
+#' @export
+as.directorVector.azimuthInterval = function(x, D=2, ...){
   res = (x[[1]]+x[[2]])/2
   return(as.directorVector.azimuth(res))
 }

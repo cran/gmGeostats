@@ -4,7 +4,6 @@
 \alias{as.AnisotropyScaling}
 \alias{as.AnisotropyScaling.numeric}
 \alias{as.AnisotropyScaling.AnisotropyScaling}
-\alias{as.AnisotropyScaling.double}
 \alias{as.AnisotropyScaling.AnisotropyRangeMatrix}
 \title{Convert to anisotropy scaling matrix}
 \usage{
