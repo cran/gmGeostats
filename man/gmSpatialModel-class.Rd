@@ -39,7 +39,7 @@ plus \code{model} (for the unconditional model) and \code{parameters} (for the e
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{variogram}: Compute a variogram, see \code{\link[=variogram_gmSpatialModel]{variogram_gmSpatialModel()}} for details
+\item \code{variogram}: Compute a variogram, see \code{\link[=variogram_gmSpatialModel]{variogram_gmSpatialModel()}} and \code{\link[=variogram]{variogram()}} for details
 
 \item \code{logratioVariogram}: S4 wrapper method around \code{\link[=logratioVariogram]{logratioVariogram()}} for \code{gmSpatialModel}
 objects

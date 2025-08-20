@@ -598,7 +598,7 @@ variogram_gmSpatialModel <-  function(object, methodPars=NULL, ...){
 #' @param cov boolean, is covariance (TRUE) or variogram (FALSE) desired? defaults to variogram
 #'
 #' @return An empirical variogram for the provided data. NOTE: avoid using directly gsi.* functions! They
-#' represent either internal functions, or preliminary, not fully-tested functions. Use \code{\link{variogram}} instead.
+#' represent either internal functions, or preliminary, not fully-tested functions. Use [variogram()] instead.
 #' @export
 #' @family gmEVario functions
 #'
@@ -735,7 +735,7 @@ gsi.EVario2D = function(X,Z,Ff=rep(1, nrow(X)),
 #' @param cov boolean, is covariance (TRUE) or variogram (FALSE) desired? defaults to variogram
 #'
 #' @return An empirical variogram for the provided data. NOTE: avoid using directly gsi.* functions! They
-#' represent either internal functions, or preliminary, not fully-tested functions. Use \code{\link{variogram}} instead.
+#' represent either internal functions, or preliminary, not fully-tested functions. Use [variogram()] instead.
 #'
 #'
 #' @export

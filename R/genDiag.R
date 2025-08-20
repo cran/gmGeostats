@@ -31,7 +31,7 @@ Maf = function(x,...) UseMethod("Maf",x)
 #' @param i a slicer for the variogram, typically this will be one or more indices of 
 #' the lag distance to take. %For other options see code{getEmpVariogramSlice}.
 #'
-#' @return An object extending \code{c("princomp.CLASSOF(x)",}"\code{\link{princomp}}") 
+#' @return An object extending \code{c("princomp.CLASSOF(x)",}"\code{\link[stats]{princomp}}") 
 #' with classes "\code{genDiag}", and an extra class argument depending on the 
 #' diagonalisation method chosen.
 #' 
@@ -77,10 +77,10 @@ Maf = function(x,...) UseMethod("Maf",x)
 #' \describe{
 #'   \item{sdev}{contrary to the output in PCA, this contains the square root of the
 #'   metric variance of the predictions obtained for each individual factor; this is the
-#'   quantity needed for \code{\link{screeplot}} to create plots of explained variance
+#'   quantity needed for \code{\link[stats]{screeplot}} to create plots of explained variance
 #'   by factor}
 #'   \item{loadings}{matrix of contributions of each (cdt-transformed) original variable to the new factors}
-#'   \item{center}{center of the data set (eventually, represented through \code{\link{cdt}}), 
+#'   \item{center}{center of the data set (eventually, represented through \code{\link[compositions]{cdt}}), 
 #'   in compositional methods}
 #'   \item{scale}{the scalings applied to each original variable}
 #'   \item{n.obs}{number of observations}
@@ -95,7 +95,7 @@ Maf = function(x,...) UseMethod("Maf",x)
 #'   each column of this matrix can be understood as a composition on itself}
 #'   \item{DownInvLoadings}{compositional methods return here the clr-backtransformed "minus inverse loadings", so that
 #'   each column of this matrix can be understood as a composition on itself; details in 
-#'   \code{\link{princomp.acomp}} }
+#'   \code{\link[compositions]{princomp.acomp}} }
 #'   \item{C1, C2}{Maf returns the two matrices that were diagonalised}
 #'   \item{eigenvalues}{Maf returns the generalized eigenvalues of the diagonalisation of C1 and C2}
 #'   \item{gof}{UWEDGE returns the values of the goodness of fit criterion across sweeps}
@@ -467,10 +467,10 @@ predict.genDiag = function (object, newdata=NULL, ...) {
 #' \code{\link{Maf}} (or to \code{UWEDGE} or \code{RJD}, on the help page of \code{\link{Maf}}).
 #' @param choices which factors should be represented? vector of 2 indices; defaults to
 #' c(1,2)
-#' @param scale deprecated, kept for coherence with \code{link{biplot.princomp}}
-#' @param pc.biplot same as the homonimous argument from \code{link{biplot.princomp}}:
+#' @param scale deprecated, kept for coherence with \code{link[stats]{biplot.princomp}}
+#' @param pc.biplot same as the same name argument from \code{link[stats]{biplot.princomp}}:
 #'  boolean, to scale variables down by sqrt(n) and observations up by the same factor. 
-#' @param ... further arguments to \code{\link{coloredBiplot}}
+#' @param ... further arguments to \code{\link[compositions]{coloredBiplot}}
 #'
 #' @return nothing. Function is called exclusively to produce the plot
 #' @export

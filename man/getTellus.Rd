@@ -28,7 +28,7 @@ Mg-Al-Ca-Fe-Rest.
 }
 \details{
 The function is provided due to conflicting licenses. You download the
-data from the server \url{https://www.bgs.ac.uk/gsni/tellus/index.html} at your own
+data from the server \url{https://www2.bgs.ac.uk/gsni/tellus/overview/index.html} at your own
 accord. Actually a visit to the project data webpage is highly recommended, in particular
 for learning about the QA/QC process of the data acquisition, other data sources
 available and how to use this wealth of data.
@@ -131,5 +131,5 @@ and testing multiple point geostatistical algorithms.
 }
 }
 \references{
-\url{https://www.bgs.ac.uk/gsni/tellus/index.html}
+\url{https://www2.bgs.ac.uk/gsni/tellus/overview/index.html}
 }

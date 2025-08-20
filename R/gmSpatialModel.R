@@ -591,7 +591,7 @@ setMethod("Predict",signature(object="gmSpatialModel", newdata="ANY", pars="gmDi
 )
 
 
-#' @describeIn gmSpatialModel Compute a variogram, see [variogram_gmSpatialModel()] for details
+#' @describeIn gmSpatialModel Compute a variogram, see [variogram_gmSpatialModel()] and [variogram()] for details
 #' @inheritParams variogram_gmSpatialModel
 #' @include variograms.R
 #' @export

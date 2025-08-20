@@ -62,7 +62,8 @@ Other gmEVario functions:
 \code{\link{gsi.EVario2D}()},
 \code{\link{gsi.EVario3D}()},
 \code{\link{plot.gmEVario}()},
-\code{\link{variogramModelPlot}()}
+\code{\link{variogramModelPlot}()},
+\code{\link{variogram}()}
 
 Other gmCgram functions: 
 \code{\link{[.gmCgram}()},

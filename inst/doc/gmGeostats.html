@@ -14,30 +14,42 @@
 
 <title>Multivariate geostatistics with gmGeostats</title>
 
-<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
 
 <style type="text/css">
-  code {
-    white-space: pre;
-  }
-  .sourceCode {
-    overflow: visible;
-  }
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -51,55 +63,54 @@ pre > code.sourceCode { white-space: pre-wrap; }
 pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
 div.sourceCode
-  {   }
+{ }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -108,13 +119,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -126,7 +144,187 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 
 
@@ -138,78 +336,220 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<h1 class="title toc-ignore">Multivariate geostatistics with gmGeostats</h1>
+<h1 class="title toc-ignore">Multivariate geostatistics with
+gmGeostats</h1>
 
 
 
 <div id="the-basics" class="section level2">
 <h2>The basics</h2>
-<p>“gmGeostats” is a package for multivariate geostatistics, focusing in the usage of data from multivariate restricted sampling spaces. Such data include positive data, compositional data, distributional data and the like. Most of the times, the geostatistical analysis of such data includes three steps:</p>
+<p>“gmGeostats” is a package for multivariate geostatistics, focusing in
+the usage of data from multivariate restricted sampling spaces. Such
+data include positive data, compositional data, distributional data and
+the like. Most of the times, the geostatistical analysis of such data
+includes three steps:</p>
 <ol style="list-style-type: decimal">
-<li>express your data as some vectors of real values, through a mapping. Such mappings can be isomorphisms (for Euclidean spaces) or embeddings (for regular manifolds)</li>
-<li>analyse the resulting multivariate data with vectorial methods (i.e. using cross-variograms, cokriging, cosimulation or distance based methods modified in such a way that they are rotation-invariant resp. affine equivariant)</li>
-<li>back-transform the interpolations/simulations to the original units</li>
+<li>express your data as some vectors of real values, through a mapping.
+Such mappings can be isomorphisms (for Euclidean spaces) or embeddings
+(for regular manifolds)</li>
+<li>analyse the resulting multivariate data with vectorial methods
+(i.e. using cross-variograms, cokriging, cosimulation or distance based
+methods modified in such a way that they are rotation-invariant resp.
+affine equivariant)</li>
+<li>back-transform the interpolations/simulations to the original
+units</li>
 </ol>
 <p>The package is loaded, as usual with</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gmGeostats)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Welcome to &#39;gmGeostats&#39;, a package for multivariate geostatistical analysis.</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Note: use &#39;fit_lmc&#39; instead of fit.lmc</span></span></code></pre></div>
-<p>and it fundamentally depends on packages “compositions”, “gstat” and “sp”. Other dependencies are more instrumental and less fundamental. NOTE: if you separately need “compositions” or “gstat”, load these packages first, then load “gmGeostats”. This will ensure that the overloaded functions work properly for all three packages. Alternatively, use fully qualified names (e.g. <code>pkg::foo()</code>).</p>
-<p>This vignette very briefly presents the steps to follow in several analysis and modelling routes, illustrated with the case of compositional data. No explanations, theory or discussion is included.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(gmGeostats)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co">#&gt; Welcome to &#39;gmGeostats&#39;, a package for multivariate geostatistical analysis.</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co">#&gt;  Note: use &#39;fit_lmc&#39; instead of fit.lmc</span></span></code></pre></div>
+<p>and it fundamentally depends on packages “compositions”, “gstat” and
+“sp”. Other dependencies are more instrumental and less fundamental.
+NOTE: if you separately need “compositions” or “gstat”, load these
+packages first, then load “gmGeostats”. This will ensure that the
+overloaded functions work properly for all three packages.
+Alternatively, use fully qualified names
+(e.g. <code>pkg::foo()</code>).</p>
+<p>This vignette very briefly presents the steps to follow in several
+analysis and modelling routes, illustrated with the case of
+compositional data. No explanations, theory or discussion is
+included.</p>
 </div>
 <div id="exploratory-analysis" class="section level2">
 <h2>Exploratory analysis</h2>
 <div id="descriptive-analysis" class="section level3">
 <h3>Descriptive analysis</h3>
-<p>The data can be visually inspected with scatterplots, in raw representation (<code>plot()</code>, <code>pairs()</code>), in ternary diagrams (<code>compositions::plot.acomp()</code>), and in scatterplots of logratio transformed data (use the transformations <code>pwlr()</code>, <code>alr()</code>, <code>clr()</code> or <code>ilr()</code> from package “compositions”, then <code>pairs()</code>). Function <code>pairs()</code> can be given panel functions such as e.g. <code>vp.lrdensityplot()</code>, <code>vp.kde2dplot()</code> or <code>vp.lrboxplot()</code> resp. for creating histograms of pairwise logratios, 2D kernel density maps on the scatterplots or boxplots of the pairwise logratios. Package “compositions” provides the class “acomp” to directly deal with the right representation in the several methods.</p>
-<p>Principal component analysis is also a strong help. For this, you need an isometry (not just an isomorphism). Transformation <code>clr()</code> is the best for this, and is actually automatically used when you do <code>princomp(acomp(YOURDATA))</code>. “gmGeostats” provides generalised diagonalisation methods to account for the spatial dependence, see <code>?genDiag</code> for details.</p>
+<p>The data can be visually inspected with scatterplots, in raw
+representation (<code>plot()</code>, <code>pairs()</code>), in ternary
+diagrams (<code>compositions::plot.acomp()</code>), and in scatterplots
+of logratio transformed data (use the transformations
+<code>pwlr()</code>, <code>alr()</code>, <code>clr()</code> or
+<code>ilr()</code> from package “compositions”, then
+<code>pairs()</code>). Function <code>pairs()</code> can be given panel
+functions such as e.g. <code>vp.lrdensityplot()</code>,
+<code>vp.kde2dplot()</code> or <code>vp.lrboxplot()</code> resp. for
+creating histograms of pairwise logratios, 2D kernel density maps on the
+scatterplots or boxplots of the pairwise logratios. Package
+“compositions” provides the class “acomp” to directly deal with the
+right representation in the several methods.</p>
+<p>Principal component analysis is also a strong help. For this, you
+need an isometry (not just an isomorphism). Transformation
+<code>clr()</code> is the best for this, and is actually automatically
+used when you do <code>princomp(acomp(YOURDATA))</code>. “gmGeostats”
+provides generalised diagonalisation methods to account for the spatial
+dependence, see <code>?genDiag</code> for details.</p>
 </div>
 <div id="spatial-analysis" class="section level3">
 <h3>Spatial analysis</h3>
-<p>Create your spatial objects by connecting the spatial coordinates to the multivariate observations via the functions <code>sp:SpatialPointsDataFrame()</code> or better the “gmGeostats” functions <code>make.gmMultivariateGaussianSpatialModel()</code> for multivariate data and <code>make.gmCompositionalGaussianSpatialModel()</code> for compositional data. The functions <code>make.gm******SpatialModel()</code> produces objects of spatial data container class “gmSpatialModel”, that are necessary for the rest of the analysis and modelling.</p>
-<p>Swath plots are available with command <code>swath()</code>. If you give it an “acomp” object you will obtain a matrix of logratio swath plots. Otherwise you will get an set of swath plots, one for each variable. Function <code>pairsmap()</code> works similarly, but produces bubble maps (you can control size and color of the symbols).</p>
-<p>Empirical variograms can be obtained with function <code>variogram()</code> out of the spatial data container. You can also use the function <code>logratioVariogram()</code> for compositional data. Both accept anisotropy. Their output can be plotted with <code>plot()</code>, which has specific methods for compositional and non-compositional data. In the case of anisotropic data, you can also use a method of <code>image()</code> to visualise the variogram maps, see <code>?image.logratioVariogramAnisotropy</code> for details.</p>
-<p>Finally you can also check for the strength of the spatial dependence with the test <code>noSpatCorr.test()</code>. This is a permutations test, which null hypothesis is that the data do not exhibit spatial autocorrelation.</p>
+<p>Create your spatial objects by connecting the spatial coordinates to
+the multivariate observations via the functions
+<code>sp:SpatialPointsDataFrame()</code> or better the “gmGeostats”
+functions <code>make.gmMultivariateGaussianSpatialModel()</code> for
+multivariate data and
+<code>make.gmCompositionalGaussianSpatialModel()</code> for
+compositional data. The functions
+<code>make.gm******SpatialModel()</code> produces objects of spatial
+data container class “gmSpatialModel”, that are necessary for the rest
+of the analysis and modelling.</p>
+<p>Swath plots are available with command <code>swath()</code>. If you
+give it an “acomp” object you will obtain a matrix of logratio swath
+plots. Otherwise you will get an set of swath plots, one for each
+variable. Function <code>pairsmap()</code> works similarly, but produces
+bubble maps (you can control size and color of the symbols).</p>
+<p>Empirical variograms can be obtained with function
+<code>variogram()</code> out of the spatial data container. You can also
+use the function <code>logratioVariogram()</code> for compositional
+data. Both accept anisotropy. Their output can be plotted with
+<code>plot()</code>, which has specific methods for compositional and
+non-compositional data. In the case of anisotropic data, you can also
+use a method of <code>image()</code> to visualise the variogram maps,
+see <code>?image.logratioVariogramAnisotropy</code> for details.</p>
+<p>Finally you can also check for the strength of the spatial dependence
+with the test <code>noSpatCorr.test()</code>. This is a permutations
+test, which null hypothesis is that the data do not exhibit spatial
+autocorrelation.</p>
 </div>
 </div>
 <div id="interpolation" class="section level2">
 <h2>Interpolation</h2>
 <div id="linear-model-of-coregionalisation-lmc" class="section level3">
 <h3>Linear model of coregionalisation (LMC)</h3>
-<p>Modelling the empirical variograms obtained in the last step can be done with the function <code>fit_lmc()</code>. This requires specifying a variogram model, which parameters will be fitted by that function. Variogram specifications are available with any of the following functions: <code>gstat::vgm()</code> and <code>gmGeostats::gmCgram()</code> for multivariate data, <code>compositions::CompLinModCoReg()</code> and <code>gmGeostats::LMCAnisCompo()</code> for compositional data. <code>CompLinModCoReg()</code> is the only one not accepting anisotropy. You can mix and merge empirical and theoretical models from different packages, as <code>fit_lmc()</code> will take care to convert between them for appropriate consistency.</p>
-<p>Plotting of LMCs against their empirical variograms can be done with function <code>variogramModelPlot()</code>.</p>
+<p>Modelling the empirical variograms obtained in the last step can be
+done with the function <code>fit_lmc()</code>. This requires specifying
+a variogram model, which parameters will be fitted by that function.
+Variogram specifications are available with any of the following
+functions: <code>gstat::vgm()</code> and
+<code>gmGeostats::gmCgram()</code> for multivariate data,
+<code>compositions::CompLinModCoReg()</code> and
+<code>gmGeostats::LMCAnisCompo()</code> for compositional data.
+<code>CompLinModCoReg()</code> is the only one not accepting anisotropy.
+You can mix and merge empirical and theoretical models from different
+packages, as <code>fit_lmc()</code> will take care to convert between
+them for appropriate consistency.</p>
+<p>Plotting of LMCs against their empirical variograms can be done with
+function <code>variogramModelPlot()</code>.</p>
 </div>
 <div id="variogram-and-neighbourhood-validation" class="section level3">
 <h3>Variogram and neighbourhood validation</h3>
-<p>Neighbourhood descriptions are created with function <code>KrigingNeighbourhood()</code>. Kriging neighbourhoods and LMC variogram models and can be attached to the “gmSpatialModel” objects at the moment of creation via <code>make.gm*()</code> functions, using arguments <code>ng</code> and <code>model</code> (this last one strictly requiring you to also specify the <code>formula</code> argument).</p>
-<p>Validation of the model or of the neighbourhood can then be obtained with the function <code>validate()</code>. This requires an <code>object</code> (the complete “gmSpatialModel”) and a <code>strategy</code>. Validation strategies are small S3-objects describing what will exactly be done in the validation. They can be quickly defined by means of configuration functions as <code>LeaveOneOut()</code> or <code>NfoldCrossValidation()</code>. The call to <code>validate()</code> will provide some output that can be evaluated with functions such as <code>xvErrorMeasures()</code>, <code>accuracy()</code> or <code>prediction()</code>.</p>
+<p>Neighbourhood descriptions are created with function
+<code>KrigingNeighbourhood()</code>. Kriging neighbourhoods and LMC
+variogram models and can be attached to the “gmSpatialModel” objects at
+the moment of creation via <code>make.gm*()</code> functions, using
+arguments <code>ng</code> and <code>model</code> (this last one strictly
+requiring you to also specify the <code>formula</code> argument).</p>
+<p>Validation of the model or of the neighbourhood can then be obtained
+with the function <code>validate()</code>. This requires an
+<code>object</code> (the complete “gmSpatialModel”) and a
+<code>strategy</code>. Validation strategies are small S3-objects
+describing what will exactly be done in the validation. They can be
+quickly defined by means of configuration functions as
+<code>LeaveOneOut()</code> or <code>NfoldCrossValidation()</code>. The
+call to <code>validate()</code> will provide some output that can be
+evaluated with functions such as <code>xvErrorMeasures()</code>,
+<code>accuracy()</code> or <code>prediction()</code>.</p>
 </div>
 <div id="cokriging-and-mapping" class="section level3">
 <h3>Cokriging and mapping</h3>
-<p>This way of working is common to the package. You always build a model (with a <code>make.*()</code> function), define a method parameter object (created with a specific, verbose, helper function), and feed both to a common umbrella function describing what do you want to do: <code>validate()</code> or <code>predict()</code>, the second one also requires an argument <code>newdata</code> as is standard in R. The output can then be postprocessed by specific functions.</p>
-<p>The method parameter for cokriging is actually the neighbourhood. So, you can give <code>predict()</code> an object resulting from <code>KrigingNeighbourhood()</code>, otherwise it will take the standard one stored in the “gmSpatialModel”, or produce a global neighbourhood cokriging if no neighbourhood description is found.</p>
-<p>Output of <code>predict</code> for “gstat” objects (the current default) can be re-formed to compositional shape by means of the function <code>gsi.gstatCokriging2compo()</code>; there is an <code>gsi.gstatCokriging2rmult()</code> as well for multivariate data. Maps can be obtained with function <code>image_cokriged()</code>, that produces a choropleth map with legend, and returns the color scale (i.e. some breaks and a palette of colors) to be used, e.g. for plotting the initial data on top of the maps using the same color scale. NOTE: this funtion does NOT freeze the plot! Most probably you will need to call <code>par(mfrow=c(1,1))</code> to create a clean slate device for the next plot.</p>
+<p>This way of working is common to the package. You always build a
+model (with a <code>make.*()</code> function), define a method parameter
+object (created with a specific, verbose, helper function), and feed
+both to a common umbrella function describing what do you want to do:
+<code>validate()</code> or <code>predict()</code>, the second one also
+requires an argument <code>newdata</code> as is standard in R. The
+output can then be postprocessed by specific functions.</p>
+<p>The method parameter for cokriging is actually the neighbourhood. So,
+you can give <code>predict()</code> an object resulting from
+<code>KrigingNeighbourhood()</code>, otherwise it will take the standard
+one stored in the “gmSpatialModel”, or produce a global neighbourhood
+cokriging if no neighbourhood description is found.</p>
+<p>Output of <code>predict</code> for “gstat” objects (the current
+default) can be re-formed to compositional shape by means of the
+function <code>gsi.gstatCokriging2compo()</code>; there is an
+<code>gsi.gstatCokriging2rmult()</code> as well for multivariate data.
+Maps can be obtained with function <code>image_cokriged()</code>, that
+produces a choropleth map with legend, and returns the color scale
+(i.e. some breaks and a palette of colors) to be used, e.g. for plotting
+the initial data on top of the maps using the same color scale. NOTE:
+this funtion does NOT freeze the plot! Most probably you will need to
+call <code>par(mfrow=c(1,1))</code> to create a clean slate device for
+the next plot.</p>
 </div>
 </div>
 <div id="gaussian-cosimulation" class="section level2">
 <h2>Gaussian cosimulation</h2>
 <div id="transformation-to-gaussianity" class="section level3">
 <h3>Transformation to Gaussianity</h3>
-<p>Gaussian cosimulation requires joint multivariate normality. The package provides the flow anamorphosis algorithm for this goal. This is obtained in two steps. First, you create the transformation by calling function <code>ana()</code> with your data and storing it. Then, you apply the stored transformation to the data, and obtain the normalised scores. These scores can then be treated with all methods and techniques of the preceding sections “Exploratory analysis” and “Linear model of coregionalisation (LMC)”, in particular a call to <code>make.gmMultivariateGaussianSpatialModel()</code> will create the passing “gmSpatialModel”.</p>
+<p>Gaussian cosimulation requires joint multivariate normality. The
+package provides the flow anamorphosis algorithm for this goal. This is
+obtained in two steps. First, you create the transformation by calling
+function <code>ana()</code> with your data and storing it. Then, you
+apply the stored transformation to the data, and obtain the normalised
+scores. These scores can then be treated with all methods and techniques
+of the preceding sections “Exploratory analysis” and “Linear model of
+coregionalisation (LMC)”, in particular a call to
+<code>make.gmMultivariateGaussianSpatialModel()</code> will create the
+passing “gmSpatialModel”.</p>
 </div>
 <div id="cosimulation" class="section level3">
 <h3>Cosimulation</h3>
-<p>Cosimulation method parameters are created by calls to one of the functions <code>SequentialSimulation()</code>, <code>TurningBands()</code> or <code>CholeskyDecomposition()</code>. All these functions include an argument <code>nsim</code> controlling the number of realisations desired. These are then obtained by a call to <code>predict()</code>, giving it the “gmSpatialModel”, the <code>newdata</code> and the method parameters, in this order.</p>
+<p>Cosimulation method parameters are created by calls to one of the
+functions <code>SequentialSimulation()</code>,
+<code>TurningBands()</code> or <code>CholeskyDecomposition()</code>. All
+these functions include an argument <code>nsim</code> controlling the
+number of realisations desired. These are then obtained by a call to
+<code>predict()</code>, giving it the “gmSpatialModel”, the
+<code>newdata</code> and the method parameters, in this order.</p>
 </div>
 <div id="postprocessing" class="section level3">
 <h3>Postprocessing</h3>
-<p>Multivariate cosimulation output can be seen analogue to a 3-dimensional array, with one dimension running along the simulated locations, one dimension along the realisations and one dimension along the variables. This structure is captured in “gmGeostats” with an object of class “DataFrameStack” (extending “data.frame” and mimicking arrays). Point-wise, simulation-wise and variable-wise transformations on this array can be computed with function <code>gmApply()</code>, a wrapper on <code>base::apply()</code> allowing for an easier management of the dimensions of the simulation stack. Maps can also be produced by function <code>image_cokriged()</code>.</p>
+<p>Multivariate cosimulation output can be seen analogue to a
+3-dimensional array, with one dimension running along the simulated
+locations, one dimension along the realisations and one dimension along
+the variables. This structure is captured in “gmGeostats” with an object
+of class “DataFrameStack” (extending “data.frame” and mimicking arrays).
+Point-wise, simulation-wise and variable-wise transformations on this
+array can be computed with function <code>gmApply()</code>, a wrapper on
+<code>base::apply()</code> allowing for an easier management of the
+dimensions of the simulation stack. Maps can also be produced by
+function <code>image_cokriged()</code>.</p>
 </div>
 </div>
 <div id="multipoint-simulation" class="section level2">
 <h2>Multipoint simulation</h2>
-<p>Multipoint cosimulation is available with the same strategy than Gaussian based simulation. One needs first to define a “gmSpatialModel” containing the conditioning data (the original data) and the stochastic model (the training image). Second, a simulation grid must be created, and provided to <code>predict()</code> as the <code>newdata</code> argument. And third, we must provide some method parameters defining the simulation algorithm to use: currently, only direct sampling is available, and its parameters can be constructed calling <code>DSpars()</code>.</p>
-<p>Training images are currently objects of class “SpatialPixelsDataFrame” or “SpatialGridDataFrame”, from package “sp”. The conditioning data will be migrated to the simulation grid internally; the grid topologies for simulation and training image will be checked for consistency.</p>
+<p>Multipoint cosimulation is available with the same strategy than
+Gaussian based simulation. One needs first to define a “gmSpatialModel”
+containing the conditioning data (the original data) and the stochastic
+model (the training image). Second, a simulation grid must be created,
+and provided to <code>predict()</code> as the <code>newdata</code>
+argument. And third, we must provide some method parameters defining the
+simulation algorithm to use: currently, only direct sampling is
+available, and its parameters can be constructed calling
+<code>DSpars()</code>.</p>
+<p>Training images are currently objects of class
+“SpatialPixelsDataFrame” or “SpatialGridDataFrame”, from package “sp”.
+The conditioning data will be migrated to the simulation grid
+internally; the grid topologies for simulation and training image will
+be checked for consistency.</p>
 </div>
 
 

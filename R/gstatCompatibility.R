@@ -601,7 +601,7 @@ as.variogramModel.LMCAnisCompo <- function(m, V=NULL, prefix=NULL, ensurePSD=TRU
   for(j in 1:ncol(m)){
     anis[j, "anis1"] <- sqrt(sum((m[,j]$A[,2])^2))
     anis[j, "range"] <- m[,j]$range/anis[j, "anis1"]
-    anis[j, "ang1"] <- atan2(-m[,j]$A[2,1], m[,j]$A[1,1]) * 180/pi
+    anis[j, "ang1"] <- atan2(-m[,j]$A[2,1], m[,j]$A[1,1]) * 180/pi + 180
   }
   anis = data.frame(anis, ang2=0, anis2=1, ang3=0, kappa=0.5*(models!="Nug"))
   # if(all(anis$anis1==1)) anis=NULL

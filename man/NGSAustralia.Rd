@@ -5,35 +5,7 @@
 \alias{NGSAustralia}
 \title{National Geochemical Survey of Australia: soil data}
 \format{
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 5259 rows and 76 columns.
-}
-\source{
-\url{https://www.ga.gov.au/about/projects/resources/national-geochemical-survey}
-}
-\usage{
-NGSAustralia
-}
-\description{
-A dataset containing the geochemical composition of soil samples covering approx 2/3
-of Australia, at a spatial resolution of 1 sample/5000 $km^2$.
-The original data is published by Geosciences Australia under the Creative
-Commons CC4 Licence + Attribution (CC-BY-SA-4.0).
-The provided data set has additional information and
-some pre-treatment with respect to the one available in the references below. These changes:
-}
-\details{
-\itemize{
-\item Concentrations are all reported as mg/kg, also known as parts per million (ppm). Values below
-detection limit are reported as minus the detection limit, as standardised in package
-"compositions".
-\item The samples were complemented with information about their belonging to one of the
-major crustal blocks (MCB) of Australia.
-\item Easting and Northing coordinates were computed using the Lambert conformal conic projection of
-Australia (earth ellipsoid GRS80; standard parallels: 18S and 36S latitude; central meridian:
-134E longitude).
-}
-
-#' @format A tibble, a data set of compound class c("tbl_df", "tbl", "data.frame") with 5259
+A tibble, a data set of compound class c("tbl_df", "tbl", "data.frame") with 5259
 observations and 76 variables:
 \describe{
 \item{ORDER}{Entry order}
@@ -44,7 +16,7 @@ observations and 76 variables:
 \item{LATITUDE}{Latitude of the sampling site}
 \item{LONGITUDE}{Longitude of the sampling site}
 \item{STATE}{State of the sampling site, one of: "NWS" (New South Wales), "NT" (Northern Territory),
-"QLD" (Qeensland), "SA" (Southern Australia), "TAS" (Tasmania), "VIC" (Victoria) or "WA" (Western Australia)}
+"QLD" (Queensland), "SA" (South Australia), "TAS" (Tasmania), "VIC" (Victoria) or "WA" (Western Australia)}
 \item{REGION}{One of the three geo-regions of the data set: "EAST", "WEST" or "EUCLA"}
 \item{DUPLICATE CODE}{Marker for duplicate samples, for quality control}
 \item{SAMPLEID}{ID of the sample}
@@ -111,7 +83,33 @@ observations and 76 variables:
 \item{\verb{Zn ICP-MS mg/kg 0.9}}{concentration of Zink measured with ICP-MS , detection limit: 0.9 mg/kg }
 \item{\verb{Zr ICP-MS mg/kg 0.2}}{concentration of Zirconium measured with ICP-MS , detection limit: 0.2 mg/kg }#'   \item{LOI CALC mg/kg}{concentration of Loss-on-Ignition, measured by calcination}
 \item{\verb{LOI CALC mg/kg}}{concentration of Loss-On-Ignition measured with Calcination , detection limit: 0.2 mg/kg }#'   \item{LOI CALC mg/kg}{concentration of Loss-on-Ignition, measured by calcination}
-\item{MRB}{obtained from simplifying the major crustal boundaries of {Korsch2015a, Korsch2015b}}
+\item{MRB}{obtained from simplifying the major crustal boundaries of (Korsch2015a, Korsch2015b)}
+}
+}
+\source{
+\url{https://www.ga.gov.au/about/projects/resources/national-geochemical-survey}
+}
+\usage{
+NGSAustralia
+}
+\description{
+A dataset containing the geochemical composition of soil samples covering approx 2/3
+of Australia, at a spatial resolution of 1 sample/5000 $km^2$.
+The original data is published by Geosciences Australia under the Creative
+Commons CC4 Licence + Attribution (CC-BY-SA-4.0).
+The provided data set has additional information and
+some pre-treatment with respect to the one available in the references below. These changes:
+}
+\details{
+\itemize{
+\item Concentrations are all reported as mg/kg, also known as parts per million (ppm). Values below
+detection limit are reported as minus the detection limit, as standardised in package
+"compositions".
+\item The samples were complemented with information about their belonging to one of the
+major crustal blocks (MCB) of Australia.
+\item Easting and Northing coordinates were computed using the Lambert conformal conic projection of
+Australia (earth ellipsoid GRS80; standard parallels: 18S and 36S latitude; central meridian:
+134E longitude).
 }
 }
 \section{License}{

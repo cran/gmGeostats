@@ -11,7 +11,17 @@ setGeneric("predict", function(object,...) standardGeneric("predict"))
 
 
 
+#' Empirical variogram or covariance function 
+#'
+#' Generic function to compute the empirical variogram or covariance function from actual data
+#'
+#' @param object spatial data container, with special methods according to the class  
+#' @param ... further parameters for generic functionality
+#'
+#' @return An empirical variogram for the provided data. 
+#' @importFrom gstat variogram
 #' @export
+#' @family gmEVario functions
 setGeneric("variogram", function(object,...) standardGeneric("variogram"))  
 
 
@@ -40,6 +50,19 @@ setOldClass("genDiag")
 # @include gstatCompatibility.R
 # @include compositionsCompatibility.R
 setOldClass("gmEVario")
+
+
+
+#' Logratio variogram of a compositional data
+#' 
+#' gmGeostats reimplementation of the compositions::logratioVariogram function
+#'
+#' @inheritParams logratioVariogram.default 
+#'
+#' @return a "logratioVariogram" object, or a "logratioVariogramAnisotropy" object
+#' if you provide more than one `azimuth`. See [logratioVariogram()] for details and 
+#' examples.
+#' @export
 setOldClass("logratioVariogram")
 setOldClass("logratioVariogramAnisotropy")
 setOldClass("gstatVariogram")

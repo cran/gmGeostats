@@ -1,4 +1,4 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -62,11 +62,11 @@ theta.gg =
     formula = ~1 # for ordinary (co)kriging
     )
 
-## ---- fig.width=7, fig.height=5-----------------------------------------------
+## ----fig.width=7, fig.height=5------------------------------------------------
 theta.vg = gmGeostats::variogram(theta.gg)
 plot(theta.vg)
 
-## ---- fig.width=7, fig.height=5-----------------------------------------------
+## ----fig.width=7, fig.height=5------------------------------------------------
 theta.md = gstat::vgm(model="Exp", range=1/3, psill=0.1) %>% 
   {gstat::vgm(add.to=., model="Sph", range=3, psill=0.1)}
 theta.gs = fit_lmc(v=theta.vg, g = theta.gg, model = theta.md)
@@ -92,7 +92,7 @@ theta.prds.grid = gsi.gstatCokriging2rmult(theta.prds)
 theta.prds.back = backtransform(theta.prds.grid, as = cdt(Zdtc))
 summary(theta.prds.back)
 
-## ---- fig.width=6, fig.height=8.5---------------------------------------------
+## ----fig.width=6, fig.height=8.5----------------------------------------------
 image_cokriged.circular = function(x, ...){
   class(x) = c("spatialGridRmult", "rmult")
   image_cokriged(x, breaks=40, col=rainbow(10), ...)
@@ -102,7 +102,7 @@ image_cokriged(theta.prds.back, ivar="theta")
 ## -----------------------------------------------------------------------------
 classesToAM("gmSpatialMethodParameters", includeSubclasses = TRUE)
 
-## ---- fig.width=7, fig.height=5-----------------------------------------------
+## ----fig.width=7, fig.height=5------------------------------------------------
 # compute covariogram!
 theta.cvg = gmGeostats::variogram(theta.gg, covariogram=TRUE)
 class(theta.cvg)
@@ -142,7 +142,7 @@ theta.cvg = gmGeostats::variogram(
 # how are the directions structured?
 theta.cvg[theta.cvg$id=="z1", "dir.hor"]
 
-## ---- fig.width=7, fig.height=5-----------------------------------------------
+## ----fig.width=7, fig.height=5------------------------------------------------
 # function doing the recalculations
 recompute_complex_cov_anis = function(cv){
   # split the gstatVariogram structure in the individual vgrams

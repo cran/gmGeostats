@@ -46,7 +46,7 @@ minimal and maximal azimuth defining the azimuth classes to consider, or (b) a v
 }
 \value{
 An empirical variogram for the provided data. NOTE: avoid using directly gsi.* functions! They
-represent either internal functions, or preliminary, not fully-tested functions. Use \code{\link{variogram}} instead.
+represent either internal functions, or preliminary, not fully-tested functions. Use \code{\link[=variogram]{variogram()}} instead.
 }
 \description{
 compute the empirical variogram or covariance function in a 2D case study
@@ -70,6 +70,7 @@ Other gmEVario functions:
 \code{\link{gsi.EVario3D}()},
 \code{\link{ndirections}()},
 \code{\link{plot.gmEVario}()},
-\code{\link{variogramModelPlot}()}
+\code{\link{variogramModelPlot}()},
+\code{\link{variogram}()}
 }
 \concept{gmEVario functions}

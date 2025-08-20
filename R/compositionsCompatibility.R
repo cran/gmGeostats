@@ -26,7 +26,9 @@
 #' vg = logratioVariogram(data=Zc, loc=X, azimuth=c(0,90))
 #' class(vg)
 #' summary(vg)
-logratioVariogram <- function(data, ...) UseMethod("logratioVariogram", data)
+logratioVariogram <- function(data, ...){
+  UseMethod("logratioVariogram", data)
+} 
 
 
 #' @describeIn logratioVariogram Empirical logratio variogram calculation

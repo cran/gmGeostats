@@ -239,7 +239,12 @@ gsi.DrawCircle = function(x, y, r.in,
 #### general internal functions -------------------------------
 
 gsi.powM <- function(A,alpha=1/2) {
-  with(svd(A),u%*%diag(d^alpha)%*%t(v))
+  if(length(A)==1){
+    aa = A^alpha
+    dim(aa) = dim(A)
+    return(aa)
+  }
+  with(svd(A), u %*% diag(d^alpha) %*% t(v))
 }
 
 

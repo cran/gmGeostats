@@ -1,5 +1,16 @@
+# gmGeostats 0.11.4
+
+* (2025-08-13) version for CRAN update 
+
+# gmGeostats 0.11.3-9001
+
+* (2025-08-12) all instances of atan2 revised for producing output in the format required (between -pi and +pi or between 0 and 2pi, depending on further usage).
+* (2025-08-12) missing or mismatch braces in some help pages corrected.
+* (2025-08-12) functions from other packages correctly anchored in helpfiles.
+
 # gmGeostats 0.11.3
 
+* (2023-04-17) functions producing multiple plots now restore the graphical parameters to initial state if terminated; minor corrections to help files; stub vignette "Simulating microstructures with gmGeostats" is not packaged any more with gmGeostats to CRAN, but can be found here (until it is finished)   
 * (2023-04-13) batch of hidden methods exported to the namespace (mostly for `as.*()` functions converting between different representations of empirical variograms and of geostatistical models)
 * (2023-04-04) C routines called as symbols and not name strings; non-ASCII characters removed
 

@@ -27,7 +27,7 @@
 # define FCONE
 #endif
 
-#define maxIntervals 1000
+#define maxIntervals 10000
 short int binBuf[maxIntervals];
 double doubleBuf[maxIntervals];
 /* int intBuf[maxIntervals];*/

@@ -25,7 +25,7 @@
 
 \item{col}{colors to be used for plotting}
 
-\item{type}{type of representation, see \code{\link[graphics:plot]{graphics::plot()}}}
+\item{type}{type of representation, see \code{\link[graphics:plot.default]{graphics::plot()}}}
 
 \item{V}{optionally, a matrix of logcontrasts, or else one of the following strings: "alr", "ilr" or "clr";
 to produce a plot of the empirical variogram in the corresponding representation; default to variation-variograms}

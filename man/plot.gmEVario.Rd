@@ -72,6 +72,7 @@ Other gmEVario functions:
 \code{\link{gsi.EVario2D}()},
 \code{\link{gsi.EVario3D}()},
 \code{\link{ndirections}()},
-\code{\link{variogramModelPlot}()}
+\code{\link{variogramModelPlot}()},
+\code{\link{variogram}()}
 }
 \concept{gmEVario functions}

@@ -17,7 +17,7 @@
 #' 134E longitude).  
 #'
 #'
-#'#' @format A tibble, a data set of compound class c("tbl_df", "tbl", "data.frame") with 5259 
+#' @format A tibble, a data set of compound class c("tbl_df", "tbl", "data.frame") with 5259 
 #' observations and 76 variables:
 #' \describe{
 #'   \item{ORDER}{Entry order}
@@ -28,7 +28,7 @@
 #'   \item{LATITUDE}{Latitude of the sampling site}
 #'   \item{LONGITUDE}{Longitude of the sampling site}
 #'   \item{STATE}{State of the sampling site, one of: "NWS" (New South Wales), "NT" (Northern Territory), 
-#'   "QLD" (Qeensland), "SA" (Southern Australia), "TAS" (Tasmania), "VIC" (Victoria) or "WA" (Western Australia)}
+#'   "QLD" (Queensland), "SA" (South Australia), "TAS" (Tasmania), "VIC" (Victoria) or "WA" (Western Australia)}
 #'   \item{REGION}{One of the three geo-regions of the data set: "EAST", "WEST" or "EUCLA"}
 #'   \item{DUPLICATE CODE}{Marker for duplicate samples, for quality control}
 #'   \item{SAMPLEID}{ID of the sample}
@@ -95,7 +95,7 @@
 #'   \item{`Zn ICP-MS mg/kg 0.9`}{concentration of Zink measured with ICP-MS , detection limit: 0.9 mg/kg }
 #'   \item{`Zr ICP-MS mg/kg 0.2`}{concentration of Zirconium measured with ICP-MS , detection limit: 0.2 mg/kg }#'   \item{LOI CALC mg/kg}{concentration of Loss-on-Ignition, measured by calcination}
 #'   \item{`LOI CALC mg/kg`}{concentration of Loss-On-Ignition measured with Calcination , detection limit: 0.2 mg/kg }#'   \item{LOI CALC mg/kg}{concentration of Loss-on-Ignition, measured by calcination}
-#'   \item{MRB}{obtained from simplifying the major crustal boundaries of {Korsch2015a, Korsch2015b}}
+#'   \item{MRB}{obtained from simplifying the major crustal boundaries of (Korsch2015a, Korsch2015b)}
 #' }
 #'
 #' @section License: CC BY-SA 4.0
@@ -155,7 +155,7 @@
 #' to call it specifying the right directory at `wd`.
 #' 
 #' @details The function is provided due to conflicting licenses. You download the 
-#' data from the server \url{https://www.bgs.ac.uk/gsni/tellus/index.html} at your own
+#' data from the server \url{https://www2.bgs.ac.uk/gsni/tellus/overview/index.html} at your own
 #' accord. Actually a visit to the project data webpage is highly recommended, in particular 
 #' for learning about the QA/QC process of the data acquisition, other data sources 
 #' available and how to use this wealth of data.
@@ -246,7 +246,7 @@
 #' This is a migrated version of the data set to a regular grid, ideal for illustrating
 #' and testing multiple point geostatistical algorithms.
 #' 
-#' @references \url{https://www.bgs.ac.uk/gsni/tellus/index.html}
+#' @references \url{https://www2.bgs.ac.uk/gsni/tellus/overview/index.html}
 #' @importFrom utils download.file 
 #' @export
 #' @examples 

@@ -14,12 +14,12 @@ Colored biplot method for objects of class genDiag}
 \item{choices}{which factors should be represented? vector of 2 indices; defaults to
 c(1,2)}
 
-\item{scale}{deprecated, kept for coherence with \code{link{biplot.princomp}}}
+\item{scale}{deprecated, kept for coherence with \code{link[stats]{biplot.princomp}}}
 
-\item{pc.biplot}{same as the homonimous argument from \code{link{biplot.princomp}}:
+\item{pc.biplot}{same as the same name argument from \code{link[stats]{biplot.princomp}}:
 boolean, to scale variables down by sqrt(n) and observations up by the same factor.}
 
-\item{...}{further arguments to \code{\link{coloredBiplot}}}
+\item{...}{further arguments to \code{\link[compositions]{coloredBiplot}}}
 }
 \value{
 nothing. Function is called exclusively to produce the plot

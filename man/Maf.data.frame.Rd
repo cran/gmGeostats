@@ -62,10 +62,10 @@ RJD(x, ...)
 \item{vg}{empirical variogram, of a kind fitting to the data provided}
 
 \item{i}{a slicer for the variogram, typically this will be one or more indices of
-the lag distance to take. \%For other options see code{getEmpVariogramSlice}.}
+the lag distance to take.}
 }
 \value{
-An object extending \code{c("princomp.CLASSOF(x)",}"\code{\link{princomp}}")
+An object extending \code{c("princomp.CLASSOF(x)",}"\code{\link[stats]{princomp}}")
 with classes "\code{genDiag}", and an extra class argument depending on the
 diagonalisation method chosen.
 
@@ -111,10 +111,10 @@ elements
 \describe{
 \item{sdev}{contrary to the output in PCA, this contains the square root of the
 metric variance of the predictions obtained for each individual factor; this is the
-quantity needed for \code{\link{screeplot}} to create plots of explained variance
+quantity needed for \code{\link[stats]{screeplot}} to create plots of explained variance
 by factor}
 \item{loadings}{matrix of contributions of each (cdt-transformed) original variable to the new factors}
-\item{center}{center of the data set (eventually, represented through \code{\link{cdt}}),
+\item{center}{center of the data set (eventually, represented through \code{\link[compositions]{cdt}}),
 in compositional methods}
 \item{scale}{the scalings applied to each original variable}
 \item{n.obs}{number of observations}
@@ -129,7 +129,7 @@ and additionally some of the following arguments, in different order
 each column of this matrix can be understood as a composition on itself}
 \item{DownInvLoadings}{compositional methods return here the clr-backtransformed "minus inverse loadings", so that
 each column of this matrix can be understood as a composition on itself; details in
-\code{\link{princomp.acomp}} }
+\code{\link[compositions]{princomp.acomp}} }
 \item{C1, C2}{Maf returns the two matrices that were diagonalised}
 \item{eigenvalues}{Maf returns the generalized eigenvalues of the diagonalisation of C1 and C2}
 \item{gof}{UWEDGE returns the values of the goodness of fit criterion across sweeps}
